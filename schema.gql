@@ -2,6 +2,46 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type User {
+  id: String!
+  email: String!
+  username: String
+  fullname: String!
+}
+
+type PaginatedUsers {
+  items: [User!]!
+  totalCount: Int!
+  page: Int!
+  limit: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
 type Query {
   hello: String!
+  users: [User!]!
+  paginatedUsers(page: Int! = 1, limit: Int! = 10): PaginatedUsers!
+  user(id: String!): User!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
+  removeUser(id: String!): User!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+  username: String
+  fullname: String!
+}
+
+input UpdateUserInput {
+  email: String
+  password: String
+  username: String
+  fullname: String
 }
