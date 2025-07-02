@@ -7,8 +7,8 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { User } from '@prisma/client';
-import { PaginatedUsers } from './dto/paginated-users.response.ts';
 import * as bcrypt from 'bcrypt';
+import { ADMIN_ID } from 'src/common/constants';
 
 @Injectable()
 export class UsersService {
@@ -29,6 +29,7 @@ export class UsersService {
       data: {
         ...input,
         password: hashedPassword,
+        createdById: ADMIN_ID,
       },
     });
   }
@@ -37,7 +38,7 @@ export class UsersService {
     return this.prisma.user.findMany();
   }
 
-  async findAllPaginated(page: number, limit: number): Promise<PaginatedUsers> {
+  async findAllPaginated(page: number, limit: number) {
     const skip = (page - 1) * limit;
 
     const [items, totalCount] = await this.prisma.$transaction([

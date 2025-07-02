@@ -22,4 +22,90 @@ model User {
   password String
   username String?
   fullname String
+
+  // FK
+
+  // BelongsTo 
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  createdById String?
+  createdBy   User?    @relation("CreatedByUser", fields: [createdById], references: [id])
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   User?    @relation("UpdatedByUser", fields: [updatedById], references: [id])
+
+  deletedAt   DateTime?
+  deletedById String?
+  deletedBy   User?     @relation("DeletedByUser", fields: [deletedById], references: [id])
+
+  // HasMany
+  createdUser    User[]     @relation("CreatedByUser")
+  updatedUser    User[]     @relation("UpdatedByUser")
+  deletedUser    User[]     @relation("DeletedByUser")
+  createProvince Province[] @relation("CreatedByUser")
+  updateProvince Province[] @relation("UpdatedByUser")
+  deleteProvince Province[] @relation("DeletedByUser")
+  createWard    Ward[]     @relation("CreatedByUser")
+  updateWard     Ward[]     @relation("UpdatedByUser")
+  deleteWard     Ward[]     @relation("DeletedByUser")
+}
+
+model Province {
+  // ID
+  id String @id @default(uuid())
+
+  // Basic
+  provinceCode String @unique
+  name         String
+  shortName    String
+  code         String
+  placeType    String
+  country      String
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  createdById String?
+  createdBy   User?    @relation("CreatedByUser", fields: [createdById], references: [id])
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   User?    @relation("UpdatedByUser", fields: [updatedById], references: [id])
+
+  deletedAt   DateTime?
+  deletedById String?
+  deletedBy   User?     @relation("DeletedByUser", fields: [deletedById], references: [id])
+
+  // HasMany
+  wards Ward[]
+}
+
+model Ward {
+  // ID
+  id String @id @default(uuid())
+
+  // Basic
+  wardCode     String @unique
+  name         String
+  provinceCode String
+
+  // FK
+  provinceId String
+
+  // BelongsTo 
+  province Province @relation(fields: [provinceId], references: [id])
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  createdById String?
+  createdBy   User?    @relation("CreatedByUser", fields: [createdById], references: [id])
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   User?    @relation("UpdatedByUser", fields: [updatedById], references: [id])
+
+  deletedAt   DateTime?
+  deletedById String?
+  deletedBy   User?     @relation("DeletedByUser", fields: [deletedById], references: [id])
 }

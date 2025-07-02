@@ -19,11 +19,56 @@ type PaginatedUsers {
   hasPrevPage: Boolean!
 }
 
+type Ward {
+  id: String!
+  wardCode: String!
+  name: String!
+  provinceCode: String!
+  province: Province
+}
+
+type Province {
+  id: String!
+  provinceCode: String!
+  name: String!
+  shortName: String!
+  code: String!
+  placeType: String!
+  country: String!
+  wards: [Ward!]
+}
+
+type PaginatedProvinces {
+  items: [Province!]!
+  totalCount: Int!
+  page: Int!
+  limit: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+type PaginatedWards {
+  items: [Ward!]!
+  totalCount: Int!
+  page: Int!
+  limit: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
 type Query {
   hello: String!
   users: [User!]!
   paginatedUsers(page: Int! = 1, limit: Int! = 10): PaginatedUsers!
   user(id: String!): User!
+  provinces: [Province!]!
+  paginatedProvinces(page: Int! = 1, limit: Int! = 10): PaginatedProvinces!
+  province(id: String!): Province!
+  wards: [Ward!]!
+  paginatedWards(page: Int! = 1, limit: Int! = 10): PaginatedWards!
+  ward(id: String!): Ward!
 }
 
 type Mutation {
