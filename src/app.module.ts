@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ProvincesModule } from './provinces/provinces.module';
 import { WardsModule } from './wards/wards.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { WardsModule } from './wards/wards.module';
     UsersModule,
     ProvincesModule,
     WardsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
