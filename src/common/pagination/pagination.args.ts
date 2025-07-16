@@ -1,6 +1,6 @@
 // src/common/pagination/pagination.args.ts
 import { ArgsType, Field, Int } from '@nestjs/graphql';
-import { Min } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, Min } from 'class-validator';
 
 @ArgsType()
 export class PaginationArgs {
@@ -9,6 +9,16 @@ export class PaginationArgs {
   page: number = 1;
 
   @Field(() => Int, { defaultValue: 10 })
-  @Min(1, { message: 'Limit must be >= 1' })
+  @Min(0, { message: 'Limit must be >= 0' })
   limit: number = 10;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isDeleted?: boolean;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  search?: string;
 }

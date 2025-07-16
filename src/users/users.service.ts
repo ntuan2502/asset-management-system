@@ -52,12 +52,14 @@ export class UsersService {
 
     return {
       items,
-      totalCount,
-      page,
-      limit,
-      totalPages,
-      hasNextPage: page < totalPages,
-      hasPrevPage: page > 1,
+      pagination: {
+        totalCount,
+        page,
+        limit,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
     };
   }
 
@@ -74,9 +76,8 @@ export class UsersService {
   }
 
   async update(id: string, input: UpdateUserInput): Promise<User> {
-    const user = await this.findOne(id); // để kiểm tra tồn tại
+    const user = await this.findOne(id);
 
-    // Nếu cập nhật email, kiểm tra email mới có bị trùng không
     if (input.email && input.email !== user.email) {
       const emailTaken = await this.prisma.user.findUnique({
         where: { email: input.email },
@@ -94,7 +95,7 @@ export class UsersService {
   }
 
   async remove(id: string): Promise<User> {
-    await this.findOne(id); // kiểm tra tồn tại
+    await this.findOne(id);
     return this.prisma.user.delete({ where: { id } });
   }
 }
