@@ -5,9 +5,10 @@ import { CreateUserHandler } from 'src/1_application/user/commands/handlers/crea
 import { PrismaService } from 'src/3_infrastructure/persistence/prisma/prisma.service';
 import { PrismaUserRepository } from 'src/3_infrastructure/persistence/prisma/repositories/prisma-user.repository';
 import { USER_REPOSITORY } from './repositories/user.repository.interface';
+import { GetUserByIdHandler } from 'src/1_application/user/queries/handlers/get-user-by-id.handler'; // << IMPORT
 
 const commandHandlers = [CreateUserHandler];
-const queryHandlers = []; // Sẽ thêm sau
+const queryHandlers = [GetUserByIdHandler]; // << THÊM HANDLER VÀO ĐÂY
 const repositories = [
   {
     provide: USER_REPOSITORY,
@@ -21,9 +22,8 @@ const repositories = [
     UserResolver,
     PrismaService,
     ...commandHandlers,
-    ...queryHandlers,
+    ...queryHandlers, // << ĐĂNG KÝ
     ...repositories,
   ],
-  exports: [],
 })
 export class UserModule {}

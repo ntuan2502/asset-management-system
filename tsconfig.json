@@ -9,7 +9,12 @@
     "target": "ES2023",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
+    // --- THÊM CÁC DÒNG NÀY ---
+    "baseUrl": "./", // Đặt thư mục gốc là thư mục hiện tại
+    "paths": {
+      "src/*": ["src/*"] // Tạo một bí danh: bất cứ gì bắt đầu bằng "src/" sẽ được map tới thư mục "src/" thật
+    },
+    // -------------------------
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
