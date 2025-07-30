@@ -4,16 +4,18 @@ import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AppResolver } from './app.resolver';
-import { PrismaModule } from './prisma/prisma.module';
+import { UserModule } from './2_domain/user/user.module';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      playground: true,
       autoSchemaFile: 'schema.gql',
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      playground: false,
     }),
-    PrismaModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
