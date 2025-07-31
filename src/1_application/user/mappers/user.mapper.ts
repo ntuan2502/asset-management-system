@@ -10,6 +10,8 @@ export class UserMapper {
     domainUser.lastName = prismaUser.lastName;
     domainUser.dob = prismaUser.dob;
     domainUser.gender = prismaUser.gender;
+    domainUser.createdAt = prismaUser.createdAt; // << THÊM MỚI
+    domainUser.updatedAt = prismaUser.updatedAt; // << THÊM MỚI
     return domainUser;
   }
 

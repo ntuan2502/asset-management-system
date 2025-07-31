@@ -5,6 +5,7 @@ import { CreateUserCommand } from 'src/1_application/user/commands/impl/create-u
 import { UserType } from './user.type'; // << Tạo file riêng cho UserType
 import { GetUserByIdQuery } from 'src/1_application/user/queries/impl/get-user-by-id.query'; // << Import Query
 import { GetAllUsersQuery } from 'src/1_application/user/queries/impl/get-all-users.query';
+import { DeleteUserCommand } from 'src/1_application/user/commands/impl/delete-user.command';
 
 @Resolver(() => UserType)
 export class UserResolver {
@@ -30,5 +31,14 @@ export class UserResolver {
   @Query(() => [UserType], { name: 'users' }) // Lưu ý kiểu trả về là một mảng [UserType]
   async getAllUsers(): Promise<UserType[]> {
     return this.queryBus.execute(new GetAllUsersQuery());
+  }
+
+  // --- THÊM MỚI ---
+  @Mutation(() => Boolean) // Trả về true nếu thành công
+  async deleteUser(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    await this.commandBus.execute(new DeleteUserCommand(id));
+    return true;
   }
 }

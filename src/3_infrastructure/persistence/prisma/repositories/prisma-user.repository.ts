@@ -19,19 +19,45 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async findById(id: string): Promise<UserAggregate | null> {
-    const prismaUser = await this.prisma.user.findUnique({ where: { id } });
+    const prismaUser = await this.prisma.user.findFirst({
+      // Sửa thành findFirst
+      where: {
+        id,
+        deletedAt: null, // << THÊM ĐIỀU KIỆN
+      },
+    });
     return prismaUser ? UserMapper.toDomain(prismaUser) : null; // << SỬ DỤNG MAPPER
   }
 
   async findByEmail(email: string): Promise<UserAggregate | null> {
-    const prismaUser = await this.prisma.user.findUnique({ where: { email } });
+    const prismaUser = await this.prisma.user.findFirst({
+      // Sửa thành findFirst
+      where: {
+        email,
+        deletedAt: null, // << THÊM ĐIỀU KIỆN
+      },
+    });
     return prismaUser ? UserMapper.toDomain(prismaUser) : null; // << SỬ DỤNG MAPPER
   }
 
   // --- THÊM MỚI ---
   async findAll(): Promise<UserAggregate[]> {
-    const prismaUsers = await this.prisma.user.findMany();
+    const prismaUsers = await this.prisma.user.findMany({
+      where: {
+        deletedAt: null, // << THÊM ĐIỀU KIỆN
+      },
+    });
     // Dùng mapper để chuyển đổi một mảng các đối tượng Prisma thành mảng Aggregate
     return prismaUsers.map((prismaUser) => UserMapper.toDomain(prismaUser));
+  }
+
+  // --- THÊM MỚI ---
+  async softDelete(id: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id },
+      data: {
+        deletedAt: new Date(), // Cập nhật trường deletedAt thành thời gian hiện tại
+      },
+    });
   }
 }

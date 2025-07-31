@@ -6,4 +6,6 @@ export class UserAggregate {
   lastName: string;
   dob: Date | null; // Cập nhật kiểu dữ liệu cho đúng
   gender: string | null; // Cập nhật kiểu dữ liệu cho đúng
+  createdAt: Date; // << THÊM MỚI
+  updatedAt: Date; // << THÊM MỚI
 }

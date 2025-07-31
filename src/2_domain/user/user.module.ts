@@ -7,9 +7,16 @@ import { PrismaUserRepository } from 'src/3_infrastructure/persistence/prisma/re
 import { USER_REPOSITORY } from './repositories/user.repository.interface';
 import { GetUserByIdHandler } from 'src/1_application/user/queries/handlers/get-user-by-id.handler'; // << IMPORT
 import { GetAllUsersHandler } from 'src/1_application/user/queries/handlers/get-all-users.handler';
+import { DeleteUserHandler } from 'src/1_application/user/commands/handlers/delete-user.handler';
 
-const commandHandlers = [CreateUserHandler];
-const queryHandlers = [GetUserByIdHandler, GetAllUsersHandler]; // << THÊM HANDLER VÀO ĐÂY
+const commandHandlers = [
+  CreateUserHandler,
+  DeleteUserHandler, // << THÊM VÀO ĐÂY
+];
+const queryHandlers = [
+  GetUserByIdHandler,
+  GetAllUsersHandler, // << THÊM HANDLER VÀO ĐÂY
+];
 const repositories = [
   {
     provide: USER_REPOSITORY,
