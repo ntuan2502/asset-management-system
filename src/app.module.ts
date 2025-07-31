@@ -6,6 +6,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AppResolver } from './app.resolver';
 import { UserModule } from './2_domain/user/user.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { EventStoreModule } from './3_infrastructure/event-store/event-store.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
       playground: false,
     }),
     UserModule,
+    EventStoreModule, // << ADD
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
