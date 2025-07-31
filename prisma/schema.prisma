@@ -9,11 +9,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Tạo một enum cho Gender để đảm bảo tính nhất quán
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
+  id        String    @id @default(cuid())
+  email     String    @unique
+  password  String // THÊM MỚI: Lưu trữ mật khẩu đã được hash
   firstName String
   lastName  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  dob       DateTime? // THÊM MỚI: Date of Birth, optional
+  gender    Gender? // THÊM MỚI: Dùng Enum, optional
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // THÊM MỚI: Dùng cho soft delete, optional
 }

@@ -14,7 +14,7 @@ export class GetAllUsersHandler implements IQueryHandler<GetAllUsersQuery> {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async execute(): Promise<UserAggregate[]> {
+  async execute(_query: GetAllUsersQuery): Promise<UserAggregate[]> {
     return this.userRepository.findAll();
   }
 }

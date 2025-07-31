@@ -9,8 +9,11 @@ export class PrismaUserRepository implements IUserRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(user: UserAggregate): Promise<UserAggregate> {
+    // SỬA ĐỔI: Sử dụng mapper để tạo đối tượng data tương thích với Prisma
+    const prismaUserData = UserMapper.toPersistence(user);
+
     const createdPrismaUser = await this.prisma.user.create({
-      data: user,
+      data: prismaUserData, // << Truyền dữ liệu đã được map
     });
     return UserMapper.toDomain(createdPrismaUser); // << SỬ DỤNG MAPPER
   }

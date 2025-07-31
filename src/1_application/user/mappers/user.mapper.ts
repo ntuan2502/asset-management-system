@@ -1,4 +1,4 @@
-import { User as PrismaUser } from '@prisma/client';
+import { Gender, Prisma, User as PrismaUser } from '@prisma/client';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
 
 export class UserMapper {
@@ -8,6 +8,24 @@ export class UserMapper {
     domainUser.email = prismaUser.email;
     domainUser.firstName = prismaUser.firstName;
     domainUser.lastName = prismaUser.lastName;
+    domainUser.dob = prismaUser.dob;
+    domainUser.gender = prismaUser.gender;
     return domainUser;
+  }
+
+  // --- THÊM MỚI ---
+  public static toPersistence(
+    domainUser: UserAggregate,
+  ): Prisma.UserCreateInput {
+    return {
+      id: domainUser.id,
+      email: domainUser.email,
+      password: domainUser.password,
+      firstName: domainUser.firstName,
+      lastName: domainUser.lastName,
+      dob: domainUser.dob,
+      // Chuyển đổi kiểu dữ liệu cho gender một cách an toàn
+      gender: domainUser.gender ? (domainUser.gender as Gender) : null,
+    };
   }
 }
