@@ -6,6 +6,8 @@ import { UserType } from './user.type'; // << Tạo file riêng cho UserType
 import { GetUserByIdQuery } from 'src/1_application/user/queries/impl/get-user-by-id.query'; // << Import Query
 import { GetAllUsersQuery } from 'src/1_application/user/queries/impl/get-all-users.query';
 import { DeleteUserCommand } from 'src/1_application/user/commands/impl/delete-user.command';
+import { UpdateUserInput } from 'src/1_application/user/dtos/update-user.input';
+import { UpdateUserCommand } from 'src/1_application/user/commands/impl/update-user.command';
 
 @Resolver(() => UserType)
 export class UserResolver {
@@ -40,5 +42,15 @@ export class UserResolver {
   ): Promise<boolean> {
     await this.commandBus.execute(new DeleteUserCommand(id));
     return true;
+  }
+
+  // --- THÊM MỚI ---
+  @Mutation(() => UserType) // Trả về UserType để client có thể lấy thông tin mới nhất
+  async updateUser(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateUserInput,
+  ): Promise<UserType> {
+    // Gửi command vào hệ thống và trả về kết quả (đối tượng user đã được cập nhật)
+    return this.commandBus.execute(new UpdateUserCommand(id, input));
   }
 }

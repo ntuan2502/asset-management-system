@@ -2,6 +2,7 @@ import { IEvent } from '@nestjs/cqrs';
 import { StoredEvent } from 'src/3_infrastructure/event-store/event-store.interface';
 import { UserCreatedEvent } from 'src/2_domain/user/events/user-created.event';
 import { UserDeletedEvent } from 'src/2_domain/user/events/user-deleted.event';
+import { UserUpdatedEvent } from 'src/2_domain/user/events/user-updated.event'; // << IMPORT
 
 // Định nghĩa một kiểu cho constructor của các sự kiện
 // Nó là một class có thể được `new` và là một subtype của IEvent
@@ -12,6 +13,7 @@ type EventConstructor = new (...args: any[]) => IEvent;
 const eventConstructors: { [key: string]: EventConstructor } = {
   [UserCreatedEvent.name]: UserCreatedEvent,
   [UserDeletedEvent.name]: UserDeletedEvent,
+  [UserUpdatedEvent.name]: UserUpdatedEvent, // << THÊM DÒNG NÀY
 };
 
 export class EventFactory {

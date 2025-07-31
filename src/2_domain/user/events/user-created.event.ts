@@ -1,15 +1,14 @@
 import { IEvent } from '@nestjs/cqrs';
 
-// Định nghĩa một interface cho payload để có type-safety
 interface UserCreatedPayload {
   id: string;
   email: string;
   hashedPassword: string;
   firstName: string;
   lastName: string;
-  dob?: Date | null; // << THÊM MỚI
-  gender?: string | null; // << THÊM MỚI
-  createdAt: Date; // << THÊM MỚI
+  dob?: Date | null;
+  gender?: string | null;
+  createdAt: Date;
 }
 
 export class UserCreatedEvent implements IEvent {
@@ -18,12 +17,17 @@ export class UserCreatedEvent implements IEvent {
   public readonly hashedPassword: string;
   public readonly firstName: string;
   public readonly lastName: string;
-  public readonly dob?: Date | null; // << THÊM MỚI
-  public readonly gender?: string | null; // << THÊM MỚI
-  public readonly createdAt: Date; // << THÊM MỚI
+  public readonly dob?: Date | null;
+  public readonly gender?: string | null;
+  public readonly createdAt: Date;
 
-  // Constructor giờ đây nhận một đối tượng duy nhất
   constructor(payload: UserCreatedPayload) {
     Object.assign(this, payload);
+    if (this.dob) {
+      this.dob = new Date(this.dob);
+    }
+    if (this.createdAt) {
+      this.createdAt = new Date(this.createdAt);
+    }
   }
 }

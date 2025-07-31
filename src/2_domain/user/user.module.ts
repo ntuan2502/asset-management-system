@@ -10,10 +10,12 @@ import { GetAllUsersHandler } from 'src/1_application/user/queries/handlers/get-
 import { DeleteUserHandler } from 'src/1_application/user/commands/handlers/delete-user.handler';
 import { UserProjector } from 'src/3_infrastructure/projection/user.projector';
 import { EventStoreModule } from 'src/3_infrastructure/event-store/event-store.module'; // << IMPORT
+import { UpdateUserHandler } from 'src/1_application/user/commands/handlers/update-user.handler'; // << IMPORT
 
 const commandHandlers = [
   CreateUserHandler,
   DeleteUserHandler, // << THÊM VÀO ĐÂY
+  UpdateUserHandler, // << THÊM VÀO ĐÂY
 ];
 const queryHandlers = [
   GetUserByIdHandler,

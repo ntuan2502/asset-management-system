@@ -27,6 +27,7 @@ type Query {
 type Mutation {
   createUser(input: CreateUserInput!): User!
   deleteUser(id: ID!): Boolean!
+  updateUser(id: ID!, input: UpdateUserInput!): User!
 }
 
 input CreateUserInput {
@@ -43,4 +44,11 @@ enum GenderEnum {
   MALE
   FEMALE
   OTHER
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  dob: DateTime
+  gender: GenderEnum
 }
