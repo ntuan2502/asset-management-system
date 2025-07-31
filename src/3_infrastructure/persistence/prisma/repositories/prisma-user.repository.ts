@@ -24,4 +24,11 @@ export class PrismaUserRepository implements IUserRepository {
     const prismaUser = await this.prisma.user.findUnique({ where: { email } });
     return prismaUser ? UserMapper.toDomain(prismaUser) : null; // << SỬ DỤNG MAPPER
   }
+
+  // --- THÊM MỚI ---
+  async findAll(): Promise<UserAggregate[]> {
+    const prismaUsers = await this.prisma.user.findMany();
+    // Dùng mapper để chuyển đổi một mảng các đối tượng Prisma thành mảng Aggregate
+    return prismaUsers.map((prismaUser) => UserMapper.toDomain(prismaUser));
+  }
 }

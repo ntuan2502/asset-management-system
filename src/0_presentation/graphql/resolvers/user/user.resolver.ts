@@ -4,6 +4,7 @@ import { CreateUserInput } from 'src/1_application/user/dtos/create-user.input';
 import { CreateUserCommand } from 'src/1_application/user/commands/impl/create-user.command';
 import { UserType } from './user.type'; // << Tạo file riêng cho UserType
 import { GetUserByIdQuery } from 'src/1_application/user/queries/impl/get-user-by-id.query'; // << Import Query
+import { GetAllUsersQuery } from 'src/1_application/user/queries/impl/get-all-users.query';
 
 @Resolver(() => UserType)
 export class UserResolver {
@@ -23,5 +24,11 @@ export class UserResolver {
     @Args('id', { type: () => ID }) id: string,
   ): Promise<UserType | null> {
     return this.queryBus.execute(new GetUserByIdQuery(id));
+  }
+
+  // --- THÊM MỚI ---
+  @Query(() => [UserType], { name: 'users' }) // Lưu ý kiểu trả về là một mảng [UserType]
+  async getAllUsers(): Promise<UserType[]> {
+    return this.queryBus.execute(new GetAllUsersQuery());
   }
 }

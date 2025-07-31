@@ -7,4 +7,5 @@ export interface IUserRepository {
   create(user: UserAggregate): Promise<UserAggregate>;
   findById(id: string): Promise<UserAggregate | null>;
   findByEmail(email: string): Promise<UserAggregate | null>;
+  findAll(): Promise<UserAggregate[]>; // << THÊM DÒNG NÀY
 }
