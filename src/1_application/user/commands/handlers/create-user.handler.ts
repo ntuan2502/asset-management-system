@@ -52,6 +52,8 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       hashedPassword,
       input.firstName,
       input.lastName,
+      input.dob, // << THÊM MỚI
+      input.gender, // << THÊM MỚI
     );
 
     // 5. **Lấy và Lưu Sự kiện vào Event Store**

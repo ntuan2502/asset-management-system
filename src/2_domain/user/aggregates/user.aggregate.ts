@@ -35,6 +35,8 @@ export class UserAggregate extends AggregateRoot {
     hashedPassword: string,
     firstName: string,
     lastName: string,
+    dob?: Date | null,
+    gender?: string | null,
   ) {
     const createdAt = new Date(); // Tạo timestamp tại thời điểm nghiệp vụ xảy ra
     // Phương thức apply() được kế thừa từ AggregateRoot.
@@ -47,6 +49,8 @@ export class UserAggregate extends AggregateRoot {
         hashedPassword,
         firstName,
         lastName,
+        dob,
+        gender,
         createdAt, // << Truyền timestamp vào sự kiện
       }),
     );
@@ -71,6 +75,11 @@ export class UserAggregate extends AggregateRoot {
     this.password = event.hashedPassword;
     this.firstName = event.firstName;
     this.lastName = event.lastName;
+    // SỬA LỖI: Nếu event.dob là undefined, hãy dùng null
+    this.dob = event.dob ?? null;
+
+    // SỬA LỖI: Nếu event.gender là undefined, hãy dùng null
+    this.gender = event.gender ?? null;
     this.createdAt = event.createdAt; // << GÁN GIÁ TRỊ TỪ SỰ KIỆN
     this.updatedAt = event.createdAt; // << Khi mới tạo, updatedAt bằng createdAt
     this.version++;

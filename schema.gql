@@ -34,4 +34,13 @@ input CreateUserInput {
   password: String!
   firstName: String!
   lastName: String!
+  dob: DateTime
+  gender: GenderEnum
+}
+
+"""The gender of the user."""
+enum GenderEnum {
+  MALE
+  FEMALE
+  OTHER
 }

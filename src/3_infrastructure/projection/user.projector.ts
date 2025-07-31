@@ -3,6 +3,7 @@ import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { PrismaService } from 'src/3_infrastructure/persistence/prisma/prisma.service';
 import { UserCreatedEvent } from 'src/2_domain/user/events/user-created.event';
 import { UserDeletedEvent } from 'src/2_domain/user/events/user-deleted.event';
+import { Gender } from '@prisma/client';
 
 // @EventsHandler nhận vào một hoặc nhiều lớp sự kiện mà nó muốn lắng nghe.
 
@@ -32,6 +33,11 @@ export class UserProjector
         password: event.hashedPassword,
         firstName: event.firstName,
         lastName: event.lastName,
+        dob: event.dob, // << THÊM MỚI
+        // SỬA LỖI: Chuyển đổi string thành Gender enum
+        gender: event.gender ? (event.gender as Gender) : null,
+        createdAt: event.createdAt,
+        updatedAt: event.createdAt, // Cập nhật cả updatedAt khi tạo
       },
     });
   }
