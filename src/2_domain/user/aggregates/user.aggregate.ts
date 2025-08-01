@@ -6,6 +6,8 @@ import {
   UserUpdatedPayload,
 } from '../events/user-updated.event'; // << IMPORT SỰ KIỆN MỚI
 import { UpdateUserInput } from 'src/1_application/user/dtos/update-user.input'; // << IMPORT DTO
+import { UserSnapshotDto } from './user-snapshot.dto';
+import { UserRestoredEvent } from '../events/user-restored.event';
 
 export class UserAggregate extends AggregateRoot {
   public id: string;
@@ -18,16 +20,58 @@ export class UserAggregate extends AggregateRoot {
   public createdAt: Date;
   public updatedAt: Date;
   public deletedAt: Date | null = null;
-
   public version = 0;
 
   constructor() {
     super();
   }
 
+  public loadFromSnapshot(snapshot: UserSnapshotDto) {
+    Object.assign(this, snapshot);
+    this.version = snapshot.version;
+  }
+
   public loadFromHistory(history: IEvent[]) {
     history.forEach((event) => this.apply(event, true));
-    this.version = history.length;
+  }
+
+  protected onUserCreatedEvent(event: UserCreatedEvent) {
+    this.id = event.id;
+    this.email = event.email;
+    this.password = event.hashedPassword;
+    this.firstName = event.firstName;
+    this.lastName = event.lastName;
+    this.dob = event.dob ?? null;
+    this.gender = event.gender ?? null;
+    this.createdAt = event.createdAt;
+    this.updatedAt = event.createdAt;
+  }
+
+  protected onUserUpdatedEvent(event: UserUpdatedEvent) {
+    if (event.firstName !== undefined) {
+      this.firstName = event.firstName;
+    }
+    if (event.lastName !== undefined) {
+      this.lastName = event.lastName;
+    }
+    if (event.dob !== undefined) {
+      this.dob = event.dob;
+    }
+    if (event.gender !== undefined) {
+      this.gender = event.gender;
+    }
+    this.updatedAt = event.updatedAt;
+  }
+
+  protected onUserDeletedEvent(_event: UserDeletedEvent) {
+    this.deletedAt = new Date();
+  }
+
+  protected onUserRestoredEvent(event: UserRestoredEvent) {
+    // Hành động chính là set deletedAt về null
+    this.deletedAt = null;
+    // Cập nhật lại updatedAt
+    this.updatedAt = event.restoredAt;
   }
 
   public createUser(
@@ -96,40 +140,15 @@ export class UserAggregate extends AggregateRoot {
 
   public deleteUser() {
     if (this.deletedAt) {
-      return;
+      throw new Error('Cannot delete a user that has already been deleted.');
     }
     this.apply(new UserDeletedEvent({ id: this.id }));
   }
 
-  protected onUserCreatedEvent(event: UserCreatedEvent) {
-    this.id = event.id;
-    this.email = event.email;
-    this.password = event.hashedPassword;
-    this.firstName = event.firstName;
-    this.lastName = event.lastName;
-    this.dob = event.dob ?? null;
-    this.gender = event.gender ?? null;
-    this.createdAt = event.createdAt;
-    this.updatedAt = event.createdAt;
-  }
-
-  protected onUserUpdatedEvent(event: UserUpdatedEvent) {
-    if (event.firstName !== undefined) {
-      this.firstName = event.firstName;
+  public restore() {
+    if (!this.deletedAt) {
+      throw new Error('Cannot restore an active user.');
     }
-    if (event.lastName !== undefined) {
-      this.lastName = event.lastName;
-    }
-    if (event.dob !== undefined) {
-      this.dob = event.dob;
-    }
-    if (event.gender !== undefined) {
-      this.gender = event.gender;
-    }
-    this.updatedAt = event.updatedAt;
-  }
-
-  protected onUserDeletedEvent(_event: UserDeletedEvent) {
-    this.deletedAt = new Date();
+    this.apply(new UserRestoredEvent({ id: this.id, restoredAt: new Date() }));
   }
 }

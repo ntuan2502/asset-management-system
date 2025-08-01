@@ -5,39 +5,44 @@ import { CreateUserHandler } from 'src/1_application/user/commands/handlers/crea
 import { PrismaService } from 'src/3_infrastructure/persistence/prisma/prisma.service';
 import { PrismaUserRepository } from 'src/3_infrastructure/persistence/prisma/repositories/prisma-user.repository';
 import { USER_REPOSITORY } from './repositories/user.repository.interface';
-import { GetUserByIdHandler } from 'src/1_application/user/queries/handlers/get-user-by-id.handler'; // << IMPORT
+import { GetUserByIdHandler } from 'src/1_application/user/queries/handlers/get-user-by-id.handler';
 import { GetAllUsersHandler } from 'src/1_application/user/queries/handlers/get-all-users.handler';
 import { DeleteUserHandler } from 'src/1_application/user/commands/handlers/delete-user.handler';
 import { UserProjector } from 'src/3_infrastructure/projection/user.projector';
-import { EventStoreModule } from 'src/3_infrastructure/event-store/event-store.module'; // << IMPORT
-import { UpdateUserHandler } from 'src/1_application/user/commands/handlers/update-user.handler'; // << IMPORT
+import { EventStoreModule } from 'src/3_infrastructure/event-store/event-store.module';
+import { UpdateUserHandler } from 'src/1_application/user/commands/handlers/update-user.handler';
+import { SnapshotStoreModule } from 'src/3_infrastructure/snapshot-store/snapshot-store.module';
+import { AggregateRepository } from './repositories/aggregate.repository';
+import { SnapshotterService } from 'src/3_infrastructure/snapshot-store/snapshotter.service';
+import { RestoreUserHandler } from 'src/1_application/user/commands/handlers/restore-user.handler';
 
 const commandHandlers = [
   CreateUserHandler,
-  DeleteUserHandler, // << THÊM VÀO ĐÂY
-  UpdateUserHandler, // << THÊM VÀO ĐÂY
+  DeleteUserHandler,
+  UpdateUserHandler,
+  RestoreUserHandler,
 ];
-const queryHandlers = [
-  GetUserByIdHandler,
-  GetAllUsersHandler, // << THÊM HANDLER VÀO ĐÂY
-];
+const queryHandlers = [GetUserByIdHandler, GetAllUsersHandler];
 const repositories = [
   {
     provide: USER_REPOSITORY,
     useClass: PrismaUserRepository,
   },
+  AggregateRepository,
 ];
-const projectors = [UserProjector]; // << TẠO MỘT MẢNG CHO RÕ RÀNG
+const projectors = [UserProjector];
+const sagas = [SnapshotterService];
 
 @Module({
-  imports: [CqrsModule, EventStoreModule],
+  imports: [CqrsModule, EventStoreModule, SnapshotStoreModule],
   providers: [
     UserResolver,
     PrismaService,
     ...commandHandlers,
-    ...queryHandlers, // << ĐĂNG KÝ
+    ...queryHandlers,
     ...repositories,
-    ...projectors, // << ĐĂNG KÝ VÀO ĐÂY
+    ...projectors,
+    ...sagas,
   ],
 })
 export class UserModule {}

@@ -30,7 +30,6 @@ model User {
   deletedAt DateTime? // THÊM MỚI: Dùng cho soft delete, optional
 }
 
-// --- THÊM MỚI ---
 // Model để lưu trữ các sự kiện một cách bất biến (append-only)
 model Event {
   id            String   @id @default(cuid())
@@ -44,5 +43,16 @@ model Event {
   // Đảm bảo mỗi phiên bản của một aggregate là duy nhất, ngăn chặn race condition
   @@unique([aggregateId, version])
   // Tăng tốc độ truy vấn các sự kiện cho một aggregate
+  @@index([aggregateId])
+}
+
+model Snapshot {
+  id            String @id @default(cuid())
+  aggregateId   String // ID của đối tượng (vd: userId)
+  aggregateType String // Loại đối tượng (vd: "User")
+  version       Int // Phiên bản của aggregate tại thời điểm snapshot
+  payload       Json // Toàn bộ trạng thái của aggregate dưới dạng JSON
+
+  @@unique([aggregateId, version]) // Đảm bảo snapshot cho một version là duy nhất
   @@index([aggregateId])
 }

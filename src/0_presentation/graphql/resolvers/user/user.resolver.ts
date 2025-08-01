@@ -1,27 +1,22 @@
 import { Args, Mutation, Resolver, Query, ID } from '@nestjs/graphql';
-import { CommandBus, QueryBus } from '@nestjs/cqrs'; // << Thêm QueryBus
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserInput } from 'src/1_application/user/dtos/create-user.input';
 import { CreateUserCommand } from 'src/1_application/user/commands/impl/create-user.command';
-import { UserType } from './user.type'; // << Tạo file riêng cho UserType
-import { GetUserByIdQuery } from 'src/1_application/user/queries/impl/get-user-by-id.query'; // << Import Query
+import { UserType } from './user.type';
+import { GetUserByIdQuery } from 'src/1_application/user/queries/impl/get-user-by-id.query';
 import { GetAllUsersQuery } from 'src/1_application/user/queries/impl/get-all-users.query';
 import { DeleteUserCommand } from 'src/1_application/user/commands/impl/delete-user.command';
 import { UpdateUserInput } from 'src/1_application/user/dtos/update-user.input';
 import { UpdateUserCommand } from 'src/1_application/user/commands/impl/update-user.command';
+import { RestoreUserCommand } from 'src/1_application/user/commands/impl/restore-user.command';
 
 @Resolver(() => UserType)
 export class UserResolver {
   constructor(
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus, // << Inject QueryBus
+    private readonly queryBus: QueryBus,
   ) {}
 
-  @Mutation(() => UserType)
-  async createUser(@Args('input') input: CreateUserInput): Promise<UserType> {
-    return this.commandBus.execute(new CreateUserCommand(input));
-  }
-
-  // --- THÊM MỚI ---
   @Query(() => UserType, { name: 'user', nullable: true })
   async getUserById(
     @Args('id', { type: () => ID }) id: string,
@@ -29,14 +24,24 @@ export class UserResolver {
     return this.queryBus.execute(new GetUserByIdQuery(id));
   }
 
-  // --- THÊM MỚI ---
-  @Query(() => [UserType], { name: 'users' }) // Lưu ý kiểu trả về là một mảng [UserType]
+  @Query(() => [UserType], { name: 'users' })
   async getAllUsers(): Promise<UserType[]> {
     return this.queryBus.execute(new GetAllUsersQuery());
   }
 
-  // --- THÊM MỚI ---
-  @Mutation(() => Boolean) // Trả về true nếu thành công
+  @Mutation(() => UserType)
+  async createUser(@Args('input') input: CreateUserInput): Promise<UserType> {
+    return this.commandBus.execute(new CreateUserCommand(input));
+  }
+
+  @Mutation(() => UserType)
+  async updateUser(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateUserInput,
+  ): Promise<UserType> {
+    return this.commandBus.execute(new UpdateUserCommand(id, input));
+  }
+  @Mutation(() => Boolean)
   async deleteUser(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -44,13 +49,11 @@ export class UserResolver {
     return true;
   }
 
-  // --- THÊM MỚI ---
-  @Mutation(() => UserType) // Trả về UserType để client có thể lấy thông tin mới nhất
-  async updateUser(
+  @Mutation(() => Boolean)
+  async restoreUser(
     @Args('id', { type: () => ID }) id: string,
-    @Args('input') input: UpdateUserInput,
-  ): Promise<UserType> {
-    // Gửi command vào hệ thống và trả về kết quả (đối tượng user đã được cập nhật)
-    return this.commandBus.execute(new UpdateUserCommand(id, input));
+  ): Promise<boolean> {
+    await this.commandBus.execute(new RestoreUserCommand(id));
+    return true;
   }
 }
