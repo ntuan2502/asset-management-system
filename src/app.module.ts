@@ -17,7 +17,7 @@ import { EventStoreModule } from './3_infrastructure/event-store/event-store.mod
       playground: false,
     }),
     UserModule,
-    EventStoreModule, // << ADD
+    EventStoreModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
