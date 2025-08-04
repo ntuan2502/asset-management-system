@@ -5,12 +5,12 @@ import {
   IEventStore,
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
-import { AggregateRepository } from 'src/2_domain/user/repositories/aggregate.repository';
+import { UserAggregateRepository } from 'src/2_domain/user/repositories/user-aggregate.repository';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   constructor(
-    private readonly aggregateRepository: AggregateRepository,
+    private readonly aggregateRepository: UserAggregateRepository,
     @Inject(EVENT_STORE_SERVICE)
     private readonly eventStore: IEventStore,
   ) {}
@@ -18,7 +18,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   async execute(command: DeleteUserCommand): Promise<void> {
     const { id } = command;
 
-    const user = await this.aggregateRepository.loadUserAggregate(id);
+    const user = await this.aggregateRepository.findById(id);
     if (!user.id) {
       throw new NotFoundException(`User with ID "${id}" not found.`);
     }

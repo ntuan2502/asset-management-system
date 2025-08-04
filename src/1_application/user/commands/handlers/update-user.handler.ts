@@ -6,12 +6,12 @@ import {
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
-import { AggregateRepository } from 'src/2_domain/user/repositories/aggregate.repository';
+import { UserAggregateRepository } from 'src/2_domain/user/repositories/user-aggregate.repository';
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   constructor(
-    private readonly aggregateRepository: AggregateRepository,
+    private readonly aggregateRepository: UserAggregateRepository,
     @Inject(EVENT_STORE_SERVICE)
     private readonly eventStore: IEventStore,
   ) {}
@@ -19,7 +19,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
   async execute(command: UpdateUserCommand): Promise<UserAggregate> {
     const { id, payload } = command;
 
-    const user = await this.aggregateRepository.loadUserAggregate(id);
+    const user = await this.aggregateRepository.findById(id);
     if (!user.id) {
       throw new NotFoundException(`User with ID "${id}" not found.`);
     }

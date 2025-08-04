@@ -4,10 +4,8 @@ import * as bcrypt from 'bcrypt';
 import {
   IUserRepository,
   USER_REPOSITORY,
+  UserWithPermissions,
 } from 'src/2_domain/user/repositories/user.repository.interface';
-import { UserSnapshotDto } from 'src/2_domain/user/aggregates/user-snapshot.dto'; // << IMPORT DTO
-
-type LoginUserDto = Omit<UserSnapshotDto, 'password'>;
 
 @Injectable()
 export class AuthService {
@@ -20,18 +18,21 @@ export class AuthService {
   async validateUser(
     email: string,
     pass: string,
-  ): Promise<LoginUserDto | null> {
-    const user = await this.userRepository.findByEmail(email);
+  ): Promise<UserWithPermissions | null> {
+    const user = await this.userRepository.findWithPermissionsByEmail(email);
 
     if (user && user.password && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
-      return result;
+      return result as UserWithPermissions;
     }
     return null;
   }
 
-  login(user: LoginUserDto) {
-    const payload = { email: user.email, sub: user.id };
+  login(user: UserWithPermissions) {
+    const payload = {
+      sub: user.id,
+      permissions: user.permissions,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };

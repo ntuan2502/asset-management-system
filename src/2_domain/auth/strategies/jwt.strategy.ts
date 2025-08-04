@@ -5,8 +5,14 @@ import { ConfigService } from '@nestjs/config';
 import {
   IUserRepository,
   USER_REPOSITORY,
+  UserWithPermissions,
 } from 'src/2_domain/user/repositories/user.repository.interface';
-import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
+import { AppPermission } from '../constants/app-permissions';
+
+interface JwtPayload {
+  sub: string;
+  permissions: AppPermission[];
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -30,14 +36,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: {
-    sub: string;
-    email: string;
-  }): Promise<UserAggregate> {
+  async validate(payload: JwtPayload): Promise<UserWithPermissions> {
     const user = await this.userRepository.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException();
     }
-    return user;
+    (user as UserWithPermissions).permissions = payload.permissions;
+    return user as UserWithPermissions;
   }
 }

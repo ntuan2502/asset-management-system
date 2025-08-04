@@ -2,7 +2,6 @@ import { Injectable, Inject } from '@nestjs/common';
 import { IEvent, Saga, ofType } from '@nestjs/cqrs';
 import { Observable } from 'rxjs';
 import { mergeMap } from 'rxjs/operators';
-import { AggregateRepository } from 'src/2_domain/user/repositories/aggregate.repository';
 import {
   ISnapshotStore,
   SNAPSHOT_STORE_SERVICE,
@@ -14,6 +13,7 @@ import {
 import { UserCreatedEvent } from 'src/2_domain/user/events/user-created.event';
 import { UserUpdatedEvent } from 'src/2_domain/user/events/user-updated.event';
 import { UserDeletedEvent } from 'src/2_domain/user/events/user-deleted.event';
+import { UserAggregateRepository } from 'src/2_domain/user/repositories/user-aggregate.repository';
 
 // Định nghĩa một kiểu union cho tất cả các sự kiện của User
 type UserEvent = UserCreatedEvent | UserUpdatedEvent | UserDeletedEvent;
@@ -21,7 +21,7 @@ type UserEvent = UserCreatedEvent | UserUpdatedEvent | UserDeletedEvent;
 @Injectable()
 export class SnapshotterService {
   constructor(
-    private readonly aggregateRepository: AggregateRepository,
+    private readonly aggregateRepository: UserAggregateRepository,
     @Inject(SNAPSHOT_STORE_SERVICE)
     private readonly snapshotStore: ISnapshotStore,
     @Inject(SNAPSHOT_STRATEGY)
@@ -39,9 +39,7 @@ export class SnapshotterService {
       // (Tạm thời bỏ qua để đơn giản, sẽ xử lý từng sự kiện một)
       mergeMap(async (event: UserEvent) => {
         // Tải aggregate để có được phiên bản mới nhất
-        const aggregate = await this.aggregateRepository.loadUserAggregate(
-          event.id,
-        );
+        const aggregate = await this.aggregateRepository.findById(event.id);
 
         // Kiểm tra xem có nên tạo snapshot không
         if (this.snapshotStrategy.shouldTakeSnapshot(aggregate.version)) {

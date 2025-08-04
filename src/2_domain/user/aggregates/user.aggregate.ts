@@ -8,6 +8,7 @@ import {
 import { UpdateUserInput } from 'src/1_application/user/dtos/update-user.input'; // << IMPORT DTO
 import { UserSnapshotDto } from './user-snapshot.dto';
 import { UserRestoredEvent } from '../events/user-restored.event';
+import { RoleAssignedToUserEvent } from '../events/role-assigned-to-user.event';
 
 export class UserAggregate extends AggregateRoot {
   public id: string;
@@ -21,6 +22,7 @@ export class UserAggregate extends AggregateRoot {
   public updatedAt: Date;
   public deletedAt: Date | null = null;
   public version = 0;
+  public roleIds: string[] = []; // << THÊM MỚI
 
   constructor() {
     super();
@@ -72,6 +74,15 @@ export class UserAggregate extends AggregateRoot {
     this.deletedAt = null;
     // Cập nhật lại updatedAt
     this.updatedAt = event.restoredAt;
+  }
+
+  protected onRoleAssignedToUserEvent(event: RoleAssignedToUserEvent) {
+    this.roleIds.push(event.roleId);
+    this.updatedAt = event.assignedAt;
+    // Tăng version chỉ khi có sự kiện mới được apply (không phải từ history)
+    if (!this.getUncommittedEvents().some((e) => e === event)) {
+      this.version++;
+    }
   }
 
   public createUser(
@@ -150,5 +161,19 @@ export class UserAggregate extends AggregateRoot {
       throw new Error('Cannot restore an active user.');
     }
     this.apply(new UserRestoredEvent({ id: this.id, restoredAt: new Date() }));
+  }
+
+  public assignRole(roleId: string) {
+    // Quy tắc nghiệp vụ: Không gán lại vai trò đã có
+    if (this.roleIds.includes(roleId)) {
+      return; // Hoặc ném lỗi nếu muốn
+    }
+    this.apply(
+      new RoleAssignedToUserEvent({
+        userId: this.id,
+        roleId: roleId,
+        assignedAt: new Date(),
+      }),
+    );
   }
 }

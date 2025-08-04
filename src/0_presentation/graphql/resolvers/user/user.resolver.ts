@@ -13,6 +13,7 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { CurrentUser } from 'src/2_domain/auth/decorators/current-user.decorator';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
+import { AssignRoleToUserCommand } from 'src/1_application/user/commands/impl/assign-role-to-user.command';
 
 @Resolver(() => UserType)
 export class UserResolver {
@@ -72,5 +73,13 @@ export class UserResolver {
     // `user` ở đây chính là đối tượng UserAggregate đầy đủ
     // đã được trả về từ `validate()` của JwtStrategy.
     return user;
+  }
+
+  @Mutation(() => UserType)
+  async assignRoleToUser(
+    @Args('userId', { type: () => ID }) userId: string,
+    @Args('roleId', { type: () => ID }) roleId: string,
+  ): Promise<UserAggregate> {
+    return this.commandBus.execute(new AssignRoleToUserCommand(userId, roleId));
   }
 }

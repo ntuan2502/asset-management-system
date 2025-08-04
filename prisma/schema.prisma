@@ -28,6 +28,8 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? // THÊM MỚI: Dùng cho soft delete, optional
+
+  roles Role[] @relation("UserRoles")
 }
 
 // Model để lưu trữ các sự kiện một cách bất biến (append-only)
@@ -55,4 +57,24 @@ model Snapshot {
 
   @@unique([aggregateId, version]) // Đảm bảo snapshot cho một version là duy nhất
   @@index([aggregateId])
+}
+
+model Role {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+
+  users User[] @relation("UserRoles")
+
+  permissions Permission[] @relation("RolePermissions")
+}
+
+model Permission {
+  id      String @id @default(cuid())
+  action  String // vd: "create", "read", "update", "delete"
+  subject String // vd: "Asset", "User"
+
+  roles Role[] @relation("RolePermissions")
+
+  @@unique([action, subject]) // Đảm bảo mỗi quyền là duy nhất
 }

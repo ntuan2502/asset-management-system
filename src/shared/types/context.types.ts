@@ -1,12 +1,10 @@
 import { Request } from 'express';
-import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
+import { UserWithPermissions } from 'src/2_domain/user/repositories/user.repository.interface';
 
-// Mở rộng interface Request của Express để thêm thuộc tính `user`
 export interface RequestWithUser extends Request {
-  user: UserAggregate;
+  user: UserWithPermissions;
 }
 
-// Định nghĩa cấu trúc của GraphQL Context mà chúng ta đang sử dụng
 export interface GqlContext {
   req: RequestWithUser;
 }

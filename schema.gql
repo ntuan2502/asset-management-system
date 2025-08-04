@@ -18,8 +18,20 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Role {
+  id: ID!
+  name: String!
+  description: String
+}
+
 type LoginResponse {
   access_token: String!
+}
+
+type Permission {
+  id: ID!
+  action: String!
+  subject: String!
 }
 
 type Query {
@@ -27,6 +39,9 @@ type Query {
   user(id: ID!): User
   users: [User!]!
   me: User!
+  roles: [Role!]!
+  role(id: ID!): Role
+  permissions: [Permission!]!
 }
 
 type Mutation {
@@ -34,6 +49,9 @@ type Mutation {
   updateUser(id: ID!, input: UpdateUserInput!): User!
   deleteUser(id: ID!): Boolean!
   restoreUser(id: ID!): Boolean!
+  assignRoleToUser(userId: ID!, roleId: ID!): User!
+  createRole(input: CreateRoleInput!): Role!
+  assignPermissionsToRole(roleId: ID!, input: AssignPermissionsToRoleInput!): Role!
   login(input: LoginUserInput!): LoginResponse!
 }
 
@@ -58,6 +76,15 @@ input UpdateUserInput {
   lastName: String
   dob: DateTime
   gender: GenderEnum
+}
+
+input CreateRoleInput {
+  name: String!
+  description: String
+}
+
+input AssignPermissionsToRoleInput {
+  permissionIds: [ID!]!
 }
 
 input LoginUserInput {

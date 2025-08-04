@@ -4,11 +4,14 @@ import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AppResolver } from './app.resolver';
-import { UserModule } from './2_domain/user/user.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { EventStoreModule } from './3_infrastructure/event-store/event-store.module';
 import { AuthModule } from './2_domain/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { SeederModule } from './3_infrastructure/seeders/seeder.module';
+import { PermissionModule } from './2_domain/permission/permission.module';
+import { UserModule } from './2_domain/user/user.module';
+import { RoleModule } from './2_domain/role/role.module';
+import { PrismaModule } from './3_infrastructure/persistence/prisma/prisma.module';
 
 @Module({
   imports: [
@@ -21,9 +24,13 @@ import { ConfigModule } from '@nestjs/config';
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       playground: false,
     }),
+    PrismaModule,
     UserModule,
-    EventStoreModule,
+    RoleModule,
     AuthModule,
+    PermissionModule,
+
+    SeederModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

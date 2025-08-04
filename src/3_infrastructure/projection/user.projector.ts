@@ -6,6 +6,7 @@ import { UserDeletedEvent } from 'src/2_domain/user/events/user-deleted.event';
 import { UserUpdatedEvent } from 'src/2_domain/user/events/user-updated.event';
 import { Gender, Prisma } from '@prisma/client';
 import { UserRestoredEvent } from 'src/2_domain/user/events/user-restored.event';
+import { RoleAssignedToUserEvent } from 'src/2_domain/user/events/role-assigned-to-user.event';
 
 @Injectable()
 @EventsHandler(
@@ -13,11 +14,16 @@ import { UserRestoredEvent } from 'src/2_domain/user/events/user-restored.event'
   UserDeletedEvent,
   UserUpdatedEvent,
   UserRestoredEvent,
+  RoleAssignedToUserEvent,
 )
 export class UserProjector
   implements
     IEventHandler<
-      UserCreatedEvent | UserDeletedEvent | UserUpdatedEvent | UserRestoredEvent
+      | UserCreatedEvent
+      | UserDeletedEvent
+      | UserUpdatedEvent
+      | UserRestoredEvent
+      | RoleAssignedToUserEvent
     >
 {
   constructor(private readonly prisma: PrismaService) {}
@@ -27,7 +33,8 @@ export class UserProjector
       | UserCreatedEvent
       | UserDeletedEvent
       | UserUpdatedEvent
-      | UserRestoredEvent,
+      | UserRestoredEvent
+      | RoleAssignedToUserEvent,
   ) {
     if (event instanceof UserCreatedEvent) {
       await this.onUserCreated(event);
@@ -37,6 +44,8 @@ export class UserProjector
       await this.onUserDeleted(event);
     } else if (event instanceof UserRestoredEvent) {
       await this.onUserRestored(event);
+    } else if (event instanceof RoleAssignedToUserEvent) {
+      await this.onRoleAssignedToUser(event);
     }
   }
 
@@ -103,6 +112,22 @@ export class UserProjector
       data: {
         deletedAt: null,
         updatedAt: event.restoredAt,
+      },
+    });
+  }
+
+  private async onRoleAssignedToUser(
+    event: RoleAssignedToUserEvent,
+  ): Promise<void> {
+    console.log('Projector caught RoleAssignedToUserEvent:', event);
+    await this.prisma.user.update({
+      where: { id: event.userId },
+      data: {
+        // Dùng `connect` để tạo mối quan hệ
+        roles: {
+          connect: { id: event.roleId },
+        },
+        updatedAt: event.assignedAt,
       },
     });
   }
