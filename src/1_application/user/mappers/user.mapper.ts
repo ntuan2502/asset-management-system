@@ -6,6 +6,7 @@ export class UserMapper {
     const domainUser = new UserAggregate();
     domainUser.id = prismaUser.id;
     domainUser.email = prismaUser.email;
+    domainUser.password = prismaUser.password;
     domainUser.firstName = prismaUser.firstName;
     domainUser.lastName = prismaUser.lastName;
     domainUser.dob = prismaUser.dob;

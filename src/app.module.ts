@@ -7,9 +7,14 @@ import { AppResolver } from './app.resolver';
 import { UserModule } from './2_domain/user/user.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { EventStoreModule } from './3_infrastructure/event-store/event-store.module';
+import { AuthModule } from './2_domain/auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: 'schema.gql',
@@ -18,6 +23,7 @@ import { EventStoreModule } from './3_infrastructure/event-store/event-store.mod
     }),
     UserModule,
     EventStoreModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

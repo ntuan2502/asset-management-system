@@ -44,5 +44,6 @@ const sagas = [SnapshotterService];
     ...projectors,
     ...sagas,
   ],
+  exports: [...repositories],
 })
 export class UserModule {}
