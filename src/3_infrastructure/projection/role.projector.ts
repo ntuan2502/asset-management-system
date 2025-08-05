@@ -5,11 +5,16 @@ import { RoleCreatedEvent } from 'src/2_domain/role/events/role-created.event';
 import { PermissionsAssignedToRoleEvent } from 'src/2_domain/role/events/permissions-assigned-to-role.event';
 
 @Injectable()
-@EventsHandler(RoleCreatedEvent)
-export class RoleProjector implements IEventHandler<RoleCreatedEvent> {
+@EventsHandler(RoleCreatedEvent, PermissionsAssignedToRoleEvent)
+export class RoleProjector
+  implements IEventHandler<RoleCreatedEvent | PermissionsAssignedToRoleEvent>
+{
   constructor(private readonly prisma: PrismaService) {}
 
   async handle(event: RoleCreatedEvent | PermissionsAssignedToRoleEvent) {
+    console.log(
+      `--- [PROJECTOR] Received event: ${event.constructor.name} ---`,
+    );
     if (event instanceof RoleCreatedEvent) {
       console.log('Projector caught RoleCreatedEvent:', event);
       await this.prisma.role.create({
@@ -27,15 +32,21 @@ export class RoleProjector implements IEventHandler<RoleCreatedEvent> {
   private async onPermissionsAssignedToRole(
     event: PermissionsAssignedToRoleEvent,
   ): Promise<void> {
-    console.log('Projector caught PermissionsAssignedToRoleEvent:', event);
-    await this.prisma.role.update({
-      where: { id: event.roleId },
-      data: {
-        // Prisma cho phép dùng `set` để thay thế hoàn toàn danh sách quan hệ
-        permissions: {
-          set: event.permissionIds.map((id) => ({ id })),
+    try {
+      console.log('Projector caught PermissionsAssignedToRoleEvent:', event);
+      await this.prisma.role.update({
+        where: { id: event.roleId },
+        data: {
+          permissions: {
+            set: event.permissionIds.map((id) => ({ id })),
+          },
         },
-      },
-    });
+      });
+      console.log(
+        `--- [PROJECTOR] Successfully updated permissions for Role ${event.roleId} ---`,
+      );
+    } catch (error) {
+      console.error('--- [PROJECTOR] ERROR updating permissions:', error);
+    }
   }
 }

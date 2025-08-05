@@ -24,7 +24,6 @@ export class AssignPermissionsToRoleHandler
   ): Promise<RoleAggregate> {
     const { roleId, payload } = command;
 
-    // **Validation:** Kiểm tra xem các permissionIds có thực sự tồn tại không
     const permissionsCount = await this.prisma.permission.count({
       where: {
         id: { in: payload.permissionIds },
@@ -34,14 +33,13 @@ export class AssignPermissionsToRoleHandler
       throw new Error('One or more permission IDs are invalid.');
     }
 
-    // **Tải Aggregate**
     const role = await this.aggregateRepository.findById(roleId);
     if (!role.id) {
       throw new NotFoundException(`Role with ID "${roleId}" not found.`);
     }
 
     const expectedVersion = role.version;
-    role.assignPermissions(payload.permissionIds); // Gọi phương thức nghiệp vụ
+    role.assignPermissions(payload.permissionIds);
 
     const events = role.getUncommittedEvents();
     if (events.length > 0) {
@@ -50,6 +48,9 @@ export class AssignPermissionsToRoleHandler
         'Role',
         events,
         expectedVersion,
+      );
+      console.log(
+        `--- [HANDLER] Saved ${events.length} events for Role ${role.id}. Committing... ---`,
       );
       role.commit();
     }

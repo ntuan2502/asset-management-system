@@ -14,8 +14,13 @@ import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { CurrentUser } from 'src/2_domain/auth/decorators/current-user.decorator';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
 import { AssignRoleToUserCommand } from 'src/1_application/user/commands/impl/assign-role-to-user.command';
+import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
+import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
+import { ACTIONS } from 'src/2_domain/auth/constants/actions';
+import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 
 @Resolver(() => UserType)
+@UseGuards(GqlAuthGuard, PermissionsGuard)
 export class UserResolver {
   constructor(
     private readonly commandBus: CommandBus,
@@ -23,7 +28,7 @@ export class UserResolver {
   ) {}
 
   @Query(() => UserType, { name: 'user', nullable: true })
-  @UseGuards(GqlAuthGuard)
+  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.USER })
   async getUserById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<UserType | null> {
@@ -31,7 +36,7 @@ export class UserResolver {
   }
 
   @Query(() => [UserType], { name: 'users' })
-  @UseGuards(GqlAuthGuard)
+  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.USER })
   async getAllUsers(): Promise<UserType[]> {
     return this.queryBus.execute(new GetAllUsersQuery());
   }
@@ -42,7 +47,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserType)
-  @UseGuards(GqlAuthGuard)
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.USER })
   async updateUser(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateUserInput,
@@ -50,7 +55,7 @@ export class UserResolver {
     return this.commandBus.execute(new UpdateUserCommand(id, input));
   }
   @Mutation(() => Boolean)
-  @UseGuards(GqlAuthGuard)
+  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.USER })
   async deleteUser(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -59,7 +64,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(GqlAuthGuard)
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.USER })
   async restoreUser(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -68,10 +73,7 @@ export class UserResolver {
   }
 
   @Query(() => UserType, { name: 'me' })
-  @UseGuards(GqlAuthGuard) // Phải được bảo vệ để có `req.user`
   me(@CurrentUser() user: UserAggregate): UserAggregate {
-    // `user` ở đây chính là đối tượng UserAggregate đầy đủ
-    // đã được trả về từ `validate()` của JwtStrategy.
     return user;
   }
 

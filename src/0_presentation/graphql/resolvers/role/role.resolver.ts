@@ -38,6 +38,7 @@ export class RoleResolver {
   }
 
   @Query(() => RoleType, { name: 'role', nullable: true })
+  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.ROLE })
   async getRoleById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<RoleAggregate | null> {
@@ -45,6 +46,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => RoleType)
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
   async assignPermissionsToRole(
     @Args('roleId', { type: () => ID }) roleId: string,
     @Args('input') input: AssignPermissionsToRoleInput,

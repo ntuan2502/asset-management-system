@@ -1,10 +1,11 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
-import { IsArray, IsUUID } from 'class-validator';
+import { IsArray } from 'class-validator';
+import { IsCuid } from 'src/shared/validators/is-cuid.validator';
 
 @InputType()
 export class AssignPermissionsToRoleInput {
   @Field(() => [ID])
   @IsArray()
-  @IsUUID('all', { each: true }) // Giả sử ID của permission là UUID (hoặc CUID)
+  @IsCuid({ each: true })
   permissionIds: string[];
 }

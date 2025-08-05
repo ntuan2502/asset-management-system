@@ -68,14 +68,38 @@ export class UserSeeder {
       const allPermissionIds = (
         await this.prisma.permission.findMany({ select: { id: true } })
       ).map((p) => p.id);
-      console.log(
-        `Assigning ${allPermissionIds.length} permissions to ADMIN role...`,
-      );
-      await this.commandBus.execute(
-        new AssignPermissionsToRoleCommand(adminRole.id, {
-          permissionIds: allPermissionIds,
-        }),
-      );
+
+      const roleWithPermissions = await this.prisma.role.findUnique({
+        where: { id: adminRole.id },
+        include: { permissions: true },
+      });
+
+      if (!roleWithPermissions) {
+        throw new Error(
+          `ADMIN role with id ${adminRole.id} not found in read model.`,
+        );
+      }
+
+      if (roleWithPermissions.permissions.length !== allPermissionIds.length) {
+        console.log(
+          `Assigning ${allPermissionIds.length} permissions to ADMIN role...`,
+        );
+        await this.commandBus.execute(
+          new AssignPermissionsToRoleCommand(adminRole.id, {
+            permissionIds: allPermissionIds,
+          }),
+        );
+
+        await this.waitForProjection(() =>
+          this.prisma.role.findFirst({
+            where: {
+              id: adminRole.id,
+              permissions: { some: { id: { in: allPermissionIds } } },
+            },
+          }),
+        );
+        console.log('Permissions assigned successfully.');
+      }
 
       const adminEmail = this.configService.get<string>(
         'ADMIN_EMAIL',
