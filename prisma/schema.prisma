@@ -64,6 +64,10 @@ model Role {
   name        String  @unique
   description String?
 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
   users User[] @relation("UserRoles")
 
   permissions Permission[] @relation("RolePermissions")

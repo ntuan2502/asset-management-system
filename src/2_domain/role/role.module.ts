@@ -6,6 +6,8 @@ import { RoleResolver } from 'src/0_presentation/graphql/resolvers/role/role.res
 
 // Application
 import { CreateRoleHandler } from 'src/1_application/role/commands/handlers/create-role.handler';
+import { UpdateRoleHandler } from 'src/1_application/role/commands/handlers/update-role.handler';
+import { DeleteRoleHandler } from 'src/1_application/role/commands/handlers/delete-role.handler';
 import { AssignPermissionsToRoleHandler } from 'src/1_application/role/commands/handlers/assign-permissions-to-role.handler';
 import { GetAllRolesHandler } from 'src/1_application/role/queries/handlers/get-all-roles.handler';
 import { GetRoleByIdHandler } from 'src/1_application/role/queries/handlers/get-role-by-id.handler';
@@ -22,7 +24,12 @@ import { RoleProjector } from 'src/3_infrastructure/projection/role.projector';
 import { SharedInfrastructureModule } from 'src/3_infrastructure/shared/shared-infrastructure.module';
 import { PrismaModule } from 'src/3_infrastructure/persistence/prisma/prisma.module';
 
-const CommandHandlers = [CreateRoleHandler, AssignPermissionsToRoleHandler];
+const CommandHandlers = [
+  CreateRoleHandler,
+  UpdateRoleHandler,
+  DeleteRoleHandler,
+  AssignPermissionsToRoleHandler,
+];
 const QueryHandlers = [GetAllRolesHandler, GetRoleByIdHandler];
 const Repositories = [
   { provide: ROLE_REPOSITORY, useClass: PrismaRoleRepository },

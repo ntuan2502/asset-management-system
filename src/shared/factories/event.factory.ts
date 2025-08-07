@@ -7,6 +7,8 @@ import { UserRestoredEvent } from 'src/2_domain/user/events/user-restored.event'
 import { RoleCreatedEvent } from 'src/2_domain/role/events/role-created.event';
 import { PermissionsAssignedToRoleEvent } from 'src/2_domain/role/events/permissions-assigned-to-role.event';
 import { RoleAssignedToUserEvent } from 'src/2_domain/user/events/role-assigned-to-user.event';
+import { RoleUpdatedEvent } from 'src/2_domain/role/events/role-updated.event';
+import { RoleDeletedEvent } from 'src/2_domain/role/events/role-deleted.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -16,6 +18,8 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [UserUpdatedEvent.name]: UserUpdatedEvent,
   [UserRestoredEvent.name]: UserRestoredEvent,
   [RoleCreatedEvent.name]: RoleCreatedEvent,
+  [RoleUpdatedEvent.name]: RoleUpdatedEvent,
+  [RoleDeletedEvent.name]: RoleDeletedEvent,
   [PermissionsAssignedToRoleEvent.name]: PermissionsAssignedToRoleEvent,
   [RoleAssignedToUserEvent.name]: RoleAssignedToUserEvent,
 };

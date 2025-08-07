@@ -52,6 +52,8 @@ type Mutation {
   assignRoleToUser(userId: ID!, roleId: ID!): User!
   createRole(input: CreateRoleInput!): Role!
   assignPermissionsToRole(roleId: ID!, input: AssignPermissionsToRoleInput!): Role!
+  updateRole(id: ID!, input: UpdateRoleInput!): Role!
+  deleteRole(id: ID!): Boolean!
   login(input: LoginUserInput!): LoginResponse!
 }
 
@@ -85,6 +87,11 @@ input CreateRoleInput {
 
 input AssignPermissionsToRoleInput {
   permissionIds: [ID!]!
+}
+
+input UpdateRoleInput {
+  name: String
+  description: String
 }
 
 input LoginUserInput {

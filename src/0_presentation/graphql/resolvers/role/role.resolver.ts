@@ -14,6 +14,9 @@ import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { UpdateRoleInput } from 'src/1_application/role/dtos/update-role.input';
+import { UpdateRoleCommand } from 'src/1_application/role/commands/impl/update-role.command';
+import { DeleteRoleCommand } from 'src/1_application/role/commands/impl/delete-role.command';
 
 @Resolver(() => RoleType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -54,5 +57,23 @@ export class RoleResolver {
     return this.commandBus.execute(
       new AssignPermissionsToRoleCommand(roleId, input),
     );
+  }
+
+  @Mutation(() => RoleType)
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
+  async updateRole(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateRoleInput,
+  ): Promise<RoleAggregate> {
+    return this.commandBus.execute(new UpdateRoleCommand(id, input));
+  }
+
+  @Mutation(() => Boolean)
+  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.ROLE })
+  async deleteRole(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    await this.commandBus.execute(new DeleteRoleCommand(id));
+    return true;
   }
 }

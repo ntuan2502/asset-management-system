@@ -9,8 +9,8 @@ export class PrismaRoleRepository implements IRoleRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findByName(name: string): Promise<RoleAggregate | null> {
-    const role = await this.prisma.role.findUnique({
-      where: { name },
+    const role = await this.prisma.role.findFirst({
+      where: { name, deletedAt: null },
     });
     return role ? RoleMapper.toDomain(role) : null;
   }
