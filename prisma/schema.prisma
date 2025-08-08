@@ -92,7 +92,8 @@ model Session {
   expiresAt          DateTime // Thời điểm refresh token hết hạn
   createdAt          DateTime @default(now())
 
-  revokedAt DateTime?
+  revokedAt         DateTime?
+  lastAccessTokenId String?
 
   // Mối quan hệ: Mỗi Session thuộc về một User
   userId String

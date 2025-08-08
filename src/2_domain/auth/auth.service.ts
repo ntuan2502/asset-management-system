@@ -15,11 +15,13 @@ import {
   RequestWithUser,
 } from 'src/shared/types/context.types';
 import { ExtractJwt } from 'passport-jwt';
+import { createId } from '@paralleldrive/cuid2';
 
 interface AccessTokenPayload {
   sub: string;
   sessionId: string;
   permissions: AppPermission[];
+  jti?: string; // << THÊM DÒNG NÀY: jti là JWT ID, tùy chọn
 }
 
 @Injectable()
@@ -36,11 +38,12 @@ export class AuthService {
     email: string,
     pass: string,
   ): Promise<UserWithPermissions | null> {
+    // SỬA LẠI: Sử dụng findWithPermissionsByEmail để có đầy đủ dữ liệu
     const user = await this.userRepository.findWithPermissionsByEmail(email);
 
     if (user && user.password && (await bcrypt.compare(pass, user.password))) {
-      const { password, ...result } = user;
-      return result as UserWithPermissions;
+      // `user` đã là một instance UserAggregate với permissions, chỉ cần trả về nó
+      return user;
     }
     return null;
   }
@@ -50,16 +53,7 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ) {
-    // 1. **Tạo Payload cho Access Token (chưa cần sign)**
-    const accessTokenPayload = {
-      sub: user.id,
-      sessionId: '',
-      permissions: user.permissions,
-    };
-
-    // SỬA LỖI: Biến `accessToken` không cần thiết ở đây, chúng ta sẽ tạo nó ở cuối
-
-    // 2. **Tạo Refresh Token (JWT)**
+    // 1. **Tạo Refresh Token và các thông tin liên quan**
     const refreshTokenPayload = { sub: user.id };
     const refreshToken = this.jwtService.sign(refreshTokenPayload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -68,66 +62,55 @@ export class AuthService {
         '7d',
       ),
     });
-
-    // 3. **Hash Refresh Token**
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-
-    // 4. **Tính toán thời gian hết hạn**
     const refreshTokenExpiresAt = new Date();
-    const expiresInDays = parseInt(
-      this.configService.get<string>('JWT_REFRESH_SECRET_EXPIRES_IN', '7d'),
-      10,
-    );
-    refreshTokenExpiresAt.setDate(
-      refreshTokenExpiresAt.getDate() + expiresInDays,
-    );
+    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
 
-    // 5. **Tạo bản ghi Session**
+    // 2. **Tạo Access Token ID (jti)**
+    const accessTokenId = createId();
+
+    // 3. **Tạo bản ghi Session**
+    //    Chúng ta lưu jti của access token đầu tiên ngay lúc tạo session
     const session = await this.prisma.session.create({
       data: {
         userId: user.id,
-        hashedRefreshToken: hashedRefreshToken,
-        ipAddress: ipAddress,
-        userAgent: userAgent,
+        hashedRefreshToken,
+        ipAddress,
+        userAgent,
         expiresAt: refreshTokenExpiresAt,
+        lastAccessTokenId: accessTokenId, // << Gán jti ngay lúc tạo
       },
     });
 
-    // 6. **Cập nhật Access Token với sessionId và Sign nó**
-    const finalAccessTokenPayload = {
-      ...accessTokenPayload,
-      sessionId: session.id,
+    // 4. **Tạo Access Token một lần duy nhất**
+    const accessTokenPayload: AccessTokenPayload = {
+      sub: user.id,
+      sessionId: session.id, // << Lấy sessionId từ session vừa tạo
+      permissions: user.permissions,
+      jti: accessTokenId,
     };
-    const finalAccessToken = this.jwtService.sign(finalAccessTokenPayload, {
+    const accessToken = this.jwtService.sign(accessTokenPayload, {
       secret: this.configService.get<string>('JWT_SECRET'),
       expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN', '15m'),
     });
 
-    // 7. **Trả về kết quả**
+    // 5. **Trả về kết quả**
     return {
-      access_token: finalAccessToken,
+      access_token: accessToken,
       refresh_token: refreshToken,
     };
   }
 
   async refreshToken(userId: string, refreshToken: string) {
-    // 1. Tìm tất cả các session của user
     const userSessions = await this.prisma.session.findMany({
-      where: {
-        userId: userId,
-        revokedAt: null, // << THÊM ĐIỀU KIỆN
-      },
+      where: { userId: userId, revokedAt: null },
     });
-
     if (!userSessions || userSessions.length === 0) {
       throw new UnauthorizedException('No active sessions found.');
     }
 
-    // 2. Tìm session khớp với refresh token
-    // Khai báo kiểu rõ ràng cho validSession
     let validSession: Session | null = null;
     for (const session of userSessions) {
-      // Chỉ so sánh nếu hashedRefreshToken tồn tại
       if (
         session.hashedRefreshToken &&
         (await bcrypt.compare(refreshToken, session.hashedRefreshToken))
@@ -136,30 +119,37 @@ export class AuthService {
         break;
       }
     }
-
-    // `validSession` giờ đây có kiểu `Session | null`
     if (!validSession || validSession.expiresAt < new Date()) {
       throw new UnauthorizedException(
         'Refresh token is invalid or has expired.',
       );
     }
 
-    // 3. Tải lại user với permissions đầy đủ
     const user = await this.userRepository.findWithPermissionsById(
       validSession.userId,
     );
     if (!user) {
-      // Trường hợp hiếm gặp: session tồn tại nhưng user đã bị xóa
       throw new UnauthorizedException('User for this session not found.');
     }
 
-    // 4. Tạo access token mới
-    const accessTokenPayload = {
+    // --- SỬA LẠI LOGIC TẠO VÀ CẬP NHẬT JTI ---
+    const accessTokenId = createId();
+    const accessTokenPayload: AccessTokenPayload = {
       sub: user.id,
       sessionId: validSession.id,
       permissions: user.permissions,
+      jti: accessTokenId,
     };
-    const accessToken = this.jwtService.sign(accessTokenPayload);
+    const accessToken = this.jwtService.sign(accessTokenPayload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN', '15m'),
+    });
+
+    // **CẬP NHẬT JTI MỚI VÀO DATABASE**
+    await this.prisma.session.update({
+      where: { id: validSession.id },
+      data: { lastAccessTokenId: accessTokenId },
+    });
 
     return { access_token: accessToken };
   }
@@ -209,40 +199,55 @@ export class AuthService {
     req: RequestWithUser,
   ): Promise<AuthenticatedUser | null> {
     try {
-      // Logic bên trong không thay đổi.
-      // `ExtractJwt` vẫn hoạt động tốt vì `RequestWithUser` kế thừa từ `Request` của Express.
       const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
-      if (!token) {
-        return null;
-      }
+      if (!token) return null;
 
       const payload = this.jwtService.verify<AccessTokenPayload>(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
 
-      // Sửa lại query session để kiểm tra cả `revokedAt`
       const session = await this.prisma.session.findFirst({
-        where: {
-          id: payload.sessionId,
-          revokedAt: null, // << THÊM ĐIỀU KIỆN
-        },
+        where: { id: payload.sessionId, revokedAt: null },
       });
-      if (!session || session.expiresAt < new Date()) {
+
+      // SỬA LẠI: Đơn giản hóa điều kiện kiểm tra
+      if (
+        !session ||
+        session.expiresAt < new Date() ||
+        session.lastAccessTokenId !== payload.jti
+      ) {
         return null;
       }
 
       const user = await this.userRepository.findById(payload.sub);
-      if (!user) {
-        return null;
-      }
+      if (!user) return null;
 
       const authenticatedUser = user as AuthenticatedUser;
       authenticatedUser.permissions = payload.permissions;
       authenticatedUser.sessionId = payload.sessionId;
-
       return authenticatedUser;
-    } catch (error) {
-      console.error('Error validating token:', error);
+    } catch (error: unknown) {
+      // << Sửa lại: Bỏ `_` và định kiểu là `unknown`
+
+      // 1. Khai báo một thông điệp lỗi mặc định
+      let errorMessage =
+        'An unexpected error occurred during token validation.';
+
+      // 2. Sử dụng type guard để kiểm tra kiểu của `error`
+      if (error instanceof Error) {
+        // Nếu `error` là một instance của `Error`, chúng ta có thể truy cập `.message` an toàn
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        // Xử lý trường hợp ai đó `throw 'some string'`
+        errorMessage = error;
+      }
+
+      // 3. Ghi log với thông điệp đã được xử lý
+      console.error(`Token validation failed: ${errorMessage}`);
+
+      // Bạn cũng có thể log toàn bộ đối tượng lỗi để xem chi tiết nếu cần
+      // console.error('Full validation error object:', error);
+
       return null;
     }
   }

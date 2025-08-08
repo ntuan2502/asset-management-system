@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler, EventPublisher } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import * as cuid from 'cuid'; // << THAY THẾ UUID BẰNG CUID
+import { createId } from '@paralleldrive/cuid2';
 
 import { CreateUserCommand } from '../impl/create-user.command';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
@@ -38,7 +38,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     // 2. **Hashing Mật khẩu**
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(input.password, saltRounds);
-    const newUserId = cuid();
+    const newUserId = createId();
 
     // 3. **Tạo và Kết nối Aggregate với EventBus**
     // mergeObjectContext sẽ biến `user` thành một đối tượng "live" có thể publish sự kiện

@@ -1,5 +1,5 @@
 import { AggregateRoot, IEvent } from '@nestjs/cqrs';
-import * as cuid from 'cuid';
+import { createId } from '@paralleldrive/cuid2';
 import { RoleCreatedEvent } from '../events/role-created.event';
 import { PermissionsAssignedToRoleEvent } from '../events/permissions-assigned-to-role.event';
 import {
@@ -48,7 +48,7 @@ export class RoleAggregate extends AggregateRoot {
   }
 
   public createRole(name: string, description?: string | null) {
-    const id = cuid();
+    const id = createId();
     const createdAt = new Date();
     this.apply(new RoleCreatedEvent({ id, name, description, createdAt }));
   }
