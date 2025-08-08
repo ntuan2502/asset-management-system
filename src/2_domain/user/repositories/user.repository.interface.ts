@@ -6,11 +6,20 @@ export type UserWithPermissions = UserAggregate & {
 
 export const USER_REPOSITORY = 'USER_REPOSITORY';
 
+export interface PaginatedUsers {
+  nodes: UserAggregate[];
+  meta: {
+    totalCount: number;
+    page: number;
+    limit: number;
+  };
+}
+
 export interface IUserRepository {
   create(user: UserAggregate): Promise<UserAggregate>;
   findById(id: string): Promise<UserAggregate | null>;
   findByEmail(email: string): Promise<UserAggregate | null>;
-  findAll(): Promise<UserAggregate[]>;
+  findAll(args: { page: number; limit: number }): Promise<PaginatedUsers>;
   softDelete(id: string): Promise<void>;
   findWithPermissionsByEmail(
     email: string,

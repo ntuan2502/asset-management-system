@@ -19,6 +19,9 @@ import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { AuthenticatedUser } from 'src/shared/types/context.types';
+import { UserConnection } from './user-connection.type';
+import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
+import { PaginatedUsersResult } from 'src/1_application/user/queries/handlers/get-all-users.handler';
 
 @Resolver(() => UserType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -36,10 +39,16 @@ export class UserResolver {
     return this.queryBus.execute(new GetUserByIdQuery(id));
   }
 
-  @Query(() => [UserType], { name: 'users' })
+  @Query(() => UserConnection, { name: 'users' })
   @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.USER })
-  async getAllUsers(): Promise<UserType[]> {
-    return this.queryBus.execute(new GetAllUsersQuery());
+  async getAllUsers(
+    @Args() args: PaginationArgs,
+  ): Promise<PaginatedUsersResult> {
+    // << Sửa kiểu trả về của phương thức
+    // SỬA LỖI: Thêm generic type cho execute
+    return this.queryBus.execute<GetAllUsersQuery, PaginatedUsersResult>(
+      new GetAllUsersQuery(args),
+    );
   }
 
   @Mutation(() => UserType)

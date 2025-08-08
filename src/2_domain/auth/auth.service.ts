@@ -16,12 +16,26 @@ import {
 } from 'src/shared/types/context.types';
 import { ExtractJwt } from 'passport-jwt';
 import { createId } from '@paralleldrive/cuid2';
+import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
+import {
+  DEFAULT_LIMIT,
+  DEFAULT_PAGE,
+} from 'src/shared/constants/pagination.constants';
 
 interface AccessTokenPayload {
   sub: string;
   sessionId: string;
   permissions: AppPermission[];
   jti?: string; // << THÊM DÒNG NÀY: jti là JWT ID, tùy chọn
+}
+
+export interface PaginatedSessions {
+  nodes: Session[];
+  meta: {
+    totalCount: number;
+    page: number;
+    limit: number;
+  };
 }
 
 @Injectable()
@@ -180,19 +194,38 @@ export class AuthService {
     return true;
   }
 
-  async getActiveSessions(userId: string): Promise<Session[]> {
-    return this.prisma.session.findMany({
-      where: {
-        userId: userId,
-        expiresAt: {
-          gt: new Date(), // Chỉ lấy các session chưa hết hạn
+  async getActiveSessions(
+    userId: string,
+    args: PaginationArgs,
+  ): Promise<PaginatedSessions> {
+    const page = args.page ?? DEFAULT_PAGE;
+    const limit = args.limit ?? DEFAULT_LIMIT;
+    const skip = (page - 1) * limit;
+
+    const [sessions, totalCount] = await this.prisma.$transaction([
+      this.prisma.session.findMany({
+        where: {
+          userId: userId,
+          expiresAt: { gt: new Date() },
+          revokedAt: null,
         },
-        revokedAt: null, // << THÊM ĐIỀU KIỆN
-      },
-      orderBy: {
-        createdAt: 'desc', // Sắp xếp theo phiên mới nhất
-      },
-    });
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.session.count({
+        where: {
+          userId: userId,
+          expiresAt: { gt: new Date() },
+          revokedAt: null,
+        },
+      }),
+    ]);
+
+    return {
+      nodes: sessions,
+      meta: { totalCount, page, limit },
+    };
   }
 
   async validateAndGetUserFromToken(

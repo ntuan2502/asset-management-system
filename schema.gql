@@ -18,6 +18,20 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type PaginationMeta {
+  totalCount: Int!
+  page: Int!
+  limit: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+type UserConnection {
+  nodes: [User!]!
+  meta: PaginationMeta!
+}
+
 type Role {
   id: ID!
   name: String!
@@ -37,6 +51,11 @@ type Session {
   createdAt: DateTime!
 }
 
+type SessionConnection {
+  nodes: [Session!]!
+  meta: PaginationMeta!
+}
+
 type Permission {
   id: ID!
   action: String!
@@ -46,11 +65,11 @@ type Permission {
 type Query {
   hello: String!
   user(id: ID!): User
-  users: [User!]!
+  users(page: Int = 1, limit: Int = 10): UserConnection!
   me: User!
   roles: [Role!]!
   role(id: ID!): Role
-  sessions: [Session!]!
+  sessions(page: Int = 1, limit: Int = 10): SessionConnection!
   permissions: [Permission!]!
 }
 

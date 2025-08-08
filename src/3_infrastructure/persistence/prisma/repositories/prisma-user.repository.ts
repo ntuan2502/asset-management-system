@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   IUserRepository,
+  PaginatedUsers,
   UserWithPermissions,
 } from 'src/2_domain/user/repositories/user.repository.interface';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
@@ -40,13 +41,34 @@ export class PrismaUserRepository implements IUserRepository {
     return prismaUser ? UserMapper.toDomain(prismaUser) : null;
   }
 
-  async findAll(): Promise<UserAggregate[]> {
-    const prismaUsers = await this.prisma.user.findMany({
-      where: {
-        deletedAt: null,
+  async findAll(args: {
+    page: number;
+    limit: number;
+  }): Promise<PaginatedUsers> {
+    const { page, limit } = args;
+    const skip = (page - 1) * limit; // Tính toán offset
+
+    // Dùng Prisma transaction để thực hiện 2 query song song
+    const [users, totalCount] = await this.prisma.$transaction([
+      // Query để lấy danh sách user của trang hiện tại
+      this.prisma.user.findMany({
+        where: { deletedAt: null },
+        skip: skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      // Query để đếm tổng số lượng user
+      this.prisma.user.count({ where: { deletedAt: null } }),
+    ]);
+
+    return {
+      nodes: users.map((user) => UserMapper.toDomain(user)),
+      meta: {
+        totalCount,
+        page,
+        limit,
       },
-    });
-    return prismaUsers.map((prismaUser) => UserMapper.toDomain(prismaUser));
+    };
   }
 
   async softDelete(id: string): Promise<void> {

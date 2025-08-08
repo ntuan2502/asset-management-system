@@ -7,11 +7,16 @@ import { Request } from 'express';
 import { CurrentUser } from 'src/2_domain/auth/decorators/current-user.decorator';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
 import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
-import { SessionType } from 'src/1_application/auth/dtos/session.type';
 import { AuthenticatedUser } from 'src/shared/types/context.types';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtPayload } from 'jsonwebtoken';
+import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
+import { SessionConnection } from 'src/1_application/auth/dtos/session-connection.type';
+import {
+  DEFAULT_LIMIT,
+  DEFAULT_PAGE,
+} from 'src/shared/constants/pagination.constants';
 
 @Resolver()
 export class AuthResolver {
@@ -88,11 +93,30 @@ export class AuthResolver {
     return this.authService.logoutAll(user.id);
   }
 
-  @Query(() => [SessionType], { name: 'sessions' })
+  @Query(() => SessionConnection, { name: 'sessions' })
   @UseGuards(GqlAuthGuard)
   async getActiveSessions(
-    @CurrentUser() user: UserAggregate,
-  ): Promise<SessionType[]> {
-    return this.authService.getActiveSessions(user.id);
+    @CurrentUser() user: AuthenticatedUser,
+    @Args() args: PaginationArgs,
+  ) {
+    const page = args.page ?? DEFAULT_PAGE;
+    const limit = args.limit ?? DEFAULT_LIMIT;
+
+    const result = await this.authService.getActiveSessions(user.id, {
+      page,
+      limit,
+    });
+
+    const totalPages = Math.ceil(result.meta.totalCount / limit);
+
+    return {
+      nodes: result.nodes,
+      meta: {
+        ...result.meta,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
+    };
   }
 }
