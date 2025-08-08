@@ -26,6 +26,15 @@ type Role {
 
 type LoginResponse {
   access_token: String!
+  refresh_token: String
+}
+
+type Session {
+  id: ID!
+  userAgent: String
+  ipAddress: String
+  expiresAt: DateTime!
+  createdAt: DateTime!
 }
 
 type Permission {
@@ -41,6 +50,7 @@ type Query {
   me: User!
   roles: [Role!]!
   role(id: ID!): Role
+  sessions: [Session!]!
   permissions: [Permission!]!
 }
 
@@ -55,6 +65,9 @@ type Mutation {
   updateRole(id: ID!, input: UpdateRoleInput!): Role!
   deleteRole(id: ID!): Boolean!
   login(input: LoginUserInput!): LoginResponse!
+  refreshToken(refresh_token: String!): LoginResponse!
+  logout: Boolean!
+  logoutAll: Boolean!
 }
 
 input CreateUserInput {

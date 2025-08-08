@@ -15,4 +15,5 @@ export interface IUserRepository {
   findWithPermissionsByEmail(
     email: string,
   ): Promise<UserWithPermissions | null>;
+  findWithPermissionsById(id: string): Promise<UserWithPermissions | null>;
 }

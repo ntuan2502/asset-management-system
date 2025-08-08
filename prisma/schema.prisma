@@ -29,7 +29,8 @@ model User {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime? // THÊM MỚI: Dùng cho soft delete, optional
 
-  roles Role[] @relation("UserRoles")
+  roles    Role[]    @relation("UserRoles")
+  sessions Session[]
 }
 
 // Model để lưu trữ các sự kiện một cách bất biến (append-only)
@@ -81,4 +82,21 @@ model Permission {
   roles Role[] @relation("RolePermissions")
 
   @@unique([action, subject]) // Đảm bảo mỗi quyền là duy nhất
+}
+
+model Session {
+  id                 String   @id @default(cuid())
+  hashedRefreshToken String? // Lưu refresh token đã được hash, tùy chọn
+  userAgent          String? // Thông tin trình duyệt
+  ipAddress          String? // Địa chỉ IP
+  expiresAt          DateTime // Thời điểm refresh token hết hạn
+  createdAt          DateTime @default(now())
+
+  revokedAt DateTime?
+
+  // Mối quan hệ: Mỗi Session thuộc về một User
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

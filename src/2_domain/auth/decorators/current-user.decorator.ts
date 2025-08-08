@@ -4,8 +4,8 @@ import { GqlContext } from 'src/shared/types/context.types'; // << IMPORT
 
 export const CurrentUser = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
+    // SỬA LẠI: Lấy context đã được định kiểu
     const ctx = GqlExecutionContext.create(context).getContext<GqlContext>();
-    // Bây giờ ctx.req.user có kiểu rõ ràng là UserAggregate
     return ctx.req.user;
   },
 );

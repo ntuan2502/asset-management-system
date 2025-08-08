@@ -18,6 +18,7 @@ import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { AuthenticatedUser } from 'src/shared/types/context.types';
 
 @Resolver(() => UserType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -73,7 +74,7 @@ export class UserResolver {
   }
 
   @Query(() => UserType, { name: 'me' })
-  me(@CurrentUser() user: UserAggregate): UserAggregate {
+  me(@CurrentUser() user: AuthenticatedUser) {
     return user;
   }
 

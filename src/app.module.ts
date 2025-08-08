@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -12,6 +12,7 @@ import { PermissionModule } from './2_domain/permission/permission.module';
 import { UserModule } from './2_domain/user/user.module';
 import { RoleModule } from './2_domain/role/role.module';
 import { PrismaModule } from './3_infrastructure/persistence/prisma/prisma.module';
+import { AuthMiddleware } from './2_domain/auth/middleware/auth.middleware';
 
 @Module({
   imports: [
@@ -35,4 +36,9 @@ import { PrismaModule } from './3_infrastructure/persistence/prisma/prisma.modul
   controllers: [AppController],
   providers: [AppService, AppResolver],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Áp dụng AuthMiddleware cho tất cả các request đến đường dẫn '/graphql'
+    consumer.apply(AuthMiddleware).forRoutes('/graphql');
+  }
+}

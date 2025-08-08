@@ -94,4 +94,41 @@ export class PrismaUserRepository implements IUserRepository {
 
     return aggregate as UserWithPermissions;
   }
+
+  async findWithPermissionsById(
+    id: string,
+  ): Promise<UserWithPermissions | null> {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        roles: {
+          include: {
+            permissions: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    const permissions = user.roles.flatMap((role) => role.permissions);
+    const uniquePermissions = [
+      ...new Map(
+        permissions.map((p) => [`${p.action}:${p.subject}`, p]),
+      ).values(),
+    ];
+
+    const aggregate = UserMapper.toDomain(user);
+
+    (aggregate as UserWithPermissions).permissions = uniquePermissions.map(
+      (p) => ({
+        action: p.action,
+        subject: p.subject,
+      }),
+    );
+
+    return aggregate as UserWithPermissions;
+  }
 }
