@@ -1,6 +1,5 @@
 import { IEvent } from '@nestjs/cqrs';
 
-// Định nghĩa cấu trúc của một sự kiện sẽ được lưu trữ
 export interface StoredEvent {
   id: string;
   aggregateId: string;
@@ -9,7 +8,6 @@ export interface StoredEvent {
   version: number;
 }
 
-// Token để inject vào các service khác
 export const EVENT_STORE_SERVICE = 'EVENT_STORE_SERVICE';
 
 export interface IEventStore {

@@ -11,12 +11,11 @@ export class UserMapper {
     domainUser.lastName = prismaUser.lastName;
     domainUser.dob = prismaUser.dob;
     domainUser.gender = prismaUser.gender;
-    domainUser.createdAt = prismaUser.createdAt; // << THÊM MỚI
-    domainUser.updatedAt = prismaUser.updatedAt; // << THÊM MỚI
+    domainUser.createdAt = prismaUser.createdAt;
+    domainUser.updatedAt = prismaUser.updatedAt;
     return domainUser;
   }
 
-  // --- THÊM MỚI ---
   public static toPersistence(
     domainUser: UserAggregate,
   ): Prisma.UserCreateInput {
@@ -27,7 +26,6 @@ export class UserMapper {
       firstName: domainUser.firstName,
       lastName: domainUser.lastName,
       dob: domainUser.dob,
-      // Chuyển đổi kiểu dữ liệu cho gender một cách an toàn
       gender: domainUser.gender ? (domainUser.gender as Gender) : null,
     };
   }

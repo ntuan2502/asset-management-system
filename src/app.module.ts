@@ -39,7 +39,6 @@ import { OfficeModule } from './2_domain/office/office.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // Áp dụng AuthMiddleware cho tất cả các request đến đường dẫn '/graphql'
     consumer.apply(AuthMiddleware).forRoutes('/graphql');
   }
 }

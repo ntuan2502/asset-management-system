@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ISnapshotStrategy } from './snapshot.strategy.interface';
 
-const SNAPSHOT_FREQUENCY = 3; // Tạo snapshot sau mỗi 3 phiên bản
+const SNAPSHOT_FREQUENCY = 3;
 
 @Injectable()
 export class VersionFrequencyStrategy implements ISnapshotStrategy {

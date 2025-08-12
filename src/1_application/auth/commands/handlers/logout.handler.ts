@@ -12,7 +12,6 @@ export class LogoutHandler implements ICommandHandler<LogoutCommand> {
     const sessionId = user.sessionId;
 
     if (!sessionId) {
-      // Trường hợp hiếm gặp, nhưng cần kiểm tra
       throw new UnauthorizedException('Session ID not found in token.');
     }
 

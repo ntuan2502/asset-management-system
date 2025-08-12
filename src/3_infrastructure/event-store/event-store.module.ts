@@ -9,6 +9,6 @@ import { EventStoreService } from './event-store.service';
       useClass: EventStoreService,
     },
   ],
-  exports: [EVENT_STORE_SERVICE], // Export để các module khác có thể inject
+  exports: [EVENT_STORE_SERVICE],
 })
 export class EventStoreModule {}

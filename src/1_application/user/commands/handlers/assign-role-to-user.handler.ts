@@ -25,7 +25,6 @@ export class AssignRoleToUserHandler
   async execute(command: AssignRoleToUserCommand): Promise<UserAggregate> {
     const { userId, roleId } = command;
 
-    // Validation: Kiểm tra vai trò có tồn tại không
     const role = await this.roleRepository.findById(roleId);
     if (!role) {
       throw new NotFoundException(`Role with ID "${roleId}" not found.`);

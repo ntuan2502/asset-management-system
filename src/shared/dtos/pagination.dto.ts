@@ -26,10 +26,10 @@ export function Paginated<TItem>(TItemClass: Type<TItem>) {
   @ObjectType(`${TItemClass.name}Connection`, { isAbstract: true })
   abstract class PaginatedResponseClass {
     @Field(() => [TItemClass])
-    nodes: TItem[]; // Đổi tên thành `nodes` theo chuẩn Relay/Connection
+    nodes: TItem[];
 
     @Field(() => PaginationMeta)
-    meta: PaginationMeta; // Đổi tên thành `meta` cho gọn
+    meta: PaginationMeta;
   }
 
   return PaginatedResponseClass;

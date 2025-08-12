@@ -5,6 +5,6 @@ export class LoginResponse {
   @Field()
   access_token: string;
 
-  @Field({ nullable: true }) // Refresh token chỉ được trả về khi login
+  @Field({ nullable: true })
   refresh_token?: string;
 }

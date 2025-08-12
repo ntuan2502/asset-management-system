@@ -30,10 +30,8 @@ export class GetAllUsersHandler
     const page = query.args.page ?? DEFAULT_PAGE;
     const limit = query.args.limit ?? DEFAULT_LIMIT;
 
-    // Gọi repository
     const result = await this.userRepository.findAll({ page, limit });
 
-    // Xử lý logic meta
     const totalPages = Math.ceil(result.meta.totalCount / limit);
 
     return {

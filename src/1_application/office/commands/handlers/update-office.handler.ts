@@ -6,7 +6,7 @@ import {
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
 import { OfficeAggregate } from 'src/2_domain/office/aggregates/office.aggregate';
-import { OfficeAggregateRepository } from 'src/2_domain/office/repositories/office-aggregate.repository'; // << Sẽ tạo sau
+import { OfficeAggregateRepository } from 'src/2_domain/office/repositories/office-aggregate.repository';
 
 @CommandHandler(UpdateOfficeCommand)
 export class UpdateOfficeHandler

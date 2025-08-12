@@ -11,7 +11,6 @@ import {
 } from '../snapshot-store/snapshot-store.interface';
 import { EventFactory } from 'src/shared/factories/event.factory';
 
-// Định nghĩa một kiểu cho constructor của aggregate
 type AggregateConstructor<T extends AggregateRoot> = new (...args: any[]) => T;
 
 export class BaseAggregateRepository<
@@ -37,7 +36,6 @@ export class BaseAggregateRepository<
 
     const snapshot = await this.snapshotStore.getLatestSnapshot(id);
     if (snapshot) {
-      // Cần một cách chung để tải snapshot
       Object.assign(aggregate, snapshot.payload);
       aggregate.version = snapshot.version;
       version = snapshot.version;

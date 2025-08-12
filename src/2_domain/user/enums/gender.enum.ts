@@ -6,7 +6,6 @@ export enum GenderEnum {
   OTHER = 'OTHER',
 }
 
-// Đăng ký Enum này với NestJS GraphQL
 registerEnumType(GenderEnum, {
   name: 'GenderEnum',
   description: 'The gender of the user.',

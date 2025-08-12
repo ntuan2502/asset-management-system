@@ -26,7 +26,7 @@ interface AccessTokenPayload {
   sub: string;
   sessionId: string;
   permissions: AppPermission[];
-  jti?: string; // << THÊM DÒNG NÀY: jti là JWT ID, tùy chọn
+  jti?: string;
 }
 
 export interface PaginatedSessions {
@@ -52,11 +52,9 @@ export class AuthService {
     email: string,
     pass: string,
   ): Promise<UserWithPermissions | null> {
-    // SỬA LẠI: Sử dụng findWithPermissionsByEmail để có đầy đủ dữ liệu
     const user = await this.userRepository.findWithPermissionsByEmail(email);
 
     if (user && user.password && (await bcrypt.compare(pass, user.password))) {
-      // `user` đã là một instance UserAggregate với permissions, chỉ cần trả về nó
       return user;
     }
     return null;
@@ -67,7 +65,6 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ) {
-    // 1. **Tạo Refresh Token và các thông tin liên quan**
     const refreshTokenPayload = { sub: user.id };
     const refreshToken = this.jwtService.sign(refreshTokenPayload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -80,11 +77,8 @@ export class AuthService {
     const refreshTokenExpiresAt = new Date();
     refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
 
-    // 2. **Tạo Access Token ID (jti)**
     const accessTokenId = createId();
 
-    // 3. **Tạo bản ghi Session**
-    //    Chúng ta lưu jti của access token đầu tiên ngay lúc tạo session
     const session = await this.prisma.session.create({
       data: {
         userId: user.id,
@@ -92,14 +86,13 @@ export class AuthService {
         ipAddress,
         userAgent,
         expiresAt: refreshTokenExpiresAt,
-        lastAccessTokenId: accessTokenId, // << Gán jti ngay lúc tạo
+        lastAccessTokenId: accessTokenId,
       },
     });
 
-    // 4. **Tạo Access Token một lần duy nhất**
     const accessTokenPayload: AccessTokenPayload = {
       sub: user.id,
-      sessionId: session.id, // << Lấy sessionId từ session vừa tạo
+      sessionId: session.id,
       permissions: user.permissions,
       jti: accessTokenId,
     };
@@ -108,7 +101,6 @@ export class AuthService {
       expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN', '15m'),
     });
 
-    // 5. **Trả về kết quả**
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -146,7 +138,6 @@ export class AuthService {
       throw new UnauthorizedException('User for this session not found.');
     }
 
-    // --- SỬA LẠI LOGIC TẠO VÀ CẬP NHẬT JTI ---
     const accessTokenId = createId();
     const accessTokenPayload: AccessTokenPayload = {
       sub: user.id,
@@ -159,7 +150,6 @@ export class AuthService {
       expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN', '15m'),
     });
 
-    // **CẬP NHẬT JTI MỚI VÀO DATABASE**
     await this.prisma.session.update({
       where: { id: validSession.id },
       data: { lastAccessTokenId: accessTokenId },
@@ -169,23 +159,20 @@ export class AuthService {
   }
 
   async logout(sessionId: string): Promise<boolean> {
-    // Dùng `update` để đánh dấu là đã bị thu hồi, thay vì `delete`
     await this.prisma.session.updateMany({
       where: { id: sessionId },
       data: {
         revokedAt: new Date(),
       },
     });
-    return true; // Trả về true nếu xóa thành công
+    return true;
   }
 
-  // Logout tất cả các session của một user
   async logoutAll(userId: string): Promise<boolean> {
-    // Dùng `updateMany` để thu hồi tất cả session của user
     await this.prisma.session.updateMany({
       where: {
         userId: userId,
-        revokedAt: null, // Chỉ thu hồi những session đang hoạt động
+        revokedAt: null,
       },
       data: {
         revokedAt: new Date(),
@@ -243,7 +230,6 @@ export class AuthService {
         where: { id: payload.sessionId, revokedAt: null },
       });
 
-      // SỬA LẠI: Đơn giản hóa điều kiện kiểm tra
       if (
         !session ||
         session.expiresAt < new Date() ||
@@ -260,26 +246,16 @@ export class AuthService {
       authenticatedUser.sessionId = payload.sessionId;
       return authenticatedUser;
     } catch (error: unknown) {
-      // << Sửa lại: Bỏ `_` và định kiểu là `unknown`
-
-      // 1. Khai báo một thông điệp lỗi mặc định
       let errorMessage =
         'An unexpected error occurred during token validation.';
 
-      // 2. Sử dụng type guard để kiểm tra kiểu của `error`
       if (error instanceof Error) {
-        // Nếu `error` là một instance của `Error`, chúng ta có thể truy cập `.message` an toàn
         errorMessage = error.message;
       } else if (typeof error === 'string') {
-        // Xử lý trường hợp ai đó `throw 'some string'`
         errorMessage = error;
       }
 
-      // 3. Ghi log với thông điệp đã được xử lý
       console.error(`Token validation failed: ${errorMessage}`);
-
-      // Bạn cũng có thể log toàn bộ đối tượng lỗi để xem chi tiết nếu cần
-      // console.error('Full validation error object:', error);
 
       return null;
     }

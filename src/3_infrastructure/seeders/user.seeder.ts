@@ -24,7 +24,7 @@ export class UserSeeder {
 
   private async waitForProjection<T>(
     query: () => Promise<T | null>,
-    timeout = 5000, // Chờ tối đa 5 giây
+    timeout = 5000,
   ): Promise<T> {
     const startTime = Date.now();
     while (Date.now() - startTime < timeout) {
@@ -32,7 +32,6 @@ export class UserSeeder {
       if (result) {
         return result;
       }
-      // Đợi một chút trước khi thử lại
       await new Promise((resolve) => setTimeout(resolve, 200));
     }
     throw new Error(`Projection timed out after ${timeout / 1000} seconds.`);

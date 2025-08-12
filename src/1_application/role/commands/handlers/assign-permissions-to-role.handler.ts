@@ -16,7 +16,7 @@ export class AssignPermissionsToRoleHandler
   constructor(
     private readonly aggregateRepository: RoleAggregateRepository,
     @Inject(EVENT_STORE_SERVICE) private readonly eventStore: IEventStore,
-    private readonly prisma: PrismaService, // Inject Prisma để kiểm tra Permissions
+    private readonly prisma: PrismaService,
   ) {}
 
   async execute(

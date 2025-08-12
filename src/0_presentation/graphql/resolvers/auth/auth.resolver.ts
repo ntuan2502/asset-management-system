@@ -1,7 +1,6 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Request } from 'express';
-// Import DTOs, Guards, Decorators
 import { LoginResponse } from 'src/1_application/auth/dtos/login-response.dto';
 import { LoginUserInput } from 'src/1_application/auth/dtos/login-user.input';
 import { UseGuards } from '@nestjs/common';
@@ -10,7 +9,6 @@ import { CurrentUser } from 'src/2_domain/auth/decorators/current-user.decorator
 import { AuthenticatedUser } from 'src/shared/types/context.types';
 import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
 import { SessionConnection } from 'src/1_application/auth/dtos/session-connection.type';
-// Import Commands & Queries
 import { LoginCommand } from 'src/1_application/auth/commands/impl/login.command';
 import { RefreshTokenCommand } from 'src/1_application/auth/commands/impl/refresh-token.command';
 import { LogoutCommand } from 'src/1_application/auth/commands/impl/logout.command';
