@@ -1,5 +1,8 @@
 import { createId } from '@paralleldrive/cuid2';
-import { RoleCreatedEvent } from '../events/role-created.event';
+import {
+  RoleCreatedEvent,
+  RoleCreatedPayload,
+} from '../events/role-created.event';
 import { PermissionsAssignedToRoleEvent } from '../events/permissions-assigned-to-role.event';
 import {
   RoleUpdatedEvent,
@@ -8,6 +11,8 @@ import {
 import { RoleDeletedEvent } from '../events/role-deleted.event';
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
 import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { UpdateRoleInput } from 'src/1_application/role/dtos/update-role.input';
+import { RoleRestoredEvent } from '../events/role-restored.event';
 
 export class RoleAggregate extends BaseAggregateRoot {
   public readonly aggregateType = AGGREGATE_TYPES.ROLE;
@@ -41,13 +46,17 @@ export class RoleAggregate extends BaseAggregateRoot {
     );
   }
 
-  public createRole(name: string, description?: string | null) {
+  public createRole(data: Omit<RoleCreatedPayload, 'id' | 'createdAt'>) {
     const id = createId();
     const createdAt = new Date();
-    this.apply(new RoleCreatedEvent({ id, name, description, createdAt }));
+    this.apply(new RoleCreatedEvent({ id, ...data, createdAt }));
   }
 
-  public updateRole(payload: { name?: string; description?: string | null }) {
+  public updateRole(payload: UpdateRoleInput) {
+    if (this.deletedAt) {
+      throw new Error('Cannot update a deleted role.');
+    }
+
     const changes: Partial<RoleUpdatedPayload> = {};
     let hasChanges = false;
 
@@ -83,6 +92,13 @@ export class RoleAggregate extends BaseAggregateRoot {
     this.apply(new RoleDeletedEvent({ id: this.id, deletedAt: new Date() }));
   }
 
+  public restoreRole() {
+    if (!this.deletedAt) {
+      throw new Error('Cannot restore an active role.');
+    }
+    this.apply(new RoleRestoredEvent({ id: this.id, restoredAt: new Date() }));
+  }
+
   protected onPermissionsAssignedToRoleEvent(
     event: PermissionsAssignedToRoleEvent,
   ) {
@@ -114,6 +130,12 @@ export class RoleAggregate extends BaseAggregateRoot {
   protected onRoleDeletedEvent(event: RoleDeletedEvent) {
     this.deletedAt = event.deletedAt;
     this.updatedAt = event.deletedAt;
+    this.version++;
+  }
+
+  protected onRoleRestoredEvent(event: RoleRestoredEvent) {
+    this.deletedAt = null;
+    this.updatedAt = event.restoredAt;
     this.version++;
   }
 }

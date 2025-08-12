@@ -6,17 +6,20 @@ import { PermissionsAssignedToRoleEvent } from 'src/2_domain/role/events/permiss
 import { RoleUpdatedEvent } from 'src/2_domain/role/events/role-updated.event';
 import { RoleDeletedEvent } from 'src/2_domain/role/events/role-deleted.event';
 import { Prisma } from '@prisma/client';
+import { RoleRestoredEvent } from 'src/2_domain/role/events/role-restored.event';
 
 type RoleEvent =
   | RoleCreatedEvent
   | RoleUpdatedEvent
   | RoleDeletedEvent
+  | RoleRestoredEvent
   | PermissionsAssignedToRoleEvent;
 @Injectable()
 @EventsHandler(
   RoleCreatedEvent,
   RoleUpdatedEvent,
   RoleDeletedEvent,
+  RoleRestoredEvent,
   PermissionsAssignedToRoleEvent,
 )
 export class RoleProjector implements IEventHandler<RoleEvent> {
@@ -29,6 +32,8 @@ export class RoleProjector implements IEventHandler<RoleEvent> {
       await this.onRoleUpdated(event);
     } else if (event instanceof RoleDeletedEvent) {
       await this.onRoleDeleted(event);
+    } else if (event instanceof RoleRestoredEvent) {
+      await this.onRoleRestored(event);
     } else if (event instanceof PermissionsAssignedToRoleEvent) {
       await this.onPermissionsAssignedToRole(event);
     }
@@ -86,6 +91,22 @@ export class RoleProjector implements IEventHandler<RoleEvent> {
       );
     } catch (error) {
       console.error(`--- [PROJECTOR] ERROR deleting role ${event.id}:`, error);
+    }
+  }
+
+  private async onRoleRestored(event: RoleRestoredEvent): Promise<void> {
+    try {
+      console.log('--- [PROJECTOR] Received RoleRestoredEvent ---', event);
+      await this.prisma.role.update({
+        where: { id: event.id },
+        data: {
+          deletedAt: null,
+          updatedAt: event.restoredAt,
+        },
+      });
+      console.log(`--- [PROJECTOR] Successfully restored role ${event.id} ---`);
+    } catch (error) {
+      console.error(`--- [PROJECTOR] ERROR restoring role ${event.id}:`, error);
     }
   }
 

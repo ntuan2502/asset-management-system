@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler, EventPublisher } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { createId } from '@paralleldrive/cuid2';
 
 import { CreateUserCommand } from '../impl/create-user.command';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
@@ -34,19 +33,16 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(input.password, saltRounds);
-    const newUserId = createId();
-
     const user = this.publisher.mergeObjectContext(new UserAggregate());
 
-    user.createUser(
-      newUserId,
-      input.email,
-      hashedPassword,
-      input.firstName,
-      input.lastName,
-      input.dob,
-      input.gender,
-    );
+    user.createUser({
+      email: input.email,
+      hashedPassword: hashedPassword,
+      firstName: input.firstName,
+      lastName: input.lastName,
+      dob: input.dob,
+      gender: input.gender,
+    });
 
     const events = user.getUncommittedEvents();
     await this.eventStore.saveEvents(user.id, user.aggregateType, events, 0);

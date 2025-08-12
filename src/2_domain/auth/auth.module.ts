@@ -7,9 +7,24 @@ import { UserModule } from 'src/2_domain/user/user.module';
 import { AuthResolver } from 'src/0_presentation/graphql/resolvers/auth/auth.resolver';
 import { PermissionsGuard } from './guards/permissions.guard';
 import { PrismaModule } from 'src/3_infrastructure/persistence/prisma/prisma.module';
+import { LoginHandler } from 'src/1_application/auth/commands/handlers/login.handler';
+import { RefreshTokenHandler } from 'src/1_application/auth/commands/handlers/refresh-token.handler';
+import { GetActiveSessionsHandler } from 'src/1_application/auth/queries/handlers/get-active-sessions.handler';
+import { LogoutHandler } from 'src/1_application/auth/commands/handlers/logout.handler';
+import { LogoutAllHandler } from 'src/1_application/auth/commands/handlers/logout-all.handler';
+import { CqrsModule } from '@nestjs/cqrs';
+
+const CommandHandlers = [
+  LoginHandler,
+  RefreshTokenHandler,
+  LogoutHandler,
+  LogoutAllHandler,
+];
+const QueryHandlers = [GetActiveSessionsHandler];
 
 @Module({
   imports: [
+    CqrsModule,
     UserModule,
     PassportModule,
     ConfigModule,
@@ -23,7 +38,13 @@ import { PrismaModule } from 'src/3_infrastructure/persistence/prisma/prisma.mod
       inject: [ConfigService],
     }),
   ],
-  providers: [AuthService, AuthResolver, PermissionsGuard],
+  providers: [
+    AuthService,
+    AuthResolver,
+    ...CommandHandlers,
+    ...QueryHandlers,
+    PermissionsGuard,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

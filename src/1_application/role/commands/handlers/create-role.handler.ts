@@ -29,7 +29,7 @@ export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand> {
 
     const role = this.publisher.mergeObjectContext(new RoleAggregate());
 
-    role.createRole(input.name, input.description);
+    role.createRole(input);
 
     const events = role.getUncommittedEvents();
     await this.eventStore.saveEvents(role.id, role.aggregateType, events, 0);

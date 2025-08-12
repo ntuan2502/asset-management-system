@@ -1,5 +1,6 @@
 export const AGGREGATE_TYPES = {
   USER: 'User',
+  PERMISSION: 'Permission',
   ROLE: 'Role',
   OFFICE: 'Office',
   DEPARTMENT: 'Department',

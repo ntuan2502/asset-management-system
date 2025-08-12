@@ -38,6 +38,11 @@ type Role {
   description: String
 }
 
+type RoleConnection {
+  nodes: [Role!]!
+  meta: PaginationMeta!
+}
+
 type LoginResponse {
   access_token: String!
   refresh_token: String
@@ -62,6 +67,11 @@ type Permission {
   subject: String!
 }
 
+type PermissionConnection {
+  nodes: [Permission!]!
+  meta: PaginationMeta!
+}
+
 type Office {
   id: ID!
   name: String!
@@ -81,13 +91,13 @@ type OfficeConnection {
 
 type Query {
   hello: String!
-  user(id: ID!): User
   users(page: Int = 1, limit: Int = 10): UserConnection!
+  user(id: ID!): User
   me: User!
-  roles: [Role!]!
+  roles(page: Int = 1, limit: Int = 10): RoleConnection!
   role(id: ID!): Role
   sessions(page: Int = 1, limit: Int = 10): SessionConnection!
-  permissions: [Permission!]!
+  permissions(page: Int = 1, limit: Int = 10): PermissionConnection!
   offices(page: Int = 1, limit: Int = 10): OfficeConnection!
   office(id: ID!): Office
 }
@@ -99,9 +109,10 @@ type Mutation {
   restoreUser(id: ID!): Boolean!
   assignRoleToUser(userId: ID!, roleId: ID!): User!
   createRole(input: CreateRoleInput!): Role!
-  assignPermissionsToRole(roleId: ID!, input: AssignPermissionsToRoleInput!): Role!
   updateRole(id: ID!, input: UpdateRoleInput!): Role!
   deleteRole(id: ID!): Boolean!
+  restoreRole(id: ID!): Boolean!
+  assignPermissionsToRole(roleId: ID!, input: AssignPermissionsToRoleInput!): Role!
   login(input: LoginUserInput!): LoginResponse!
   refreshToken(refresh_token: String!): LoginResponse!
   logout: Boolean!
@@ -139,13 +150,13 @@ input CreateRoleInput {
   description: String
 }
 
-input AssignPermissionsToRoleInput {
-  permissionIds: [ID!]!
-}
-
 input UpdateRoleInput {
   name: String
   description: String
+}
+
+input AssignPermissionsToRoleInput {
+  permissionIds: [ID!]!
 }
 
 input LoginUserInput {

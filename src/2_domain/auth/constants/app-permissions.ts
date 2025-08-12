@@ -7,6 +7,9 @@ export type AppPermission = {
 };
 
 export const ALL_APP_PERMISSIONS: AppPermission[] = [
+  // Thêm quyền cho Permission (chỉ đọc)
+  { action: ACTIONS.READ, subject: SUBJECTS.PERMISSION },
+
   // Quyền trên User
   { action: ACTIONS.CREATE, subject: SUBJECTS.USER },
   { action: ACTIONS.READ, subject: SUBJECTS.USER },

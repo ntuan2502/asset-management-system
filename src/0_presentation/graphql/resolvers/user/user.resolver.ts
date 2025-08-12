@@ -31,12 +31,9 @@ export class UserResolver {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @Query(() => UserType, { name: 'user', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.USER })
-  async getUserById(
-    @Args('id', { type: () => ID }) id: string,
-  ): Promise<UserType | null> {
-    return this.queryBus.execute(new GetUserByIdQuery(id));
+  @Mutation(() => UserType)
+  async createUser(@Args('input') input: CreateUserInput): Promise<UserType> {
+    return this.commandBus.execute(new CreateUserCommand(input));
   }
 
   @Query(() => UserConnection, { name: 'users' })
@@ -44,14 +41,15 @@ export class UserResolver {
   async getAllUsers(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedUsersResult> {
-    return this.queryBus.execute<GetAllUsersQuery, PaginatedUsersResult>(
-      new GetAllUsersQuery(args),
-    );
+    return this.queryBus.execute(new GetAllUsersQuery(args));
   }
 
-  @Mutation(() => UserType)
-  async createUser(@Args('input') input: CreateUserInput): Promise<UserType> {
-    return this.commandBus.execute(new CreateUserCommand(input));
+  @Query(() => UserType, { name: 'user', nullable: true })
+  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.USER })
+  async getUserById(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<UserType | null> {
+    return this.queryBus.execute(new GetUserByIdQuery(id));
   }
 
   @Mutation(() => UserType)

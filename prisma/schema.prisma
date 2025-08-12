@@ -85,6 +85,9 @@ model Permission {
   action  String // vd: "create", "read", "update", "delete"
   subject String // vd: "Asset", "User"
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   roles Role[] @relation("RolePermissions")
 
   @@unique([action, subject]) // Đảm bảo mỗi quyền là duy nhất

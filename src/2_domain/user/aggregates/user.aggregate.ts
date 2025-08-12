@@ -1,4 +1,7 @@
-import { UserCreatedEvent } from '../events/user-created.event';
+import {
+  UserCreatedEvent,
+  UserCreatedPayload,
+} from '../events/user-created.event';
 import { UserDeletedEvent } from '../events/user-deleted.event';
 import {
   UserUpdatedEvent,
@@ -10,6 +13,7 @@ import { UserRestoredEvent } from '../events/user-restored.event';
 import { RoleAssignedToUserEvent } from '../events/role-assigned-to-user.event';
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
 import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { createId } from '@paralleldrive/cuid2';
 
 export class UserAggregate extends BaseAggregateRoot {
   public readonly aggregateType = AGGREGATE_TYPES.USER;
@@ -75,28 +79,10 @@ export class UserAggregate extends BaseAggregateRoot {
     }
   }
 
-  public createUser(
-    id: string,
-    email: string,
-    hashedPassword: string,
-    firstName: string,
-    lastName: string,
-    dob?: Date | null,
-    gender?: string | null,
-  ) {
+  public createUser(data: Omit<UserCreatedPayload, 'id' | 'createdAt'>) {
+    const id = createId();
     const createdAt = new Date();
-    this.apply(
-      new UserCreatedEvent({
-        id,
-        email,
-        hashedPassword,
-        firstName,
-        lastName,
-        dob,
-        gender,
-        createdAt,
-      }),
-    );
+    this.apply(new UserCreatedEvent({ id, ...data, createdAt }));
   }
 
   public updateUser(payload: UpdateUserInput) {

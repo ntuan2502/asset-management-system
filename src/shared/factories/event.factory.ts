@@ -13,6 +13,7 @@ import { OfficeCreatedEvent } from 'src/2_domain/office/events/office-created.ev
 import { OfficeUpdatedEvent } from 'src/2_domain/office/events/office-updated.event';
 import { OfficeDeletedEvent } from 'src/2_domain/office/events/office-deleted.event';
 import { OfficeRestoredEvent } from 'src/2_domain/office/events/office-restored.event';
+import { RoleRestoredEvent } from 'src/2_domain/role/events/role-restored.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -21,11 +22,14 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [UserDeletedEvent.name]: UserDeletedEvent,
   [UserUpdatedEvent.name]: UserUpdatedEvent,
   [UserRestoredEvent.name]: UserRestoredEvent,
+
   [RoleCreatedEvent.name]: RoleCreatedEvent,
   [RoleUpdatedEvent.name]: RoleUpdatedEvent,
   [RoleDeletedEvent.name]: RoleDeletedEvent,
+  [RoleRestoredEvent.name]: RoleRestoredEvent,
   [PermissionsAssignedToRoleEvent.name]: PermissionsAssignedToRoleEvent,
   [RoleAssignedToUserEvent.name]: RoleAssignedToUserEvent,
+
   [OfficeCreatedEvent.name]: OfficeCreatedEvent,
   [OfficeUpdatedEvent.name]: OfficeUpdatedEvent,
   [OfficeDeletedEvent.name]: OfficeDeletedEvent,

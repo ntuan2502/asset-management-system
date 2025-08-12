@@ -1,5 +1,8 @@
 import { createId } from '@paralleldrive/cuid2';
-import { OfficeCreatedEvent } from '../events/office-created.event';
+import {
+  OfficeCreatedEvent,
+  OfficeCreatedPayload,
+} from '../events/office-created.event';
 import {
   OfficeUpdatedEvent,
   OfficeUpdatedPayload,
@@ -8,6 +11,7 @@ import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
 import { OfficeDeletedEvent } from '../events/office-deleted.event';
 import { OfficeRestoredEvent } from '../events/office-restored.event';
 import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { UpdateOfficeInput } from 'src/1_application/office/dtos/update-office.input';
 
 export class OfficeAggregate extends BaseAggregateRoot {
   public readonly aggregateType = AGGREGATE_TYPES.OFFICE;
@@ -22,27 +26,17 @@ export class OfficeAggregate extends BaseAggregateRoot {
   public updatedAt: Date;
   public deletedAt: Date | null = null;
 
-  public createOffice(data: {
-    name: string;
-    internationalName: string;
-    shortName: string;
-    taxCode: string;
-    address: string;
-    description?: string | null;
-  }) {
+  public createOffice(data: Omit<OfficeCreatedPayload, 'id' | 'createdAt'>) {
     const id = createId();
     const createdAt = new Date();
     this.apply(new OfficeCreatedEvent({ id, ...data, createdAt }));
   }
 
-  public updateOffice(payload: {
-    name?: string;
-    internationalName?: string;
-    shortName?: string;
-    taxCode?: string;
-    address?: string;
-    description?: string | null;
-  }) {
+  public updateOffice(payload: UpdateOfficeInput) {
+    if (this.deletedAt) {
+      throw new Error('Cannot update a deleted office.');
+    }
+
     const changes: Partial<OfficeUpdatedPayload> = {};
     let hasChanges = false;
 

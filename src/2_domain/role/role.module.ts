@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-// Presentation
 import { RoleResolver } from 'src/0_presentation/graphql/resolvers/role/role.resolver';
 
-// Application
 import { CreateRoleHandler } from 'src/1_application/role/commands/handlers/create-role.handler';
 import { UpdateRoleHandler } from 'src/1_application/role/commands/handlers/update-role.handler';
 import { DeleteRoleHandler } from 'src/1_application/role/commands/handlers/delete-role.handler';
@@ -12,22 +10,21 @@ import { AssignPermissionsToRoleHandler } from 'src/1_application/role/commands/
 import { GetAllRolesHandler } from 'src/1_application/role/queries/handlers/get-all-roles.handler';
 import { GetRoleByIdHandler } from 'src/1_application/role/queries/handlers/get-role-by-id.handler';
 
-// Domain
 import { ROLE_REPOSITORY } from './repositories/role.repository.interface';
 import { RoleAggregateRepository } from './repositories/role-aggregate.repository';
 
-// Infrastructure
 import { PrismaRoleRepository } from 'src/3_infrastructure/persistence/prisma/repositories/role/prisma-role.repository';
 import { RoleProjector } from 'src/3_infrastructure/projection/role.projector';
 
-// Shared Modules
 import { SharedInfrastructureModule } from 'src/3_infrastructure/shared/shared-infrastructure.module';
 import { PrismaModule } from 'src/3_infrastructure/persistence/prisma/prisma.module';
+import { RestoreRoleHandler } from 'src/1_application/role/commands/handlers/restore-role.handler';
 
 const CommandHandlers = [
   CreateRoleHandler,
   UpdateRoleHandler,
   DeleteRoleHandler,
+  RestoreRoleHandler,
   AssignPermissionsToRoleHandler,
 ];
 const QueryHandlers = [GetAllRolesHandler, GetRoleByIdHandler];

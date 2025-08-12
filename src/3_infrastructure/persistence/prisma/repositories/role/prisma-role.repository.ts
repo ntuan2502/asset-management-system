@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/3_infrastructure/persistence/prisma/prisma.service';
-import { IRoleRepository } from 'src/2_domain/role/repositories/role.repository.interface';
+import {
+  IRoleRepository,
+  PaginatedRoles,
+} from 'src/2_domain/role/repositories/role.repository.interface';
 import { RoleAggregate } from 'src/2_domain/role/aggregates/role.aggregate';
 import { RoleMapper } from 'src/1_application/role/mappers/role.mapper';
 
@@ -20,8 +23,26 @@ export class PrismaRoleRepository implements IRoleRepository {
     return role ? RoleMapper.toDomain(role) : null;
   }
 
-  async findAll(): Promise<RoleAggregate[]> {
-    const roles = await this.prisma.role.findMany();
-    return roles.map((role) => RoleMapper.toDomain(role));
+  async findAll(args: {
+    page: number;
+    limit: number;
+  }): Promise<PaginatedRoles> {
+    const { page, limit } = args;
+    const skip = (page - 1) * limit;
+
+    const [roles, totalCount] = await this.prisma.$transaction([
+      this.prisma.role.findMany({
+        where: { deletedAt: null },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.role.count({ where: { deletedAt: null } }),
+    ]);
+
+    return {
+      nodes: roles.map((role) => RoleMapper.toDomain(role)),
+      meta: { totalCount, page, limit },
+    };
   }
 }

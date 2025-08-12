@@ -17,6 +17,10 @@ import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { UpdateRoleInput } from 'src/1_application/role/dtos/update-role.input';
 import { UpdateRoleCommand } from 'src/1_application/role/commands/impl/update-role.command';
 import { DeleteRoleCommand } from 'src/1_application/role/commands/impl/delete-role.command';
+import { RestoreRoleCommand } from 'src/1_application/role/commands/impl/restore-role.command';
+import { RoleConnection } from './role-connection.type';
+import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
+import { PaginatedRolesResult } from 'src/1_application/role/queries/handlers/get-all-roles.handler';
 
 @Resolver(() => RoleType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -34,10 +38,12 @@ export class RoleResolver {
     return this.commandBus.execute(new CreateRoleCommand(input));
   }
 
-  @Query(() => [RoleType], { name: 'roles' })
+  @Query(() => RoleConnection, { name: 'roles' })
   @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.ROLE })
-  async getAllRoles(): Promise<RoleAggregate[]> {
-    return this.queryBus.execute(new GetAllRolesQuery());
+  async getAllRoles(
+    @Args() args: PaginationArgs,
+  ): Promise<PaginatedRolesResult> {
+    return this.queryBus.execute(new GetAllRolesQuery(args));
   }
 
   @Query(() => RoleType, { name: 'role', nullable: true })
@@ -46,17 +52,6 @@ export class RoleResolver {
     @Args('id', { type: () => ID }) id: string,
   ): Promise<RoleAggregate | null> {
     return this.queryBus.execute(new GetRoleByIdQuery(id));
-  }
-
-  @Mutation(() => RoleType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
-  async assignPermissionsToRole(
-    @Args('roleId', { type: () => ID }) roleId: string,
-    @Args('input') input: AssignPermissionsToRoleInput,
-  ): Promise<RoleAggregate> {
-    return this.commandBus.execute(
-      new AssignPermissionsToRoleCommand(roleId, input),
-    );
   }
 
   @Mutation(() => RoleType)
@@ -75,5 +70,25 @@ export class RoleResolver {
   ): Promise<boolean> {
     await this.commandBus.execute(new DeleteRoleCommand(id));
     return true;
+  }
+
+  @Mutation(() => Boolean)
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
+  async restoreRole(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    await this.commandBus.execute(new RestoreRoleCommand(id));
+    return true;
+  }
+
+  @Mutation(() => RoleType)
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
+  async assignPermissionsToRole(
+    @Args('roleId', { type: () => ID }) roleId: string,
+    @Args('input') input: AssignPermissionsToRoleInput,
+  ): Promise<RoleAggregate> {
+    return this.commandBus.execute(
+      new AssignPermissionsToRoleCommand(roleId, input),
+    );
   }
 }

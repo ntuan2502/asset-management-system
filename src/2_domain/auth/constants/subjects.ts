@@ -1,5 +1,6 @@
 export const SUBJECTS = {
   USER: 'User',
+  PERMISSION: 'Permission',
   ROLE: 'Role',
   ASSET: 'Asset',
   OFFICE: 'Office',

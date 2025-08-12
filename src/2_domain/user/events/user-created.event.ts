@@ -1,6 +1,6 @@
 import { IEvent } from '@nestjs/cqrs';
 
-interface UserCreatedPayload {
+export interface UserCreatedPayload {
   id: string;
   email: string;
   hashedPassword: string;
