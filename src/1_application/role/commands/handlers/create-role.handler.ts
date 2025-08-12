@@ -22,23 +22,18 @@ export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand> {
   async execute(command: CreateRoleCommand): Promise<RoleAggregate> {
     const { input } = command;
 
-    // Validation: Kiểm tra xem tên vai trò đã tồn tại chưa (trên Read Model)
     const existingRole = await this.roleRepository.findByName(input.name);
     if (existingRole) {
       throw new Error(`Role with name "${input.name}" already exists.`);
     }
 
-    // Kết nối Aggregate với EventBus
     const role = this.publisher.mergeObjectContext(new RoleAggregate());
 
-    // Thực thi logic nghiệp vụ
     role.createRole(input.name, input.description);
 
-    // Lưu sự kiện
     const events = role.getUncommittedEvents();
-    await this.eventStore.saveEvents(role.id, 'Role', events, 0);
+    await this.eventStore.saveEvents(role.id, role.aggregateType, events, 0);
 
-    // Commit và Publish
     role.commit();
 
     return role;

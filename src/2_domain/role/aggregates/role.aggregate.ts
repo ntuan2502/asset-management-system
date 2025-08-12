@@ -1,4 +1,3 @@
-import { AggregateRoot, IEvent } from '@nestjs/cqrs';
 import { createId } from '@paralleldrive/cuid2';
 import { RoleCreatedEvent } from '../events/role-created.event';
 import { PermissionsAssignedToRoleEvent } from '../events/permissions-assigned-to-role.event';
@@ -7,26 +6,22 @@ import {
   RoleUpdatedPayload,
 } from '../events/role-updated.event';
 import { RoleDeletedEvent } from '../events/role-deleted.event';
+import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
+import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
 
-export class RoleAggregate extends AggregateRoot {
-  public id: string;
+export class RoleAggregate extends BaseAggregateRoot {
+  public readonly aggregateType = AGGREGATE_TYPES.ROLE;
+
   public name: string;
   public description: string | null = null;
-  public permissionIds: string[] = []; // Sẽ dùng sau, khởi tạo rỗng
+  public permissionIds: string[] = [];
   public createdAt: Date;
   public updatedAt: Date;
   public deletedAt: Date | null = null;
-  public version = 0;
-
-  public loadFromHistory(history: IEvent[]) {
-    history.forEach((event) => this.apply(event, true));
-  }
 
   public assignPermissions(permissionIds: string[]) {
-    // Sử dụng Set để loại bỏ các ID trùng lặp và dễ dàng so sánh
     const newPermissionIds = [...new Set(permissionIds)];
 
-    // Quy tắc nghiệp vụ: Chỉ phát ra sự kiện nếu danh sách quyền thực sự thay đổi
     const currentIds = new Set(this.permissionIds);
     const incomingIds = new Set(newPermissionIds);
 
@@ -34,7 +29,6 @@ export class RoleAggregate extends AggregateRoot {
       currentIds.size === incomingIds.size &&
       [...currentIds].every((id) => incomingIds.has(id))
     ) {
-      // Không có gì thay đổi, không làm gì cả
       return;
     }
 
@@ -53,7 +47,7 @@ export class RoleAggregate extends AggregateRoot {
     this.apply(new RoleCreatedEvent({ id, name, description, createdAt }));
   }
 
-  public updateInfo(payload: { name?: string; description?: string | null }) {
+  public updateRole(payload: { name?: string; description?: string | null }) {
     const changes: Partial<RoleUpdatedPayload> = {};
     let hasChanges = false;
 

@@ -18,7 +18,7 @@ export class UserAggregateRepository extends BaseAggregateRepository<UserAggrega
     @Inject(SNAPSHOT_STORE_SERVICE) snapshotStore: ISnapshotStore,
     publisher: EventPublisher,
   ) {
-    super(eventStore, snapshotStore, publisher); // << Gọi super()
+    super(eventStore, snapshotStore, publisher);
   }
 
   async findById(id: string): Promise<UserAggregate> {

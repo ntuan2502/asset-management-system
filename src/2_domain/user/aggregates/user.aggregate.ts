@@ -1,17 +1,19 @@
-import { AggregateRoot, IEvent } from '@nestjs/cqrs';
 import { UserCreatedEvent } from '../events/user-created.event';
 import { UserDeletedEvent } from '../events/user-deleted.event';
 import {
   UserUpdatedEvent,
   UserUpdatedPayload,
-} from '../events/user-updated.event'; // << IMPORT SỰ KIỆN MỚI
-import { UpdateUserInput } from 'src/1_application/user/dtos/update-user.input'; // << IMPORT DTO
+} from '../events/user-updated.event';
+import { UpdateUserInput } from 'src/1_application/user/dtos/update-user.input';
 import { UserSnapshotDto } from './user-snapshot.dto';
 import { UserRestoredEvent } from '../events/user-restored.event';
 import { RoleAssignedToUserEvent } from '../events/role-assigned-to-user.event';
+import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
+import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
 
-export class UserAggregate extends AggregateRoot {
-  public id: string;
+export class UserAggregate extends BaseAggregateRoot {
+  public readonly aggregateType = AGGREGATE_TYPES.USER;
+
   public email: string;
   public password: string;
   public firstName: string;
@@ -21,20 +23,11 @@ export class UserAggregate extends AggregateRoot {
   public createdAt: Date;
   public updatedAt: Date;
   public deletedAt: Date | null = null;
-  public version = 0;
-  public roleIds: string[] = []; // << THÊM MỚI
-
-  constructor() {
-    super();
-  }
+  public roleIds: string[] = [];
 
   public loadFromSnapshot(snapshot: UserSnapshotDto) {
     Object.assign(this, snapshot);
     this.version = snapshot.version;
-  }
-
-  public loadFromHistory(history: IEvent[]) {
-    history.forEach((event) => this.apply(event, true));
   }
 
   protected onUserCreatedEvent(event: UserCreatedEvent) {
@@ -70,16 +63,13 @@ export class UserAggregate extends AggregateRoot {
   }
 
   protected onUserRestoredEvent(event: UserRestoredEvent) {
-    // Hành động chính là set deletedAt về null
     this.deletedAt = null;
-    // Cập nhật lại updatedAt
     this.updatedAt = event.restoredAt;
   }
 
   protected onRoleAssignedToUserEvent(event: RoleAssignedToUserEvent) {
     this.roleIds.push(event.roleId);
     this.updatedAt = event.assignedAt;
-    // Tăng version chỉ khi có sự kiện mới được apply (không phải từ history)
     if (!this.getUncommittedEvents().some((e) => e === event)) {
       this.version++;
     }
@@ -108,7 +98,8 @@ export class UserAggregate extends AggregateRoot {
       }),
     );
   }
-  public updateInfo(payload: UpdateUserInput) {
+
+  public updateUser(payload: UpdateUserInput) {
     if (this.deletedAt) {
       throw new Error('Cannot update a deleted user.');
     }
@@ -156,7 +147,7 @@ export class UserAggregate extends AggregateRoot {
     this.apply(new UserDeletedEvent({ id: this.id }));
   }
 
-  public restore() {
+  public restoreUser() {
     if (!this.deletedAt) {
       throw new Error('Cannot restore an active user.');
     }
@@ -164,9 +155,8 @@ export class UserAggregate extends AggregateRoot {
   }
 
   public assignRole(roleId: string) {
-    // Quy tắc nghiệp vụ: Không gán lại vai trò đã có
     if (this.roleIds.includes(roleId)) {
-      return; // Hoặc ném lỗi nếu muốn
+      return;
     }
     this.apply(
       new RoleAssignedToUserEvent({

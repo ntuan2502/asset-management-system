@@ -28,7 +28,7 @@ export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand> {
     if (events.length > 0) {
       await this.eventStore.saveEvents(
         role.id,
-        'Role',
+        role.aggregateType,
         events,
         expectedVersion,
       );

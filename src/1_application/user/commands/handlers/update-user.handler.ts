@@ -25,11 +25,16 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
     }
 
     const expectedVersion = user.version;
-    user.updateInfo(payload);
+    user.updateUser(payload);
 
     const events = user.getUncommittedEvents();
     if (events.length > 0) {
-      await this.eventStore.saveEvents(id, 'User', events, expectedVersion);
+      await this.eventStore.saveEvents(
+        user.id,
+        user.aggregateType,
+        events,
+        expectedVersion,
+      );
       user.commit();
     }
 

@@ -9,6 +9,10 @@ import { PermissionsAssignedToRoleEvent } from 'src/2_domain/role/events/permiss
 import { RoleAssignedToUserEvent } from 'src/2_domain/user/events/role-assigned-to-user.event';
 import { RoleUpdatedEvent } from 'src/2_domain/role/events/role-updated.event';
 import { RoleDeletedEvent } from 'src/2_domain/role/events/role-deleted.event';
+import { OfficeCreatedEvent } from 'src/2_domain/office/events/office-created.event';
+import { OfficeUpdatedEvent } from 'src/2_domain/office/events/office-updated.event';
+import { OfficeDeletedEvent } from 'src/2_domain/office/events/office-deleted.event';
+import { OfficeRestoredEvent } from 'src/2_domain/office/events/office-restored.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -22,6 +26,10 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [RoleDeletedEvent.name]: RoleDeletedEvent,
   [PermissionsAssignedToRoleEvent.name]: PermissionsAssignedToRoleEvent,
   [RoleAssignedToUserEvent.name]: RoleAssignedToUserEvent,
+  [OfficeCreatedEvent.name]: OfficeCreatedEvent,
+  [OfficeUpdatedEvent.name]: OfficeUpdatedEvent,
+  [OfficeDeletedEvent.name]: OfficeDeletedEvent,
+  [OfficeRestoredEvent.name]: OfficeRestoredEvent,
 };
 
 export class EventFactory {

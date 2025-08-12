@@ -23,13 +23,13 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
     }
 
     const expectedVersion = role.version;
-    role.updateInfo(payload);
+    role.updateRole(payload);
 
     const events = role.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
         role.id,
-        'Role',
+        role.aggregateType,
         events,
         expectedVersion,
       );

@@ -17,18 +17,22 @@ export class RestoreUserHandler implements ICommandHandler<RestoreUserCommand> {
   async execute(command: RestoreUserCommand): Promise<void> {
     const { id } = command;
 
-    // Load aggregate (bao gồm cả các user đã bị xóa)
     const user = await this.aggregateRepository.findById(id);
     if (!user.id) {
       throw new NotFoundException(`User with ID "${id}" not found.`);
     }
 
     const expectedVersion = user.version;
-    user.restore(); // Gọi phương thức nghiệp vụ
+    user.restoreUser();
 
     const events = user.getUncommittedEvents();
     if (events.length > 0) {
-      await this.eventStore.saveEvents(id, 'User', events, expectedVersion);
+      await this.eventStore.saveEvents(
+        user.id,
+        user.aggregateType,
+        events,
+        expectedVersion,
+      );
       user.commit();
     }
   }

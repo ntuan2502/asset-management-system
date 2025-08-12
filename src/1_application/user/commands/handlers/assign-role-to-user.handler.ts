@@ -43,7 +43,7 @@ export class AssignRoleToUserHandler
     if (events.length > 0) {
       await this.eventStore.saveEvents(
         user.id,
-        'User',
+        user.aggregateType,
         events,
         expectedVersion,
       );

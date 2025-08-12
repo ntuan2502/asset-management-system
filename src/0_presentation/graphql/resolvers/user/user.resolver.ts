@@ -44,8 +44,6 @@ export class UserResolver {
   async getAllUsers(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedUsersResult> {
-    // << Sửa kiểu trả về của phương thức
-    // SỬA LỖI: Thêm generic type cho execute
     return this.queryBus.execute<GetAllUsersQuery, PaginatedUsersResult>(
       new GetAllUsersQuery(args),
     );

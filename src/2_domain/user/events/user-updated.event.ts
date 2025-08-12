@@ -1,14 +1,12 @@
 import { IEvent } from '@nestjs/cqrs';
 
-// Định nghĩa payload cho sự kiện cập nhật
-// Tất cả các trường đều là tùy chọn
 export interface UserUpdatedPayload {
-  id: string; // ID của user được cập nhật
+  id: string;
   firstName?: string;
   lastName?: string;
   dob?: Date;
   gender?: string | null;
-  updatedAt: Date; // Thời điểm cập nhật
+  updatedAt: Date;
 }
 
 export class UserUpdatedEvent implements IEvent {
@@ -22,7 +20,6 @@ export class UserUpdatedEvent implements IEvent {
   constructor(payload: UserUpdatedPayload) {
     Object.assign(this, payload);
 
-    // --- THÊM PHẦN CHUYỂN ĐỔI ---
     if (this.dob) {
       this.dob = new Date(this.dob);
     }

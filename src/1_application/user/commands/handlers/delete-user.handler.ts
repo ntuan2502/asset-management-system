@@ -28,7 +28,12 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
 
     const events = user.getUncommittedEvents();
     if (events.length > 0) {
-      await this.eventStore.saveEvents(id, 'User', events, expectedVersion);
+      await this.eventStore.saveEvents(
+        user.id,
+        user.aggregateType,
+        events,
+        expectedVersion,
+      );
       user.commit();
     }
   }

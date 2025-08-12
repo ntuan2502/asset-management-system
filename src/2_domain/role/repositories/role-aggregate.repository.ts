@@ -18,7 +18,7 @@ export class RoleAggregateRepository extends BaseAggregateRepository<RoleAggrega
     @Inject(SNAPSHOT_STORE_SERVICE) snapshotStore: ISnapshotStore,
     publisher: EventPublisher,
   ) {
-    super(eventStore, snapshotStore, publisher); // << Gọi super()
+    super(eventStore, snapshotStore, publisher);
   }
   async findById(id: string): Promise<RoleAggregate> {
     return this.loadAggregate(id, RoleAggregate);

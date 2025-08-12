@@ -14,17 +14,15 @@ export class UserType {
   @Field()
   lastName: string;
 
-  // --- THÊM MỚI CÁC TRƯỜNG ---
-
-  @Field(() => GraphQLISODateTime, { nullable: true }) // Dùng kiểu DateTime của GraphQL
+  @Field(() => GraphQLISODateTime, { nullable: true })
   dob: Date;
 
   @Field({ nullable: true })
   gender: string;
 
-  @Field(() => GraphQLISODateTime) // Kiểu DateTime cho ngày tháng
+  @Field(() => GraphQLISODateTime)
   createdAt: Date;
 
-  @Field(() => GraphQLISODateTime) // Kiểu DateTime cho ngày tháng
+  @Field(() => GraphQLISODateTime)
   updatedAt: Date;
 }

@@ -62,6 +62,23 @@ type Permission {
   subject: String!
 }
 
+type Office {
+  id: ID!
+  name: String!
+  internationalName: String!
+  shortName: String!
+  taxCode: String!
+  address: String!
+  description: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type OfficeConnection {
+  nodes: [Office!]!
+  meta: PaginationMeta!
+}
+
 type Query {
   hello: String!
   user(id: ID!): User
@@ -71,6 +88,8 @@ type Query {
   role(id: ID!): Role
   sessions(page: Int = 1, limit: Int = 10): SessionConnection!
   permissions: [Permission!]!
+  offices(page: Int = 1, limit: Int = 10): OfficeConnection!
+  office(id: ID!): Office
 }
 
 type Mutation {
@@ -87,6 +106,9 @@ type Mutation {
   refreshToken(refresh_token: String!): LoginResponse!
   logout: Boolean!
   logoutAll: Boolean!
+  createOffice(input: CreateOfficeInput!): Office!
+  updateOffice(id: ID!, input: UpdateOfficeInput!): Office!
+  deleteOffice(id: ID!): Boolean!
 }
 
 input CreateUserInput {
@@ -129,4 +151,22 @@ input UpdateRoleInput {
 input LoginUserInput {
   email: String!
   password: String!
+}
+
+input CreateOfficeInput {
+  name: String!
+  internationalName: String!
+  shortName: String!
+  taxCode: String!
+  address: String!
+  description: String
+}
+
+input UpdateOfficeInput {
+  name: String
+  internationalName: String
+  shortName: String
+  taxCode: String
+  address: String
+  description: String
 }

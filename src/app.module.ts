@@ -13,6 +13,7 @@ import { UserModule } from './2_domain/user/user.module';
 import { RoleModule } from './2_domain/role/role.module';
 import { PrismaModule } from './3_infrastructure/persistence/prisma/prisma.module';
 import { AuthMiddleware } from './2_domain/auth/middleware/auth.middleware';
+import { OfficeModule } from './2_domain/office/office.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { AuthMiddleware } from './2_domain/auth/middleware/auth.middleware';
     RoleModule,
     AuthModule,
     PermissionModule,
-
+    OfficeModule,
     SeederModule,
   ],
   controllers: [AppController],

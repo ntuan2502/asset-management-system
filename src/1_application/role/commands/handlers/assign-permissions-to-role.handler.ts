@@ -45,7 +45,7 @@ export class AssignPermissionsToRoleHandler
     if (events.length > 0) {
       await this.eventStore.saveEvents(
         role.id,
-        'Role',
+        role.aggregateType,
         events,
         expectedVersion,
       );

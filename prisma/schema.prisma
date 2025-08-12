@@ -31,6 +31,12 @@ model User {
 
   roles    Role[]    @relation("UserRoles")
   sessions Session[]
+
+  officeId String?
+  office   Office? @relation(fields: [officeId], references: [id])
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
 }
 
 // Model để lưu trữ các sự kiện một cách bất biến (append-only)
@@ -100,4 +106,41 @@ model Session {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+model Office {
+  id                String  @id @default(cuid())
+  name              String // Tên
+  internationalName String // Tên quốc tế
+  shortName         String // Tên viết tắt
+  taxCode           String // Mã số thuế
+  address           String
+  description       String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users       User[]
+  departments Department[]
+
+  @@index([internationalName])
+  @@index([shortName])
+  @@index([taxCode])
+}
+
+model Department {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  officeId String
+  office   Office @relation(fields: [officeId], references: [id])
+  users    User[]
+
+  @@unique([name, officeId])
 }

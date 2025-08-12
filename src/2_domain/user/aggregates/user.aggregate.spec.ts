@@ -105,7 +105,7 @@ describe('UserAggregate', () => {
 
   it('should throw an error when trying to restore an already active user', () => {
     const aggregate = new UserAggregate();
-    const action = () => aggregate.restore();
+    const action = () => aggregate.restoreUser();
     expect(action).toThrow('Cannot restore an active user.');
   });
 });
