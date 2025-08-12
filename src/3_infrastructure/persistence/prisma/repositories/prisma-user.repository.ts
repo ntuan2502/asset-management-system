@@ -35,7 +35,6 @@ export class PrismaUserRepository implements IUserRepository {
     const prismaUser = await this.prisma.user.findFirst({
       where: {
         email,
-        deletedAt: null,
       },
     });
     return prismaUser ? UserMapper.toDomain(prismaUser) : null;
