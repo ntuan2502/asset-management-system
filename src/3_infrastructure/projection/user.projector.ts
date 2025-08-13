@@ -7,13 +7,17 @@ import { UserUpdatedEvent } from 'src/2_domain/user/events/user-updated.event';
 import { Gender, Prisma } from '@prisma/client';
 import { UserRestoredEvent } from 'src/2_domain/user/events/user-restored.event';
 import { RoleAssignedToUserEvent } from 'src/2_domain/user/events/role-assigned-to-user.event';
+import { UserOfficeChangedEvent } from 'src/2_domain/user/events/user-office-changed.event';
+import { UserDepartmentChangedEvent } from 'src/2_domain/user/events/user-department-changed.event';
 
 type UserEvent =
   | UserCreatedEvent
   | UserDeletedEvent
   | UserUpdatedEvent
   | UserRestoredEvent
-  | RoleAssignedToUserEvent;
+  | RoleAssignedToUserEvent
+  | UserOfficeChangedEvent
+  | UserDepartmentChangedEvent;
 @Injectable()
 @EventsHandler(
   UserCreatedEvent,
@@ -21,6 +25,8 @@ type UserEvent =
   UserUpdatedEvent,
   UserRestoredEvent,
   RoleAssignedToUserEvent,
+  UserOfficeChangedEvent,
+  UserDepartmentChangedEvent,
 )
 export class UserProjector implements IEventHandler<UserEvent> {
   constructor(private readonly prisma: PrismaService) {}
@@ -36,6 +42,10 @@ export class UserProjector implements IEventHandler<UserEvent> {
       await this.onUserRestored(event);
     } else if (event instanceof RoleAssignedToUserEvent) {
       await this.onRoleAssignedToUser(event);
+    } else if (event instanceof UserOfficeChangedEvent) {
+      await this.onUserOfficeChanged(event);
+    } else if (event instanceof UserDepartmentChangedEvent) {
+      await this.onUserDepartmentChanged(event);
     }
   }
 
@@ -51,6 +61,8 @@ export class UserProjector implements IEventHandler<UserEvent> {
           lastName: event.lastName,
           dob: event.dob,
           gender: event.gender ? (event.gender as Gender) : null,
+          officeId: event.officeId,
+          departmentId: event.departmentId,
           createdAt: event.createdAt,
           updatedAt: event.createdAt,
         },
@@ -148,6 +160,61 @@ export class UserProjector implements IEventHandler<UserEvent> {
     } catch (error) {
       console.error(
         `--- [PROJECTOR] ERROR assigning role ${event.roleId} to user ${event.userId}:`,
+        error,
+      );
+    }
+  }
+
+  private async onUserOfficeChanged(
+    event: UserOfficeChangedEvent,
+  ): Promise<void> {
+    try {
+      console.log('--- [PROJECTOR] Received UserOfficeChangedEvent ---', event);
+      await this.prisma.user.update({
+        where: { id: event.id },
+        data: {
+          // Dùng `connect` để tạo liên kết
+          // Hoặc `disconnect: true` nếu newOfficeId là null
+          office: event.newOfficeId
+            ? { connect: { id: event.newOfficeId } }
+            : { disconnect: true },
+          updatedAt: event.changedAt,
+        },
+      });
+      console.log(
+        `--- [PROJECTOR] Successfully changed office for user ${event.id} ---`,
+      );
+    } catch (error) {
+      console.error(
+        `--- [PROJECTOR] ERROR changing office for user ${event.id}:`,
+        error,
+      );
+    }
+  }
+
+  private async onUserDepartmentChanged(
+    event: UserDepartmentChangedEvent,
+  ): Promise<void> {
+    try {
+      console.log(
+        '--- [PROJECTOR] Received UserDepartmentChangedEvent ---',
+        event,
+      );
+      await this.prisma.user.update({
+        where: { id: event.id },
+        data: {
+          department: event.newDepartmentId
+            ? { connect: { id: event.newDepartmentId } }
+            : { disconnect: true },
+          updatedAt: event.changedAt,
+        },
+      });
+      console.log(
+        `--- [PROJECTOR] Successfully changed department for user ${event.id} ---`,
+      );
+    } catch (error) {
+      console.error(
+        `--- [PROJECTOR] ERROR changing department for user ${event.id}:`,
         error,
       );
     }

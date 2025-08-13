@@ -8,6 +8,8 @@ export interface UserCreatedPayload {
   lastName: string;
   dob?: Date | null;
   gender?: string | null;
+  officeId?: string | null;
+  departmentId?: string | null;
   createdAt: Date;
 }
 
@@ -19,6 +21,8 @@ export class UserCreatedEvent implements IEvent {
   public readonly lastName: string;
   public readonly dob?: Date | null;
   public readonly gender?: string | null;
+  public readonly officeId?: string | null;
+  public readonly departmentId?: string | null;
   public readonly createdAt: Date;
 
   constructor(payload: UserCreatedPayload) {

@@ -1,8 +1,21 @@
-import { Gender, Prisma, User as PrismaUser } from '@prisma/client';
+import {
+  Department,
+  Gender,
+  Office,
+  Prisma,
+  User as PrismaUser,
+  Role,
+} from '@prisma/client';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
 
+type PrismaUserWithRelations = PrismaUser & {
+  office?: Office | null;
+  department?: Department | null;
+  roles?: Role[];
+};
+
 export class UserMapper {
-  public static toDomain(prismaUser: PrismaUser): UserAggregate {
+  public static toDomain(prismaUser: PrismaUserWithRelations): UserAggregate {
     const domainUser = new UserAggregate();
     domainUser.id = prismaUser.id;
     domainUser.email = prismaUser.email;
@@ -13,6 +26,13 @@ export class UserMapper {
     domainUser.gender = prismaUser.gender;
     domainUser.createdAt = prismaUser.createdAt;
     domainUser.updatedAt = prismaUser.updatedAt;
+    domainUser.deletedAt = prismaUser.deletedAt;
+
+    domainUser.roleIds = prismaUser.roles?.map((role) => role.id) ?? [];
+
+    domainUser.officeId = prismaUser.officeId;
+    domainUser.departmentId = prismaUser.departmentId;
+
     return domainUser;
   }
 

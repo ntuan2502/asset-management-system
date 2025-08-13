@@ -27,6 +27,7 @@ export class PrismaUserRepository implements IUserRepository {
         id,
         deletedAt: null,
       },
+      include: { roles: true },
     });
     return prismaUser ? UserMapper.toDomain(prismaUser) : null;
   }
@@ -36,6 +37,7 @@ export class PrismaUserRepository implements IUserRepository {
       where: {
         email,
       },
+      include: { roles: true },
     });
     return prismaUser ? UserMapper.toDomain(prismaUser) : null;
   }
@@ -50,6 +52,7 @@ export class PrismaUserRepository implements IUserRepository {
     const [users, totalCount] = await this.prisma.$transaction([
       this.prisma.user.findMany({
         where: { deletedAt: null },
+        include: { roles: true },
         skip: skip,
         take: limit,
         orderBy: { createdAt: 'desc' },

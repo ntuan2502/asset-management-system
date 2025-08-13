@@ -11,6 +11,9 @@ export class UserSnapshotDto {
   dob: Date | null;
 
   gender: string | null;
+  roleIds: string[];
+  officeId: string | null;
+  departmentId: string | null;
 
   @Type(() => Date)
   deletedAt: Date | null;

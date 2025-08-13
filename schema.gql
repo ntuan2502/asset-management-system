@@ -2,6 +2,36 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Office {
+  id: ID!
+  name: String!
+  internationalName: String!
+  shortName: String!
+  taxCode: String!
+  address: String!
+  description: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Department {
+  id: ID!
+  name: String!
+  description: String
+  office: Office!
+}
+
+type Role {
+  id: ID!
+  name: String!
+  description: String
+}
+
 type User {
   id: ID!
   email: String!
@@ -11,12 +41,10 @@ type User {
   gender: String
   createdAt: DateTime!
   updatedAt: DateTime!
+  roles: [Role!]!
+  office: Office
+  department: Department
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type PaginationMeta {
   totalCount: Int!
@@ -32,14 +60,18 @@ type UserConnection {
   meta: PaginationMeta!
 }
 
-type Role {
-  id: ID!
-  name: String!
-  description: String
-}
-
 type RoleConnection {
   nodes: [Role!]!
+  meta: PaginationMeta!
+}
+
+type DepartmentConnection {
+  nodes: [Department!]!
+  meta: PaginationMeta!
+}
+
+type OfficeConnection {
+  nodes: [Office!]!
   meta: PaginationMeta!
 }
 
@@ -72,35 +104,6 @@ type PermissionConnection {
   meta: PaginationMeta!
 }
 
-type Office {
-  id: ID!
-  name: String!
-  internationalName: String!
-  shortName: String!
-  taxCode: String!
-  address: String!
-  description: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type OfficeConnection {
-  nodes: [Office!]!
-  meta: PaginationMeta!
-}
-
-type Department {
-  id: ID!
-  name: String!
-  description: String
-  office: Office!
-}
-
-type DepartmentConnection {
-  nodes: [Department!]!
-  meta: PaginationMeta!
-}
-
 type Query {
   hello: String!
   users(page: Int = 1, limit: Int = 10): UserConnection!
@@ -108,12 +111,12 @@ type Query {
   me: User!
   roles(page: Int = 1, limit: Int = 10): RoleConnection!
   role(id: ID!): Role
-  sessions(page: Int = 1, limit: Int = 10): SessionConnection!
-  permissions(page: Int = 1, limit: Int = 10): PermissionConnection!
-  offices(page: Int = 1, limit: Int = 10): OfficeConnection!
-  office(id: ID!): Office
   departments(page: Int = 1, limit: Int = 10): DepartmentConnection!
   department(id: ID!): Department
+  offices(page: Int = 1, limit: Int = 10): OfficeConnection!
+  office(id: ID!): Office
+  sessions(page: Int = 1, limit: Int = 10): SessionConnection!
+  permissions(page: Int = 1, limit: Int = 10): PermissionConnection!
 }
 
 type Mutation {
@@ -127,17 +130,17 @@ type Mutation {
   deleteRole(id: ID!): Boolean!
   restoreRole(id: ID!): Boolean!
   assignPermissionsToRole(roleId: ID!, input: AssignPermissionsToRoleInput!): Role!
-  login(input: LoginUserInput!): LoginResponse!
-  refreshToken(refresh_token: String!): LoginResponse!
-  logout: Boolean!
-  logoutAll: Boolean!
-  createOffice(input: CreateOfficeInput!): Office!
-  updateOffice(id: ID!, input: UpdateOfficeInput!): Office!
-  deleteOffice(id: ID!): Boolean!
   createDepartment(input: CreateDepartmentInput!): Department!
   updateDepartment(id: ID!, input: UpdateDepartmentInput!): Department!
   deleteDepartment(id: ID!): Boolean!
   restoreDepartment(id: ID!): Boolean!
+  createOffice(input: CreateOfficeInput!): Office!
+  updateOffice(id: ID!, input: UpdateOfficeInput!): Office!
+  deleteOffice(id: ID!): Boolean!
+  login(input: LoginUserInput!): LoginResponse!
+  refreshToken(refresh_token: String!): LoginResponse!
+  logout: Boolean!
+  logoutAll: Boolean!
 }
 
 input CreateUserInput {
@@ -147,6 +150,12 @@ input CreateUserInput {
   lastName: String!
   dob: DateTime
   gender: GenderEnum
+
+  """ID of the office the user belongs to"""
+  officeId: ID
+
+  """ID of the department the user belongs to"""
+  departmentId: ID
 }
 
 """The gender of the user."""
@@ -161,6 +170,12 @@ input UpdateUserInput {
   lastName: String
   dob: DateTime
   gender: GenderEnum
+
+  """ID of the new office for the user"""
+  officeId: ID
+
+  """ID of the new department for the user"""
+  departmentId: ID
 }
 
 input CreateRoleInput {
@@ -177,9 +192,15 @@ input AssignPermissionsToRoleInput {
   permissionIds: [ID!]!
 }
 
-input LoginUserInput {
-  email: String!
-  password: String!
+input CreateDepartmentInput {
+  name: String!
+  officeId: ID!
+  description: String
+}
+
+input UpdateDepartmentInput {
+  name: String
+  description: String
 }
 
 input CreateOfficeInput {
@@ -200,13 +221,7 @@ input UpdateOfficeInput {
   description: String
 }
 
-input CreateDepartmentInput {
-  name: String!
-  officeId: ID!
-  description: String
-}
-
-input UpdateDepartmentInput {
-  name: String
-  description: String
+input LoginUserInput {
+  email: String!
+  password: String!
 }

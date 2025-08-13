@@ -5,11 +5,11 @@ import {
   IDepartmentRepository,
   DEPARTMENT_REPOSITORY,
 } from 'src/2_domain/department/repositories/department.repository.interface';
-import { DepartmentAggregate } from 'src/2_domain/department/aggregates/department.aggregate';
+import { DepartmentAggregate } from 'src/2_domain/department/aggregates/department.aggregate'; // << Import
 
 @QueryHandler(GetDepartmentByIdQuery)
 export class GetDepartmentByIdHandler
-  implements IQueryHandler<GetDepartmentByIdQuery>
+  implements IQueryHandler<GetDepartmentByIdQuery, DepartmentAggregate | null>
 {
   constructor(
     @Inject(DEPARTMENT_REPOSITORY)

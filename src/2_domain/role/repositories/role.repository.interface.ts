@@ -10,5 +10,6 @@ export const ROLE_REPOSITORY = 'ROLE_REPOSITORY';
 export interface IRoleRepository {
   findByName(name: string): Promise<RoleAggregate | null>;
   findById(id: string): Promise<RoleAggregate | null>;
+  findByIds(ids: string[]): Promise<RoleAggregate[]>;
   findAll(args: { page: number; limit: number }): Promise<PaginatedRoles>;
 }

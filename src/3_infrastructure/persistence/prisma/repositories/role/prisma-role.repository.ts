@@ -23,6 +23,16 @@ export class PrismaRoleRepository implements IRoleRepository {
     return role ? RoleMapper.toDomain(role) : null;
   }
 
+  async findByIds(ids: string[]): Promise<RoleAggregate[]> {
+    const roles = await this.prisma.role.findMany({
+      where: {
+        id: { in: ids },
+        deletedAt: null,
+      },
+    });
+    return roles.map((role) => RoleMapper.toDomain(role));
+  }
+
   async findAll(args: {
     page: number;
     limit: number;

@@ -1,4 +1,4 @@
-import { Field, InputType, GraphQLISODateTime } from '@nestjs/graphql';
+import { Field, InputType, GraphQLISODateTime, ID } from '@nestjs/graphql';
 import {
   IsEmail,
   IsNotEmpty,
@@ -9,6 +9,7 @@ import {
   IsEnum,
 } from 'class-validator';
 import { GenderEnum } from 'src/2_domain/user/enums/gender.enum';
+import { IsCuid } from 'src/shared/validators/is-cuid.validator';
 
 @InputType()
 export class CreateUserInput {
@@ -41,4 +42,20 @@ export class CreateUserInput {
   @IsOptional()
   @IsEnum(GenderEnum)
   gender?: GenderEnum;
+
+  @Field(() => ID, {
+    nullable: true,
+    description: 'ID of the office the user belongs to',
+  })
+  @IsOptional()
+  @IsCuid()
+  officeId?: string;
+
+  @Field(() => ID, {
+    nullable: true,
+    description: 'ID of the department the user belongs to',
+  })
+  @IsOptional()
+  @IsCuid()
+  departmentId?: string;
 }

@@ -18,6 +18,8 @@ import { DepartmentCreatedEvent } from 'src/2_domain/department/events/departmen
 import { DepartmentUpdatedEvent } from 'src/2_domain/department/events/department-updated.event';
 import { DepartmentDeletedEvent } from 'src/2_domain/department/events/department-deleted.event';
 import { DepartmentRestoredEvent } from 'src/2_domain/department/events/department-restored.event';
+import { UserOfficeChangedEvent } from 'src/2_domain/user/events/user-office-changed.event';
+import { UserDepartmentChangedEvent } from 'src/2_domain/user/events/user-department-changed.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -26,6 +28,8 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [UserDeletedEvent.name]: UserDeletedEvent,
   [UserUpdatedEvent.name]: UserUpdatedEvent,
   [UserRestoredEvent.name]: UserRestoredEvent,
+  [UserOfficeChangedEvent.name]: UserOfficeChangedEvent,
+  [UserDepartmentChangedEvent.name]: UserDepartmentChangedEvent,
 
   [RoleCreatedEvent.name]: RoleCreatedEvent,
   [RoleUpdatedEvent.name]: RoleUpdatedEvent,

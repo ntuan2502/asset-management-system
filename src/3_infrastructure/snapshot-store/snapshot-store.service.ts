@@ -40,9 +40,12 @@ export class SnapshotStoreService implements ISnapshotStore {
       lastName: aggregate.lastName,
       dob: aggregate.dob,
       gender: aggregate.gender,
-      deletedAt: aggregate.deletedAt,
+      roleIds: aggregate.roleIds,
+      officeId: aggregate.officeId,
+      departmentId: aggregate.departmentId,
       createdAt: aggregate.createdAt,
       updatedAt: aggregate.updatedAt,
+      deletedAt: aggregate.deletedAt,
       version: aggregate.version,
     };
 

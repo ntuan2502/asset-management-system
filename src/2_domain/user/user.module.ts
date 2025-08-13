@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { UserResolver } from 'src/0_presentation/graphql/resolvers/user/user.resolver';
@@ -21,6 +21,8 @@ import { SharedInfrastructureModule } from 'src/3_infrastructure/shared/shared-i
 import { RoleModule } from 'src/2_domain/role/role.module';
 import { PrismaModule } from 'src/3_infrastructure/persistence/prisma/prisma.module';
 import { UserProjector } from 'src/3_infrastructure/projection/user.projector';
+import { DepartmentModule } from '../department/department.module';
+import { OfficeModule } from '../office/office.module';
 
 const CommandHandlers = [
   CreateUserHandler,
@@ -38,7 +40,14 @@ const Repositories = [
 const Sagas = [SnapshotterService];
 
 @Module({
-  imports: [PrismaModule, CqrsModule, SharedInfrastructureModule, RoleModule],
+  imports: [
+    PrismaModule,
+    CqrsModule,
+    SharedInfrastructureModule,
+    forwardRef(() => RoleModule),
+    forwardRef(() => DepartmentModule),
+    forwardRef(() => OfficeModule),
+  ],
   providers: [
     UserResolver,
     ...CommandHandlers,

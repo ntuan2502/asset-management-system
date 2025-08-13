@@ -19,6 +19,7 @@ import { RoleProjector } from 'src/3_infrastructure/projection/role.projector';
 import { SharedInfrastructureModule } from 'src/3_infrastructure/shared/shared-infrastructure.module';
 import { PrismaModule } from 'src/3_infrastructure/persistence/prisma/prisma.module';
 import { RestoreRoleHandler } from 'src/1_application/role/commands/handlers/restore-role.handler';
+import { GetRolesByIdsHandler } from 'src/1_application/role/queries/handlers/get-roles-by-ids.handler';
 
 const CommandHandlers = [
   CreateRoleHandler,
@@ -27,7 +28,11 @@ const CommandHandlers = [
   RestoreRoleHandler,
   AssignPermissionsToRoleHandler,
 ];
-const QueryHandlers = [GetAllRolesHandler, GetRoleByIdHandler];
+const QueryHandlers = [
+  GetAllRolesHandler,
+  GetRoleByIdHandler,
+  GetRolesByIdsHandler,
+];
 const Repositories = [
   { provide: ROLE_REPOSITORY, useClass: PrismaRoleRepository },
   RoleAggregateRepository,

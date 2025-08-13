@@ -1,4 +1,7 @@
 import { ObjectType, Field, ID, GraphQLISODateTime } from '@nestjs/graphql';
+import { OfficeType } from '../office/office.type';
+import { DepartmentType } from '../department/department.type';
+import { RoleType } from '../role/role.type';
 
 @ObjectType('User')
 export class UserType {
@@ -25,4 +28,13 @@ export class UserType {
 
   @Field(() => GraphQLISODateTime)
   updatedAt: Date;
+
+  @Field(() => [RoleType], { nullable: 'itemsAndList' }) // Cho phép cả mảng và các item trong mảng là null/rỗng
+  roles: RoleType[];
+
+  @Field(() => OfficeType, { nullable: true })
+  office?: OfficeType;
+
+  @Field(() => DepartmentType, { nullable: true })
+  department?: DepartmentType;
 }
