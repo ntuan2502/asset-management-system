@@ -3,6 +3,7 @@
 exports[`UserAggregate should apply a UserCreatedEvent and update state correctly 1`] = `
 UserCreatedEvent {
   "createdAt": 2025-01-01T10:00:00.000Z,
+  "departmentId": "dept-xyz",
   "dob": 1990-01-15T00:00:00.000Z,
   "email": "test@example.com",
   "firstName": "John",
@@ -10,26 +11,32 @@ UserCreatedEvent {
   "hashedPassword": "hashed-password",
   "id": "user-123",
   "lastName": "Doe",
+  "officeId": "office-abc",
 }
 `;
 
 exports[`UserAggregate should apply a UserCreatedEvent and update state correctly 2`] = `
 UserAggregate {
+  "aggregateType": "User",
   "createdAt": 2025-01-01T10:00:00.000Z,
   "deletedAt": null,
+  "departmentId": "dept-xyz",
   "dob": 1990-01-15T00:00:00.000Z,
   "email": "test@example.com",
   "firstName": "John",
   "gender": "MALE",
   "id": "user-123",
   "lastName": "Doe",
+  "officeId": "office-abc",
   "password": "hashed-password",
+  "roleIds": [],
   "updatedAt": 2025-01-01T10:00:00.000Z,
   "version": 0,
   Symbol(): false,
   Symbol(): [
     UserCreatedEvent {
       "createdAt": 2025-01-01T10:00:00.000Z,
+      "departmentId": "dept-xyz",
       "dob": 1990-01-15T00:00:00.000Z,
       "email": "test@example.com",
       "firstName": "John",
@@ -37,6 +44,7 @@ UserAggregate {
       "hashedPassword": "hashed-password",
       "id": "user-123",
       "lastName": "Doe",
+      "officeId": "office-abc",
     },
   ],
 }
