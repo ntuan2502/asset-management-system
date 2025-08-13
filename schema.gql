@@ -89,6 +89,18 @@ type OfficeConnection {
   meta: PaginationMeta!
 }
 
+type Department {
+  id: ID!
+  name: String!
+  description: String
+  office: Office!
+}
+
+type DepartmentConnection {
+  nodes: [Department!]!
+  meta: PaginationMeta!
+}
+
 type Query {
   hello: String!
   users(page: Int = 1, limit: Int = 10): UserConnection!
@@ -100,6 +112,8 @@ type Query {
   permissions(page: Int = 1, limit: Int = 10): PermissionConnection!
   offices(page: Int = 1, limit: Int = 10): OfficeConnection!
   office(id: ID!): Office
+  departments(page: Int = 1, limit: Int = 10): DepartmentConnection!
+  department(id: ID!): Department
 }
 
 type Mutation {
@@ -120,6 +134,10 @@ type Mutation {
   createOffice(input: CreateOfficeInput!): Office!
   updateOffice(id: ID!, input: UpdateOfficeInput!): Office!
   deleteOffice(id: ID!): Boolean!
+  createDepartment(input: CreateDepartmentInput!): Department!
+  updateDepartment(id: ID!, input: UpdateDepartmentInput!): Department!
+  deleteDepartment(id: ID!): Boolean!
+  restoreDepartment(id: ID!): Boolean!
 }
 
 input CreateUserInput {
@@ -179,5 +197,16 @@ input UpdateOfficeInput {
   shortName: String
   taxCode: String
   address: String
+  description: String
+}
+
+input CreateDepartmentInput {
+  name: String!
+  officeId: ID!
+  description: String
+}
+
+input UpdateDepartmentInput {
+  name: String
   description: String
 }

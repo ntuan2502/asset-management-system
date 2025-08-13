@@ -14,6 +14,10 @@ import { OfficeUpdatedEvent } from 'src/2_domain/office/events/office-updated.ev
 import { OfficeDeletedEvent } from 'src/2_domain/office/events/office-deleted.event';
 import { OfficeRestoredEvent } from 'src/2_domain/office/events/office-restored.event';
 import { RoleRestoredEvent } from 'src/2_domain/role/events/role-restored.event';
+import { DepartmentCreatedEvent } from 'src/2_domain/department/events/department-created.event';
+import { DepartmentUpdatedEvent } from 'src/2_domain/department/events/department-updated.event';
+import { DepartmentDeletedEvent } from 'src/2_domain/department/events/department-deleted.event';
+import { DepartmentRestoredEvent } from 'src/2_domain/department/events/department-restored.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -34,6 +38,11 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [OfficeUpdatedEvent.name]: OfficeUpdatedEvent,
   [OfficeDeletedEvent.name]: OfficeDeletedEvent,
   [OfficeRestoredEvent.name]: OfficeRestoredEvent,
+
+  [DepartmentCreatedEvent.name]: DepartmentCreatedEvent,
+  [DepartmentUpdatedEvent.name]: DepartmentUpdatedEvent,
+  [DepartmentDeletedEvent.name]: DepartmentDeletedEvent,
+  [DepartmentRestoredEvent.name]: DepartmentRestoredEvent,
 };
 
 export class EventFactory {

@@ -14,6 +14,7 @@ import { RoleModule } from './2_domain/role/role.module';
 import { PrismaModule } from './3_infrastructure/persistence/prisma/prisma.module';
 import { AuthMiddleware } from './2_domain/auth/middleware/auth.middleware';
 import { OfficeModule } from './2_domain/office/office.module';
+import { DepartmentModule } from './2_domain/department/department.module';
 
 @Module({
   imports: [
@@ -31,8 +32,9 @@ import { OfficeModule } from './2_domain/office/office.module';
     RoleModule,
     AuthModule,
     PermissionModule,
-    OfficeModule,
     SeederModule,
+    OfficeModule,
+    DepartmentModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],
