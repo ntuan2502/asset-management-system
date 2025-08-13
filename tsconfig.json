@@ -13,6 +13,7 @@
     "paths": {
       "src/*": ["src/*"]
     },
+    "resolveJsonModule": true,
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,

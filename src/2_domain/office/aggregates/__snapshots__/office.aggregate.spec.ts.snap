@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OfficeAggregate createOffice should apply an OfficeCreatedEvent and set initial state 1`] = `
+OfficeCreatedEvent {
+  "address": "123 Main St, HCMC",
+  "createdAt": 2025-01-01T10:00:00.000Z,
+  "description": "Headquarters",
+  "id": "mock-cuid-12345",
+  "internationalName": "Amata Vietnam Joint Stock Company",
+  "name": "Amata Vietnam JSC",
+  "shortName": "AMATAVN",
+  "taxCode": "0123456789",
+}
+`;
+
+exports[`OfficeAggregate createOffice should apply an OfficeCreatedEvent and set initial state 2`] = `
+OfficeAggregate {
+  "address": "123 Main St, HCMC",
+  "aggregateType": "Office",
+  "createdAt": 2025-01-01T10:00:00.000Z,
+  "deletedAt": null,
+  "description": "Headquarters",
+  "id": "mock-cuid-12345",
+  "internationalName": "Amata Vietnam Joint Stock Company",
+  "name": "Amata Vietnam JSC",
+  "shortName": "AMATAVN",
+  "taxCode": "0123456789",
+  "updatedAt": 2025-01-01T10:00:00.000Z,
+  "version": 1,
+  Symbol(): false,
+  Symbol(): [
+    OfficeCreatedEvent {
+      "address": "123 Main St, HCMC",
+      "createdAt": 2025-01-01T10:00:00.000Z,
+      "description": "Headquarters",
+      "id": "mock-cuid-12345",
+      "internationalName": "Amata Vietnam Joint Stock Company",
+      "name": "Amata Vietnam JSC",
+      "shortName": "AMATAVN",
+      "taxCode": "0123456789",
+    },
+  ],
+}
+`;
+
+exports[`OfficeAggregate updateOffice should apply an OfficeUpdatedEvent when data changes: aggregate state 1`] = `
+OfficeAggregate {
+  "address": "Old Address",
+  "aggregateType": "Office",
+  "createdAt": 2025-01-01T00:00:00.000Z,
+  "deletedAt": null,
+  "description": "New Description",
+  "id": "office-123",
+  "internationalName": "Old International Name",
+  "name": "New Name",
+  "shortName": "OLD",
+  "taxCode": "12345",
+  "updatedAt": 2025-02-02T11:00:00.000Z,
+  "version": 2,
+  Symbol(): false,
+  Symbol(): [
+    OfficeUpdatedEvent {
+      "address": undefined,
+      "description": "New Description",
+      "id": "office-123",
+      "internationalName": undefined,
+      "name": "New Name",
+      "shortName": undefined,
+      "taxCode": undefined,
+      "updatedAt": 2025-02-02T11:00:00.000Z,
+    },
+  ],
+}
+`;
+
+exports[`OfficeAggregate updateOffice should apply an OfficeUpdatedEvent when data changes: event 1`] = `
+OfficeUpdatedEvent {
+  "address": undefined,
+  "description": "New Description",
+  "id": "office-123",
+  "internationalName": undefined,
+  "name": "New Name",
+  "shortName": undefined,
+  "taxCode": undefined,
+  "updatedAt": 2025-02-02T11:00:00.000Z,
+}
+`;
