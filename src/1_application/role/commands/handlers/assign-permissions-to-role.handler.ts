@@ -8,6 +8,10 @@ import {
 import { RoleAggregate } from 'src/2_domain/role/aggregates/role.aggregate';
 import { RoleAggregateRepository } from 'src/2_domain/role/repositories/role-aggregate.repository';
 import { PrismaService } from 'src/3_infrastructure/persistence/prisma/prisma.service';
+import {
+  PERMISSION_ERRORS,
+  ROLE_ERRORS,
+} from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(AssignPermissionsToRoleCommand)
 export class AssignPermissionsToRoleHandler
@@ -30,12 +34,12 @@ export class AssignPermissionsToRoleHandler
       },
     });
     if (permissionsCount !== payload.permissionIds.length) {
-      throw new Error('One or more permission IDs are invalid.');
+      throw new Error(PERMISSION_ERRORS.INVALID_IDS);
     }
 
     const role = await this.aggregateRepository.findById(roleId);
     if (!role.id) {
-      throw new NotFoundException(`Role with ID "${roleId}" not found.`);
+      throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(roleId));
     }
 
     const expectedVersion = role.version;
@@ -48,9 +52,6 @@ export class AssignPermissionsToRoleHandler
         role.aggregateType,
         events,
         expectedVersion,
-      );
-      console.log(
-        `--- [HANDLER] Saved ${events.length} events for Role ${role.id}. Committing... ---`,
       );
       role.commit();
     }

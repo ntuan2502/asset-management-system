@@ -16,6 +16,7 @@ import {
   OFFICE_REPOSITORY,
 } from 'src/2_domain/office/repositories/office.repository.interface';
 import { NotFoundException } from '@nestjs/common';
+import { OFFICE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(CreateDepartmentCommand)
 export class CreateDepartmentHandler
@@ -38,9 +39,7 @@ export class CreateDepartmentHandler
     // Validation 1: Office phải tồn tại
     const officeExists = await this.officeRepository.findById(input.officeId);
     if (!officeExists) {
-      throw new NotFoundException(
-        `Office with ID "${input.officeId}" not found.`,
-      );
+      throw new NotFoundException(OFFICE_ERRORS.NOT_FOUND(input.officeId));
     }
 
     // Validation 2: Tên phòng ban không được trùng trong office đó

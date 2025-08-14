@@ -16,6 +16,7 @@ import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants'
 import { createId } from '@paralleldrive/cuid2';
 import { UserOfficeChangedEvent } from '../events/user-office-changed.event';
 import { UserDepartmentChangedEvent } from '../events/user-department-changed.event';
+import { USER_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class UserAggregate extends BaseAggregateRoot {
   public readonly aggregateType = AGGREGATE_TYPES.USER;
@@ -107,7 +108,7 @@ export class UserAggregate extends BaseAggregateRoot {
 
   public updateUser(payload: UpdateUserInput) {
     if (this.deletedAt) {
-      throw new Error('Cannot update a deleted user.');
+      throw new Error(USER_ERRORS.CANNOT_UPDATE_DELETED);
     }
 
     const changes: Partial<UserUpdatedPayload> = {};
@@ -157,14 +158,14 @@ export class UserAggregate extends BaseAggregateRoot {
 
   public deleteUser() {
     if (this.deletedAt) {
-      throw new Error('Cannot delete a user that has already been deleted.');
+      throw new Error(USER_ERRORS.ALREADY_DELETED);
     }
     this.apply(new UserDeletedEvent({ id: this.id }));
   }
 
   public restoreUser() {
     if (!this.deletedAt) {
-      throw new Error('Cannot restore an active user.');
+      throw new Error(USER_ERRORS.IS_ACTIVE);
     }
     this.apply(new UserRestoredEvent({ id: this.id, restoredAt: new Date() }));
   }

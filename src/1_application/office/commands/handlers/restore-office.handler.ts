@@ -6,6 +6,7 @@ import {
   IEventStore,
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
+import { OFFICE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(RestoreOfficeCommand)
 export class RestoreOfficeHandler
@@ -20,7 +21,7 @@ export class RestoreOfficeHandler
     const { id } = command;
     const office = await this.aggregateRepository.findById(id);
     if (!office.id) {
-      throw new NotFoundException(`Office with ID "${id}" not found.`);
+      throw new NotFoundException(OFFICE_ERRORS.NOT_FOUND(id));
     }
 
     const expectedVersion = office.version;

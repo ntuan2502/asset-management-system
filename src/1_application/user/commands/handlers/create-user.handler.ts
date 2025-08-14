@@ -20,6 +20,11 @@ import {
   IOfficeRepository,
   OFFICE_REPOSITORY,
 } from 'src/2_domain/office/repositories/office.repository.interface';
+import {
+  DEPARTMENT_ERRORS,
+  OFFICE_ERRORS,
+  USER_ERRORS,
+} from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -39,15 +44,13 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
     const existingUser = await this.userRepository.findByEmail(input.email);
     if (existingUser) {
-      throw new Error('User with this email already exists.');
+      throw new Error(USER_ERRORS.ALREADY_EXISTS(input.email));
     }
 
     if (input.officeId) {
       const office = await this.officeRepo.findById(input.officeId);
       if (!office) {
-        throw new NotFoundException(
-          `Office with ID "${input.officeId}" not found.`,
-        );
+        throw new NotFoundException(OFFICE_ERRORS.NOT_FOUND(input.officeId));
       }
     }
 
@@ -55,14 +58,14 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       const department = await this.departmentRepo.findById(input.departmentId);
       if (!department) {
         throw new NotFoundException(
-          `Department with ID "${input.departmentId}" not found.`,
+          DEPARTMENT_ERRORS.NOT_FOUND(input.departmentId),
         );
       }
 
       if (!input.officeId) {
         input.officeId = department.officeId;
       } else if (department.officeId !== input.officeId) {
-        throw new Error('Department does not belong to the specified office.');
+        throw new Error(USER_ERRORS.INCONSISTENT_DEPARTMENT);
       }
     }
 

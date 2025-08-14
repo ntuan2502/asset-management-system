@@ -7,6 +7,7 @@ import {
   IEventStore,
 } from 'src/3_infrastructure/event-store/event-store.interface';
 import { RoleAggregate } from 'src/2_domain/role/aggregates/role.aggregate';
+import { ROLE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(UpdateRoleCommand)
 export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
@@ -19,7 +20,7 @@ export class UpdateRoleHandler implements ICommandHandler<UpdateRoleCommand> {
     const { id, payload } = command;
     const role = await this.aggregateRepository.findById(id);
     if (!role.id) {
-      throw new NotFoundException(`Role with ID "${id}" not found.`);
+      throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(id));
     }
 
     const expectedVersion = role.version;

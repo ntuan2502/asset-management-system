@@ -6,6 +6,7 @@ import {
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
 import { UserAggregateRepository } from 'src/2_domain/user/repositories/user-aggregate.repository';
+import { USER_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
@@ -20,7 +21,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
 
     const user = await this.aggregateRepository.findById(id);
     if (!user.id) {
-      throw new NotFoundException(`User with ID "${id}" not found.`);
+      throw new NotFoundException(USER_ERRORS.NOT_FOUND(id));
     }
 
     const expectedVersion = user.version;

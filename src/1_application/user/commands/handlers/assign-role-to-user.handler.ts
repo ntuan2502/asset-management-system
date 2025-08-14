@@ -11,6 +11,10 @@ import {
   IRoleRepository,
   ROLE_REPOSITORY,
 } from 'src/2_domain/role/repositories/role.repository.interface';
+import {
+  ROLE_ERRORS,
+  USER_ERRORS,
+} from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(AssignRoleToUserCommand)
 export class AssignRoleToUserHandler
@@ -27,12 +31,12 @@ export class AssignRoleToUserHandler
 
     const role = await this.roleRepository.findById(roleId);
     if (!role) {
-      throw new NotFoundException(`Role with ID "${roleId}" not found.`);
+      throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(roleId));
     }
 
     const user = await this.userAggregateRepository.findById(userId);
     if (!user.id) {
-      throw new NotFoundException(`User with ID "${userId}" not found.`);
+      throw new NotFoundException(USER_ERRORS.NOT_FOUND(userId));
     }
 
     const expectedVersion = user.version;

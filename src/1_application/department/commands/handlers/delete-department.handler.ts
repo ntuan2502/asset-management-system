@@ -6,6 +6,7 @@ import {
   IEventStore,
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
+import { DEPARTMENT_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(DeleteDepartmentCommand)
 export class DeleteDepartmentHandler
@@ -20,7 +21,7 @@ export class DeleteDepartmentHandler
     const { id } = command;
     const department = await this.aggregateRepository.findById(id);
     if (!department.id) {
-      throw new NotFoundException(`Department with ID "${id}" not found.`);
+      throw new NotFoundException(DEPARTMENT_ERRORS.NOT_FOUND(id));
     }
 
     const expectedVersion = department.version;

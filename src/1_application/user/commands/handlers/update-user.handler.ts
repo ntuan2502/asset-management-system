@@ -15,6 +15,11 @@ import {
   IOfficeRepository,
   OFFICE_REPOSITORY,
 } from 'src/2_domain/office/repositories/office.repository.interface';
+import {
+  DEPARTMENT_ERRORS,
+  OFFICE_ERRORS,
+  USER_ERRORS,
+} from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
@@ -31,7 +36,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
     const { id, payload } = command;
     const user = await this.aggregateRepository.findById(id);
     if (!user.id) {
-      throw new NotFoundException(`User with ID "${id}" not found.`);
+      throw new NotFoundException(USER_ERRORS.NOT_FOUND(id));
     }
 
     const finalOfficeId =
@@ -44,9 +49,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
     if (payload.officeId) {
       const office = await this.officeRepo.findById(payload.officeId);
       if (!office) {
-        throw new NotFoundException(
-          `Office with ID "${payload.officeId}" not found.`,
-        );
+        throw new NotFoundException(OFFICE_ERRORS.NOT_FOUND(payload.officeId));
       }
     }
 
@@ -54,7 +57,7 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
       const department = await this.departmentRepo.findById(finalDepartmentId);
       if (!department) {
         throw new NotFoundException(
-          `Department with ID "${finalDepartmentId}" not found.`,
+          DEPARTMENT_ERRORS.NOT_FOUND(finalDepartmentId),
         );
       }
 

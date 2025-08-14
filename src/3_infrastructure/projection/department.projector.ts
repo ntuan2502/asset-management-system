@@ -6,6 +6,7 @@ import { DepartmentUpdatedEvent } from 'src/2_domain/department/events/departmen
 import { Prisma } from '@prisma/client';
 import { DepartmentDeletedEvent } from 'src/2_domain/department/events/department-deleted.event';
 import { DepartmentRestoredEvent } from 'src/2_domain/department/events/department-restored.event';
+import { PROJECTOR_LOGS } from 'src/shared/constants/log-messages.constants';
 
 type DepartmentEvent =
   | DepartmentCreatedEvent
@@ -36,8 +37,9 @@ export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
   private async onDepartmentCreated(
     event: DepartmentCreatedEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.DEPARTMENT_CREATED;
     try {
-      console.log('--- [PROJECTOR] Received DepartmentCreatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.department.create({
         data: {
           id: event.id,
@@ -48,22 +50,18 @@ export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
           updatedAt: event.createdAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully created department ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR creating department ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onDepartmentUpdated(
     event: DepartmentUpdatedEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.DEPARTMENT_UPDATED;
     try {
-      console.log('--- [PROJECTOR] Received DepartmentUpdatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       const dataToUpdate: Prisma.DepartmentUpdateInput = {
         updatedAt: event.updatedAt,
       };
@@ -78,22 +76,18 @@ export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
         where: { id: event.id },
         data: dataToUpdate,
       });
-      console.log(
-        `--- [PROJECTOR] Successfully updated department ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR updating department ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onDepartmentDeleted(
     event: DepartmentDeletedEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.DEPARTMENT_DELETED;
     try {
-      console.log('--- [PROJECTOR] Soft-deleting department ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.department.update({
         where: { id: event.id },
         data: {
@@ -101,22 +95,18 @@ export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
           updatedAt: event.deletedAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully soft-deleted department ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR soft-deleting department ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onDepartmentRestored(
     event: DepartmentRestoredEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.DEPARTMENT_RESTORED;
     try {
-      console.log('--- [PROJECTOR] Restoring department ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.department.update({
         where: { id: event.id },
         data: {
@@ -124,14 +114,9 @@ export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
           updatedAt: event.restoredAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully restored department ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR restoring department ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 }

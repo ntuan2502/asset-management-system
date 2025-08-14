@@ -12,6 +12,7 @@ import { OfficeDeletedEvent } from '../events/office-deleted.event';
 import { OfficeRestoredEvent } from '../events/office-restored.event';
 import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
 import { UpdateOfficeInput } from 'src/1_application/office/dtos/update-office.input';
+import { OFFICE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class OfficeAggregate extends BaseAggregateRoot {
   public readonly aggregateType = AGGREGATE_TYPES.OFFICE;
@@ -34,7 +35,7 @@ export class OfficeAggregate extends BaseAggregateRoot {
 
   public updateOffice(payload: UpdateOfficeInput) {
     if (this.deletedAt) {
-      throw new Error('Cannot update a deleted office.');
+      throw new Error(OFFICE_ERRORS.CANNOT_UPDATE_DELETED);
     }
 
     const changes: Partial<OfficeUpdatedPayload> = {};
@@ -86,14 +87,14 @@ export class OfficeAggregate extends BaseAggregateRoot {
 
   public deleteOffice() {
     if (this.deletedAt) {
-      throw new Error('Cannot delete an office that has already been deleted.');
+      throw new Error(OFFICE_ERRORS.ALREADY_DELETED);
     }
     this.apply(new OfficeDeletedEvent({ id: this.id, deletedAt: new Date() }));
   }
 
   public restoreOffice() {
     if (!this.deletedAt) {
-      throw new Error('Cannot restore an active office.');
+      throw new Error(OFFICE_ERRORS.IS_ACTIVE);
     }
     this.apply(
       new OfficeRestoredEvent({ id: this.id, restoredAt: new Date() }),

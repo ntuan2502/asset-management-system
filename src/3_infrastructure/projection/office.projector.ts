@@ -6,6 +6,7 @@ import { OfficeUpdatedEvent } from 'src/2_domain/office/events/office-updated.ev
 import { Prisma } from '@prisma/client';
 import { OfficeDeletedEvent } from 'src/2_domain/office/events/office-deleted.event';
 import { OfficeRestoredEvent } from 'src/2_domain/office/events/office-restored.event';
+import { PROJECTOR_LOGS } from 'src/shared/constants/log-messages.constants';
 
 type OfficeEvent =
   | OfficeCreatedEvent
@@ -35,8 +36,9 @@ export class OfficeProjector implements IEventHandler<OfficeEvent> {
   }
 
   private async onOfficeCreated(event: OfficeCreatedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.OFFICE_CREATED;
     try {
-      console.log('--- [PROJECTOR] Received OfficeCreatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.office.create({
         data: {
           id: event.id,
@@ -50,20 +52,16 @@ export class OfficeProjector implements IEventHandler<OfficeEvent> {
           updatedAt: event.createdAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully created office ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR creating office ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onOfficeUpdated(event: OfficeUpdatedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.OFFICE_UPDATED;
     try {
-      console.log('--- [PROJECTOR] Received OfficeUpdatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       const dataToUpdate: Prisma.OfficeUpdateInput = {
         updatedAt: event.updatedAt,
       };
@@ -91,20 +89,16 @@ export class OfficeProjector implements IEventHandler<OfficeEvent> {
         where: { id: event.id },
         data: dataToUpdate,
       });
-      console.log(
-        `--- [PROJECTOR] Successfully updated office ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR updating office ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onOfficeDeleted(event: OfficeDeletedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.OFFICE_DELETED;
     try {
-      console.log('--- [PROJECTOR] Received OfficeDeletedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.office.update({
         where: { id: event.id },
         data: {
@@ -112,20 +106,16 @@ export class OfficeProjector implements IEventHandler<OfficeEvent> {
           updatedAt: event.deletedAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully soft-deleted office ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR soft-deleting office ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onOfficeRestored(event: OfficeRestoredEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.OFFICE_RESTORED;
     try {
-      console.log('--- [PROJECTOR] Received OfficeRestoredEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.office.update({
         where: { id: event.id },
         data: {
@@ -133,14 +123,9 @@ export class OfficeProjector implements IEventHandler<OfficeEvent> {
           updatedAt: event.restoredAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully restored office ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR restoring office ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 }

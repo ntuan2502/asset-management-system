@@ -10,6 +10,7 @@ import {
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
 import { RoleAggregate } from 'src/2_domain/role/aggregates/role.aggregate';
+import { ROLE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(CreateRoleCommand)
 export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand> {
@@ -24,7 +25,7 @@ export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand> {
 
     const existingRole = await this.roleRepository.findByName(input.name);
     if (existingRole) {
-      throw new Error(`Role with name "${input.name}" already exists.`);
+      throw new Error(ROLE_ERRORS.ALREADY_EXISTS(input.name));
     }
 
     const role = this.publisher.mergeObjectContext(new RoleAggregate());

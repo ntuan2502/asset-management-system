@@ -11,6 +11,7 @@ import {
 } from 'src/2_domain/department/repositories/department.repository.interface';
 import { UpdateDepartmentCommand } from 'src/1_application/department/commands/impl/update-department.command';
 import { DepartmentAggregateRepository } from 'src/2_domain/department/repositories/department-aggregate.repository';
+import { DEPARTMENT_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(UpdateDepartmentCommand)
 export class UpdateDepartmentHandler
@@ -29,7 +30,7 @@ export class UpdateDepartmentHandler
     const { id, payload } = command;
     const department = await this.aggregateRepository.findById(id);
     if (!department.id) {
-      throw new NotFoundException(`Department with ID "${id}" not found.`);
+      throw new NotFoundException(DEPARTMENT_ERRORS.NOT_FOUND(id));
     }
 
     // Kiểm tra trùng lặp tên nếu tên được thay đổi

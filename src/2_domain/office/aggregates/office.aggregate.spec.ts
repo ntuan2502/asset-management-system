@@ -1,6 +1,7 @@
 import { OfficeAggregate } from './office.aggregate';
 import { OfficeCreatedEvent } from '../events/office-created.event';
 import { OfficeUpdatedEvent } from '../events/office-updated.event';
+import { DEPARTMENT_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 // Mock thư viện cuid2 để ID được tạo ra là cố định, giúp snapshot ổn định
 jest.mock('@paralleldrive/cuid2', () => ({
@@ -121,7 +122,7 @@ describe('OfficeAggregate', () => {
 
       // --- Act & Assert ---
       const action = () => aggregate.updateOffice({ name: 'New Name' });
-      expect(action).toThrow('Cannot update a deleted office.');
+      expect(action).toThrow(DEPARTMENT_ERRORS.CANNOT_UPDATE_DELETED);
     });
   });
 });

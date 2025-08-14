@@ -7,6 +7,7 @@ import { RoleUpdatedEvent } from 'src/2_domain/role/events/role-updated.event';
 import { RoleDeletedEvent } from 'src/2_domain/role/events/role-deleted.event';
 import { Prisma } from '@prisma/client';
 import { RoleRestoredEvent } from 'src/2_domain/role/events/role-restored.event';
+import { PROJECTOR_LOGS } from 'src/shared/constants/log-messages.constants';
 
 type RoleEvent =
   | RoleCreatedEvent
@@ -40,8 +41,9 @@ export class RoleProjector implements IEventHandler<RoleEvent> {
   }
 
   private async onRoleCreated(event: RoleCreatedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.ROLE_CREATED;
     try {
-      console.log('--- [PROJECTOR] Received RoleCreatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.role.create({
         data: {
           id: event.id,
@@ -49,15 +51,16 @@ export class RoleProjector implements IEventHandler<RoleEvent> {
           description: event.description,
         },
       });
-      console.log(`--- [PROJECTOR] Successfully created role ${event.id} ---`);
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR creating role ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onRoleUpdated(event: RoleUpdatedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.ROLE_UPDATED;
     try {
-      console.log('--- [PROJECTOR] Received RoleUpdatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       const dataToUpdate: Prisma.RoleUpdateInput = {
         updatedAt: event.updatedAt,
       };
@@ -73,30 +76,30 @@ export class RoleProjector implements IEventHandler<RoleEvent> {
         where: { id: event.id },
         data: dataToUpdate,
       });
-      console.log(`--- [PROJECTOR] Successfully updated role ${event.id} ---`);
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR updating role ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onRoleDeleted(event: RoleDeletedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.ROLE_DELETED;
     try {
-      console.log('--- [PROJECTOR] Received RoleDeletedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.role.update({
         where: { id: event.id },
         data: { deletedAt: event.deletedAt },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully soft-deleted role ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR deleting role ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onRoleRestored(event: RoleRestoredEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.ROLE_RESTORED;
     try {
-      console.log('--- [PROJECTOR] Received RoleRestoredEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.role.update({
         where: { id: event.id },
         data: {
@@ -104,20 +107,18 @@ export class RoleProjector implements IEventHandler<RoleEvent> {
           updatedAt: event.restoredAt,
         },
       });
-      console.log(`--- [PROJECTOR] Successfully restored role ${event.id} ---`);
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR restoring role ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onPermissionsAssignedToRole(
     event: PermissionsAssignedToRoleEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.PERMISSIONS_ASSIGNED_TO_ROLE;
     try {
-      console.log(
-        '--- [PROJECTOR] Received PermissionsAssignedToRoleEvent ---',
-        event,
-      );
+      console.log(logs.RECEIVED, event);
       await this.prisma.role.update({
         where: { id: event.roleId },
         data: {
@@ -126,14 +127,9 @@ export class RoleProjector implements IEventHandler<RoleEvent> {
           },
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully updated permissions for role ${event.roleId} ---`,
-      );
+      console.log(logs.SUCCESS(event.roleId));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR updating permissions for role ${event.roleId}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.roleId), error);
     }
   }
 }

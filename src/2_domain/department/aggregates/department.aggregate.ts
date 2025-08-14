@@ -12,6 +12,7 @@ import {
 import { DepartmentDeletedEvent } from '../events/department-deleted.event';
 import { DepartmentRestoredEvent } from '../events/department-restored.event';
 import { UpdateDepartmentInput } from 'src/1_application/department/dtos/update-department.input';
+import { DEPARTMENT_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class DepartmentAggregate extends BaseAggregateRoot {
   public readonly aggregateType = AGGREGATE_TYPES.DEPARTMENT;
@@ -33,7 +34,7 @@ export class DepartmentAggregate extends BaseAggregateRoot {
 
   public updateDepartment(payload: UpdateDepartmentInput) {
     if (this.deletedAt) {
-      throw new Error('Cannot update a deleted department.');
+      throw new Error(DEPARTMENT_ERRORS.CANNOT_UPDATE_DELETED);
     }
 
     const changes: Partial<DepartmentUpdatedPayload> = {};
@@ -65,18 +66,14 @@ export class DepartmentAggregate extends BaseAggregateRoot {
   }
 
   public deleteDepartment() {
-    if (this.deletedAt)
-      throw new Error(
-        'Cannot delete a department that has already been deleted.',
-      );
+    if (this.deletedAt) throw new Error(DEPARTMENT_ERRORS.ALREADY_DELETED);
     this.apply(
       new DepartmentDeletedEvent({ id: this.id, deletedAt: new Date() }),
     );
   }
 
   public restoreDepartment() {
-    if (!this.deletedAt)
-      throw new Error('Cannot restore an active department.');
+    if (!this.deletedAt) throw new Error(DEPARTMENT_ERRORS.IS_ACTIVE);
     this.apply(
       new DepartmentRestoredEvent({ id: this.id, restoredAt: new Date() }),
     );

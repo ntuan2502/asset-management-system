@@ -21,6 +21,7 @@ import {
   DEFAULT_LIMIT,
   DEFAULT_PAGE,
 } from 'src/shared/constants/pagination.constants';
+import { AUTH_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 interface AccessTokenPayload {
   sub: string;
@@ -112,7 +113,7 @@ export class AuthService {
       where: { userId: userId, revokedAt: null },
     });
     if (!userSessions || userSessions.length === 0) {
-      throw new UnauthorizedException('No active sessions found.');
+      throw new UnauthorizedException(AUTH_ERRORS.NO_ACTIVE_SESSIONS);
     }
 
     let validSession: Session | null = null;
@@ -135,7 +136,7 @@ export class AuthService {
       validSession.userId,
     );
     if (!user) {
-      throw new UnauthorizedException('User for this session not found.');
+      throw new UnauthorizedException(AUTH_ERRORS.USER_FOR_SESSION_NOT_FOUND);
     }
 
     const accessTokenId = createId();

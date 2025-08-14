@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UnauthorizedException } from '@nestjs/common';
 import { AuthService } from 'src/2_domain/auth/auth.service';
 import { LoginCommand } from '../impl/login.command';
+import { AUTH_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(LoginCommand)
 export class LoginHandler implements ICommandHandler<LoginCommand> {
@@ -13,7 +14,7 @@ export class LoginHandler implements ICommandHandler<LoginCommand> {
       input.password,
     );
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException(AUTH_ERRORS.INVALID_CREDENTIALS);
     }
     return this.authService.login(user, ipAddress, userAgent);
   }

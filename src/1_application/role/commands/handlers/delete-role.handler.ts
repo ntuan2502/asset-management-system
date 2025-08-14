@@ -6,6 +6,7 @@ import {
   EVENT_STORE_SERVICE,
   IEventStore,
 } from 'src/3_infrastructure/event-store/event-store.interface';
+import { ROLE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(DeleteRoleCommand)
 export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand> {
@@ -18,7 +19,7 @@ export class DeleteRoleHandler implements ICommandHandler<DeleteRoleCommand> {
     const { id } = command;
     const role = await this.aggregateRepository.findById(id);
     if (!role.id) {
-      throw new NotFoundException(`Role with ID "${id}" not found.`);
+      throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(id));
     }
 
     const expectedVersion = role.version;

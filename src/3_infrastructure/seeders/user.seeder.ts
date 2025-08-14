@@ -8,6 +8,7 @@ import { PrismaService } from '../persistence/prisma/prisma.service';
 import { AssignPermissionsToRoleCommand } from 'src/1_application/role/commands/impl/assign-permissions-to-role.command';
 import { RoleAggregate } from 'src/2_domain/role/aggregates/role.aggregate';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
+import { SEEDER_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @Injectable()
 export class UserSeeder {
@@ -61,7 +62,7 @@ export class UserSeeder {
       }
 
       if (!adminRole) {
-        throw new Error('Failed to create or find ADMIN role.');
+        throw new Error(SEEDER_ERRORS.ADMIN_ROLE_FAILURE);
       }
 
       const allPermissionIds = (
@@ -133,7 +134,7 @@ export class UserSeeder {
       }
 
       if (!adminUser) {
-        throw new Error('Failed to create or find ADMIN user.');
+        throw new Error(SEEDER_ERRORS.ADMIN_USER_FAILURE);
       }
 
       const userHasAdminRole = await this.prisma.user.findFirst({
@@ -149,7 +150,7 @@ export class UserSeeder {
 
       console.log('Admin user and roles seeded successfully.');
     } catch (error) {
-      console.error('Error during seeding admin user:', error);
+      console.error(SEEDER_ERRORS.SEEDING_FAILED, error);
     }
   }
 }

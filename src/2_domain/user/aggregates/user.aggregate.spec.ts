@@ -1,6 +1,7 @@
 import { UserAggregate } from './user.aggregate';
 import { UserDeletedEvent } from '../events/user-deleted.event';
 import { UserCreatedEvent } from '../events/user-created.event';
+import { USER_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 // describe: Nhóm các bài test cho UserAggregate
 describe('UserAggregate', () => {
@@ -92,14 +93,12 @@ describe('UserAggregate', () => {
 
     // `toThrow` kiểm tra xem hàm có ném ra lỗi không.
     // Bạn cũng có thể kiểm tra nội dung của thông báo lỗi.
-    expect(action).toThrow(
-      'Cannot delete a user that has already been deleted.',
-    );
+    expect(action).toThrow(USER_ERRORS.ALREADY_DELETED);
   });
 
   it('should throw an error when trying to restore an already active user', () => {
     const aggregate = new UserAggregate();
     const action = () => aggregate.restoreUser();
-    expect(action).toThrow('Cannot restore an active user.');
+    expect(action).toThrow(USER_ERRORS.IS_ACTIVE);
   });
 });

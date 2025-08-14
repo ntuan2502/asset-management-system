@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from 'src/2_domain/auth/auth.service';
 import { RefreshTokenCommand } from '../impl/refresh-token.command';
 import { JwtPayload } from 'jsonwebtoken';
+import { AUTH_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(RefreshTokenCommand)
 export class RefreshTokenHandler
@@ -18,7 +19,7 @@ export class RefreshTokenHandler
   async execute(command: RefreshTokenCommand) {
     const { refreshToken } = command;
     if (!refreshToken) {
-      throw new UnauthorizedException('Refresh token is missing.');
+      throw new UnauthorizedException(AUTH_ERRORS.REFRESH_TOKEN_MISSING);
     }
 
     try {
@@ -27,13 +28,17 @@ export class RefreshTokenHandler
       });
 
       if (!payload.sub) {
-        throw new UnauthorizedException('Invalid refresh token payload.');
+        throw new UnauthorizedException(
+          AUTH_ERRORS.REFRESH_TOKEN_INVALID_PAYLOAD,
+        );
       }
 
       return this.authService.refreshToken(payload.sub, refreshToken);
     } catch (error) {
-      console.error('Refresh token validation failed:', error);
-      throw new UnauthorizedException('Refresh token is invalid or expired.');
+      console.error(AUTH_ERRORS.REFRESH_TOKEN_INVALID_OR_EXPIRED, error);
+      throw new UnauthorizedException(
+        AUTH_ERRORS.REFRESH_TOKEN_INVALID_OR_EXPIRED,
+      );
     }
   }
 }

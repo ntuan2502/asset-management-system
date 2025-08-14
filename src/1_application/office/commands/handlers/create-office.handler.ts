@@ -10,6 +10,7 @@ import {
   EVENT_STORE_SERVICE,
 } from 'src/3_infrastructure/event-store/event-store.interface';
 import { OfficeAggregate } from 'src/2_domain/office/aggregates/office.aggregate';
+import { OFFICE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(CreateOfficeCommand)
 export class CreateOfficeHandler
@@ -31,9 +32,7 @@ export class CreateOfficeHandler
       taxCode: input.taxCode,
     });
     if (isDuplicate) {
-      throw new Error(
-        'Office with the same international name, short name, or tax code already exists.',
-      );
+      throw new Error(OFFICE_ERRORS.DUPLICATE);
     }
 
     const office = this.publisher.mergeObjectContext(new OfficeAggregate());

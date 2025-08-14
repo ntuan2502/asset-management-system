@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { SYSTEM_ERRORS } from './shared/constants/error-messages.constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,4 @@ async function bootstrap() {
   console.log(`Application is running on: ${await app.getUrl()}`);
 }
 
-bootstrap().catch((err) =>
-  console.error('Error during application bootstrap', err),
-);
+bootstrap().catch((err) => console.error(SYSTEM_ERRORS.BOOTSTRAP_FAILED, err));

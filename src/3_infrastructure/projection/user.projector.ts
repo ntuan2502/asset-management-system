@@ -9,6 +9,7 @@ import { UserRestoredEvent } from 'src/2_domain/user/events/user-restored.event'
 import { RoleAssignedToUserEvent } from 'src/2_domain/user/events/role-assigned-to-user.event';
 import { UserOfficeChangedEvent } from 'src/2_domain/user/events/user-office-changed.event';
 import { UserDepartmentChangedEvent } from 'src/2_domain/user/events/user-department-changed.event';
+import { PROJECTOR_LOGS } from 'src/shared/constants/log-messages.constants';
 
 type UserEvent =
   | UserCreatedEvent
@@ -50,8 +51,9 @@ export class UserProjector implements IEventHandler<UserEvent> {
   }
 
   private async onUserCreated(event: UserCreatedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.USER_CREATED;
     try {
-      console.log('--- [PROJECTOR] Received UserCreatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.user.create({
         data: {
           id: event.id,
@@ -67,15 +69,16 @@ export class UserProjector implements IEventHandler<UserEvent> {
           updatedAt: event.createdAt,
         },
       });
-      console.log(`--- [PROJECTOR] Successfully created user ${event.id} ---`);
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR creating user ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onUserUpdated(event: UserUpdatedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.USER_UPDATED;
     try {
-      console.log('--- [PROJECTOR] Received UserUpdatedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       const dataToUpdate: Prisma.UserUpdateInput = {
         updatedAt: event.updatedAt,
       };
@@ -99,14 +102,15 @@ export class UserProjector implements IEventHandler<UserEvent> {
         },
         data: dataToUpdate,
       });
-      console.log(`--- [PROJECTOR] Successfully updated user ${event.id} ---`);
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR updating user ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
   private async onUserDeleted(event: UserDeletedEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.USER_DELETED;
     try {
-      console.log('--- [PROJECTOR] Received UserDeletedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.user.update({
         where: {
           id: event.id,
@@ -115,15 +119,16 @@ export class UserProjector implements IEventHandler<UserEvent> {
           deletedAt: new Date(),
         },
       });
-      console.log(`--- [PROJECTOR] Successfully deleted user ${event.id} ---`);
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR deleting user ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onUserRestored(event: UserRestoredEvent): Promise<void> {
+    const logs = PROJECTOR_LOGS.USER_RESTORED;
     try {
-      console.log('--- [PROJECTOR] Received UserRestoredEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.user.update({
         where: { id: event.id },
         data: {
@@ -131,20 +136,18 @@ export class UserProjector implements IEventHandler<UserEvent> {
           updatedAt: event.restoredAt,
         },
       });
-      console.log(`--- [PROJECTOR] Successfully restored user ${event.id} ---`);
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(`--- [PROJECTOR] ERROR restoring user ${event.id}:`, error);
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onRoleAssignedToUser(
     event: RoleAssignedToUserEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.ROLE_ASSIGNED_TO_USER;
     try {
-      console.log(
-        '--- [PROJECTOR] Received RoleAssignedToUserEvent ---',
-        event,
-      );
+      console.log(logs.RECEIVED, event);
       await this.prisma.user.update({
         where: { id: event.userId },
         data: {
@@ -154,52 +157,39 @@ export class UserProjector implements IEventHandler<UserEvent> {
           updatedAt: event.assignedAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully assigned role ${event.roleId} to user ${event.userId} ---`,
-      );
+      console.log(logs.SUCCESS(event.userId, event.roleId));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR assigning role ${event.roleId} to user ${event.userId}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.userId, event.roleId), error);
     }
   }
 
   private async onUserOfficeChanged(
     event: UserOfficeChangedEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.USER_OFFICE_CHANGED;
     try {
-      console.log('--- [PROJECTOR] Received UserOfficeChangedEvent ---', event);
+      console.log(logs.RECEIVED, event);
       await this.prisma.user.update({
         where: { id: event.id },
         data: {
-          // Dùng `connect` để tạo liên kết
-          // Hoặc `disconnect: true` nếu newOfficeId là null
           office: event.newOfficeId
             ? { connect: { id: event.newOfficeId } }
             : { disconnect: true },
           updatedAt: event.changedAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully changed office for user ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR changing office for user ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 
   private async onUserDepartmentChanged(
     event: UserDepartmentChangedEvent,
   ): Promise<void> {
+    const logs = PROJECTOR_LOGS.USER_DEPARTMENT_CHANGED;
     try {
-      console.log(
-        '--- [PROJECTOR] Received UserDepartmentChangedEvent ---',
-        event,
-      );
+      console.log(logs.RECEIVED, event);
       await this.prisma.user.update({
         where: { id: event.id },
         data: {
@@ -209,14 +199,9 @@ export class UserProjector implements IEventHandler<UserEvent> {
           updatedAt: event.changedAt,
         },
       });
-      console.log(
-        `--- [PROJECTOR] Successfully changed department for user ${event.id} ---`,
-      );
+      console.log(logs.SUCCESS(event.id));
     } catch (error) {
-      console.error(
-        `--- [PROJECTOR] ERROR changing department for user ${event.id}:`,
-        error,
-      );
+      console.error(logs.ERROR(event.id), error);
     }
   }
 }

@@ -13,6 +13,7 @@ import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
 import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
 import { UpdateRoleInput } from 'src/1_application/role/dtos/update-role.input';
 import { RoleRestoredEvent } from '../events/role-restored.event';
+import { ROLE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class RoleAggregate extends BaseAggregateRoot {
   public readonly aggregateType = AGGREGATE_TYPES.ROLE;
@@ -54,7 +55,7 @@ export class RoleAggregate extends BaseAggregateRoot {
 
   public updateRole(payload: UpdateRoleInput) {
     if (this.deletedAt) {
-      throw new Error('Cannot update a deleted role.');
+      throw new Error(ROLE_ERRORS.CANNOT_UPDATE_DELETED);
     }
 
     const changes: Partial<RoleUpdatedPayload> = {};
@@ -87,14 +88,14 @@ export class RoleAggregate extends BaseAggregateRoot {
 
   public deleteRole() {
     if (this.deletedAt) {
-      throw new Error('Cannot delete a role that has already been deleted.');
+      throw new Error(ROLE_ERRORS.ALREADY_DELETED);
     }
     this.apply(new RoleDeletedEvent({ id: this.id, deletedAt: new Date() }));
   }
 
   public restoreRole() {
     if (!this.deletedAt) {
-      throw new Error('Cannot restore an active role.');
+      throw new Error(ROLE_ERRORS.IS_ACTIVE);
     }
     this.apply(new RoleRestoredEvent({ id: this.id, restoredAt: new Date() }));
   }
