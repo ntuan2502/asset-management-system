@@ -17,6 +17,7 @@ import { OfficeModule } from './2_domain/office/office.module';
 import { DepartmentModule } from './2_domain/department/department.module';
 import { StatusLabelModule } from './2_domain/status-label/status-label.module';
 import { CategoryModule } from './2_domain/category/category.module';
+import { ManufacturerModule } from './2_domain/manufacturer/manufacturer.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CategoryModule } from './2_domain/category/category.module';
     DepartmentModule,
     StatusLabelModule,
     CategoryModule,
+    ManufacturerModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

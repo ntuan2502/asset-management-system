@@ -7,4 +7,5 @@ export const AGGREGATE_TYPES = {
   ASSET: 'Asset',
   STATUS_LABEL: 'StatusLabel',
   CATEGORY: 'Category',
+  MANUFACTURER: 'Manufacturer',
 };

@@ -134,9 +134,8 @@ export const PROJECTOR_LOGS = {
   STATUS_LABEL_DELETED: {
     RECEIVED: logTemplate('Received', 'StatusLabelDeletedEvent'),
     SUCCESS: (id: string) =>
-      logTemplate('Success', `soft-deleted status label ${id}`),
-    ERROR: (id: string) =>
-      logTemplate('Error', `soft-deleting status label ${id}`),
+      logTemplate('Success', `deleted status label ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `deleting status label ${id}`),
   },
   STATUS_LABEL_RESTORED: {
     RECEIVED: logTemplate('Received', 'StatusLabelRestoredEvent'),
@@ -164,6 +163,31 @@ export const PROJECTOR_LOGS = {
     RECEIVED: logTemplate('Received', 'CategoryRestoredEvent'),
     SUCCESS: (id: string) => logTemplate('Success', `restored category ${id}`),
     ERROR: (id: string) => logTemplate('Error', `restoring category ${id}`),
+  },
+
+  MANUFACTURER_CREATED: {
+    RECEIVED: logTemplate('Received', 'ManufacturerCreatedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `created manufacturer ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `creating manufacturer ${id}`),
+  },
+  MANUFACTURER_UPDATED: {
+    RECEIVED: logTemplate('Received', 'ManufacturerUpdatedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `updated manufacturer ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `updating manufacturer ${id}`),
+  },
+  MANUFACTURER_DELETED: {
+    RECEIVED: logTemplate('Received', 'ManufacturerDeletedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `deleted manufacturer ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `deleting manufacturer ${id}`),
+  },
+  MANUFACTURER_RESTORED: {
+    RECEIVED: logTemplate('Received', 'ManufacturerRestoredEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `restored manufacturer ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `restoring manufacturer ${id}`),
   },
 
   PERMISSIONS_ASSIGNED_TO_ROLE: {

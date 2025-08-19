@@ -45,4 +45,10 @@ export const ALL_APP_PERMISSIONS: AppPermission[] = [
   { action: ACTIONS.READ, subject: SUBJECTS.CATEGORY },
   { action: ACTIONS.UPDATE, subject: SUBJECTS.CATEGORY },
   { action: ACTIONS.DELETE, subject: SUBJECTS.CATEGORY },
+
+  // Quyền trên Manufacturer
+  { action: ACTIONS.CREATE, subject: SUBJECTS.MANUFACTURER },
+  { action: ACTIONS.READ, subject: SUBJECTS.MANUFACTURER },
+  { action: ACTIONS.UPDATE, subject: SUBJECTS.MANUFACTURER },
+  { action: ACTIONS.DELETE, subject: SUBJECTS.MANUFACTURER },
 ];

@@ -7,4 +7,5 @@ export const SUBJECTS = {
   DEPARTMENT: 'Department',
   STATUS_LABEL: 'StatusLabel',
   CATEGORY: 'Category',
+  MANUFACTURER: 'Manufacturer',
 };

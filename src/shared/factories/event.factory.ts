@@ -24,6 +24,14 @@ import { StatusLabelCreatedEvent } from 'src/2_domain/status-label/events/status
 import { StatusLabelUpdatedEvent } from 'src/2_domain/status-label/events/status-label-updated.event';
 import { StatusLabelDeletedEvent } from 'src/2_domain/status-label/events/status-label-deleted.event';
 import { StatusLabelRestoredEvent } from 'src/2_domain/status-label/events/status-label-restored.event';
+import { CategoryCreatedEvent } from 'src/2_domain/category/events/category-created.event';
+import { CategoryUpdatedEvent } from 'src/2_domain/category/events/category-updated.event';
+import { CategoryDeletedEvent } from 'src/2_domain/category/events/category-deleted.event';
+import { CategoryRestoredEvent } from 'src/2_domain/category/events/category-restored.event';
+import { ManufacturerCreatedEvent } from 'src/2_domain/manufacturer/events/manufacturer-created.event';
+import { ManufacturerUpdatedEvent } from 'src/2_domain/manufacturer/events/manufacturer-updated.event';
+import { ManufacturerDeletedEvent } from 'src/2_domain/manufacturer/events/manufacturer-deleted.event';
+import { ManufacturerRestoredEvent } from 'src/2_domain/manufacturer/events/manufacturer-restored.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -56,6 +64,16 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [StatusLabelUpdatedEvent.name]: StatusLabelUpdatedEvent,
   [StatusLabelDeletedEvent.name]: StatusLabelDeletedEvent,
   [StatusLabelRestoredEvent.name]: StatusLabelRestoredEvent,
+
+  [CategoryCreatedEvent.name]: CategoryCreatedEvent,
+  [CategoryUpdatedEvent.name]: CategoryUpdatedEvent,
+  [CategoryDeletedEvent.name]: CategoryDeletedEvent,
+  [CategoryRestoredEvent.name]: CategoryRestoredEvent,
+
+  [ManufacturerCreatedEvent.name]: ManufacturerCreatedEvent,
+  [ManufacturerUpdatedEvent.name]: ManufacturerUpdatedEvent,
+  [ManufacturerDeletedEvent.name]: ManufacturerDeletedEvent,
+  [ManufacturerRestoredEvent.name]: ManufacturerRestoredEvent,
 };
 
 export class EventFactory {

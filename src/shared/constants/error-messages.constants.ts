@@ -90,6 +90,16 @@ export const CATEGORY_ERRORS = {
   IS_ACTIVE: 'Cannot restore an active category.',
 };
 
+export const MANUFACTURER_ERRORS = {
+  NOT_FOUND: (id: string) => `Manufacturer with ID "${id}" not found.`,
+  ALREADY_EXISTS: (name: string) =>
+    `Manufacturer with name "${name}" already exists.`,
+  ALREADY_DELETED:
+    'Cannot delete a manufacturer that has already been deleted.',
+  CANNOT_UPDATE_DELETED: 'Cannot update a deleted manufacturer.',
+  IS_ACTIVE: 'Cannot restore an active manufacturer.',
+};
+
 // ==================================
 // SEEDER ERRORS
 // ==================================

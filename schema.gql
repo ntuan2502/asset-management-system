@@ -128,6 +128,18 @@ type CategoryConnection {
   meta: PaginationMeta!
 }
 
+type Manufacturer {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ManufacturerConnection {
+  nodes: [Manufacturer!]!
+  meta: PaginationMeta!
+}
+
 type Query {
   hello: String!
   users(page: Int = 1, limit: Int = 10): UserConnection!
@@ -145,6 +157,8 @@ type Query {
   statusLabel(id: ID!): StatusLabel
   Categories(page: Int = 1, limit: Int = 10): CategoryConnection!
   Category(id: ID!): Category
+  Manufacturers(page: Int = 1, limit: Int = 10): ManufacturerConnection!
+  Manufacturer(id: ID!): Manufacturer
 }
 
 type Mutation {
@@ -175,6 +189,9 @@ type Mutation {
   createCategory(input: CreateCategoryInput!): Category!
   updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
   deleteCategory(id: ID!): Boolean!
+  createManufacturer(input: CreateManufacturerInput!): Manufacturer!
+  updateManufacturer(id: ID!, input: UpdateManufacturerInput!): Manufacturer!
+  deleteManufacturer(id: ID!): Boolean!
 }
 
 input CreateUserInput {
@@ -273,5 +290,13 @@ input CreateCategoryInput {
 }
 
 input UpdateCategoryInput {
+  name: String
+}
+
+input CreateManufacturerInput {
+  name: String!
+}
+
+input UpdateManufacturerInput {
   name: String
 }

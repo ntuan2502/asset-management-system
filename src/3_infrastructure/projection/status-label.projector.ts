@@ -70,7 +70,7 @@ export class StatusLabelProjector implements IEventHandler<StatusLabelEvent> {
         dataToUpdate.name = event.name;
       }
 
-      await this.prisma.department.update({
+      await this.prisma.statusLabel.update({
         where: { id: event.id },
         data: dataToUpdate,
       });
@@ -86,7 +86,7 @@ export class StatusLabelProjector implements IEventHandler<StatusLabelEvent> {
     const logs = PROJECTOR_LOGS.STATUS_LABEL_DELETED;
     try {
       console.log(logs.RECEIVED, event);
-      await this.prisma.department.update({
+      await this.prisma.statusLabel.update({
         where: { id: event.id },
         data: {
           deletedAt: event.deletedAt,
@@ -105,7 +105,7 @@ export class StatusLabelProjector implements IEventHandler<StatusLabelEvent> {
     const logs = PROJECTOR_LOGS.STATUS_LABEL_RESTORED;
     try {
       console.log(logs.RECEIVED, event);
-      await this.prisma.department.update({
+      await this.prisma.statusLabel.update({
         where: { id: event.id },
         data: {
           deletedAt: null,
