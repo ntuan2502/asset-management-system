@@ -6,4 +6,5 @@ export const SUBJECTS = {
   OFFICE: 'Office',
   DEPARTMENT: 'Department',
   STATUS_LABEL: 'StatusLabel',
+  CATEGORY: 'Category',
 };

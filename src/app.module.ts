@@ -16,6 +16,7 @@ import { AuthMiddleware } from './2_domain/auth/middleware/auth.middleware';
 import { OfficeModule } from './2_domain/office/office.module';
 import { DepartmentModule } from './2_domain/department/department.module';
 import { StatusLabelModule } from './2_domain/status-label/status-label.module';
+import { CategoryModule } from './2_domain/category/category.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { StatusLabelModule } from './2_domain/status-label/status-label.module';
     OfficeModule,
     DepartmentModule,
     StatusLabelModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

@@ -81,6 +81,15 @@ export const STATUS_LABEL_ERRORS = {
   IS_ACTIVE: 'Cannot restore an active status label.',
 };
 
+export const CATEGORY_ERRORS = {
+  NOT_FOUND: (id: string) => `Category with ID "${id}" not found.`,
+  ALREADY_EXISTS: (name: string) =>
+    `Category with name "${name}" already exists.`,
+  ALREADY_DELETED: 'Cannot delete a category that has already been deleted.',
+  CANNOT_UPDATE_DELETED: 'Cannot update a deleted category.',
+  IS_ACTIVE: 'Cannot restore an active category.',
+};
+
 // ==================================
 // SEEDER ERRORS
 // ==================================

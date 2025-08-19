@@ -28,11 +28,10 @@ export class CreateStatusLabelHandler
   ): Promise<StatusLabelAggregate> {
     const { input } = command;
 
-    // Validation: Tên không được trùng
-    const existingLabel = await this.statusLabelRepository.findByName(
+    const existingStatusLabel = await this.statusLabelRepository.findByName(
       input.name,
     );
-    if (existingLabel) {
+    if (existingStatusLabel) {
       throw new Error(STATUS_LABEL_ERRORS.ALREADY_EXISTS(input.name));
     }
 

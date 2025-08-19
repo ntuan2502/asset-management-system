@@ -39,4 +39,10 @@ export const ALL_APP_PERMISSIONS: AppPermission[] = [
   { action: ACTIONS.READ, subject: SUBJECTS.STATUS_LABEL },
   { action: ACTIONS.UPDATE, subject: SUBJECTS.STATUS_LABEL },
   { action: ACTIONS.DELETE, subject: SUBJECTS.STATUS_LABEL },
+
+  // Quyền trên Category
+  { action: ACTIONS.CREATE, subject: SUBJECTS.CATEGORY },
+  { action: ACTIONS.READ, subject: SUBJECTS.CATEGORY },
+  { action: ACTIONS.UPDATE, subject: SUBJECTS.CATEGORY },
+  { action: ACTIONS.DELETE, subject: SUBJECTS.CATEGORY },
 ];

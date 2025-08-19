@@ -145,6 +145,27 @@ export const PROJECTOR_LOGS = {
     ERROR: (id: string) => logTemplate('Error', `restoring status label ${id}`),
   },
 
+  CATEGORY_CREATED: {
+    RECEIVED: logTemplate('Received', 'CategoryCreatedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `created category ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `creating category ${id}`),
+  },
+  CATEGORY_UPDATED: {
+    RECEIVED: logTemplate('Received', 'CategoryUpdatedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `updated category ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `updating category ${id}`),
+  },
+  CATEGORY_DELETED: {
+    RECEIVED: logTemplate('Received', 'CategoryDeletedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `deleted category ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `deleting category ${id}`),
+  },
+  CATEGORY_RESTORED: {
+    RECEIVED: logTemplate('Received', 'CategoryRestoredEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `restored category ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `restoring category ${id}`),
+  },
+
   PERMISSIONS_ASSIGNED_TO_ROLE: {
     RECEIVED: logTemplate('Received', 'PermissionAssignedToRoleEvent'),
     SUCCESS: (id: string) =>
