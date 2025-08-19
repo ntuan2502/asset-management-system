@@ -4,8 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from 'src/2_domain/auth/auth.service';
 import { RefreshTokenCommand } from '../impl/refresh-token.command';
-import { JwtPayload } from 'jsonwebtoken';
 import { AUTH_ERRORS } from 'src/shared/constants/error-messages.constants';
+import { RefreshTokenPayload } from 'src/2_domain/auth/types/jwt-payload.types';
 
 @CommandHandler(RefreshTokenCommand)
 export class RefreshTokenHandler
@@ -23,17 +23,24 @@ export class RefreshTokenHandler
     }
 
     try {
-      const payload = this.jwtService.verify<JwtPayload>(refreshToken, {
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      });
+      const payload = this.jwtService.verify<RefreshTokenPayload>(
+        refreshToken,
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        },
+      );
 
-      if (!payload.sub) {
+      if (!payload.sub || !payload.sessionId) {
         throw new UnauthorizedException(
           AUTH_ERRORS.REFRESH_TOKEN_INVALID_PAYLOAD,
         );
       }
 
-      return this.authService.refreshToken(payload.sub, refreshToken);
+      return this.authService.refreshToken(
+        payload.sub,
+        refreshToken,
+        payload.sessionId,
+      );
     } catch (error) {
       console.error(AUTH_ERRORS.REFRESH_TOKEN_INVALID_OR_EXPIRED, error);
       throw new UnauthorizedException(

@@ -22,6 +22,7 @@ import {
   DEFAULT_PAGE,
 } from 'src/shared/constants/pagination.constants';
 import { AUTH_ERRORS } from 'src/shared/constants/error-messages.constants';
+import { RefreshTokenPayload } from './types/jwt-payload.types';
 
 interface AccessTokenPayload {
   sub: string;
@@ -66,31 +67,36 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ) {
-    const refreshTokenPayload = { sub: user.id };
+    // 1. **Tạo bản ghi Session TẠM THỜI**
+    const refreshTokenExpiresAt = new Date();
+    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
+
+    // Tạo session trước để lấy ID
+    const session = await this.prisma.session.create({
+      data: {
+        userId: user.id,
+        ipAddress,
+        userAgent,
+        expiresAt: refreshTokenExpiresAt,
+        // hashedRefreshToken và lastAccessTokenId sẽ được cập nhật sau
+      },
+    });
+
+    // 2. **Tạo Refresh Token DUY NHẤT**
+    const refreshTokenPayload: RefreshTokenPayload = {
+      sub: user.id,
+      sessionId: session.id,
+    }; // << THÊM sessionId
     const refreshToken = this.jwtService.sign(refreshTokenPayload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get<string>(
         'JWT_REFRESH_SECRET_EXPIRES_IN',
-        '7d',
       ),
     });
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    const refreshTokenExpiresAt = new Date();
-    refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
 
+    // 3. **Tạo Access Token**
     const accessTokenId = createId();
-
-    const session = await this.prisma.session.create({
-      data: {
-        userId: user.id,
-        hashedRefreshToken,
-        ipAddress,
-        userAgent,
-        expiresAt: refreshTokenExpiresAt,
-        lastAccessTokenId: accessTokenId,
-      },
-    });
-
     const accessTokenPayload: AccessTokenPayload = {
       sub: user.id,
       sessionId: session.id,
@@ -99,41 +105,43 @@ export class AuthService {
     };
     const accessToken = this.jwtService.sign(accessTokenPayload, {
       secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN', '15m'),
+      expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN'),
     });
 
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
+    // 4. **Cập nhật lại Session với các token đã tạo**
+    await this.prisma.session.update({
+      where: { id: session.id },
+      data: {
+        hashedRefreshToken,
+        lastAccessTokenId: accessTokenId,
+      },
+    });
+
+    return { access_token: accessToken, refresh_token: refreshToken };
   }
 
-  async refreshToken(userId: string, refreshToken: string) {
-    const userSessions = await this.prisma.session.findMany({
-      where: { userId: userId, revokedAt: null },
+  async refreshToken(userId: string, refreshToken: string, sessionId: string) {
+    // 1. **Query trực tiếp vào session cụ thể**
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
     });
-    if (!userSessions || userSessions.length === 0) {
-      throw new UnauthorizedException(AUTH_ERRORS.NO_ACTIVE_SESSIONS);
-    }
 
-    let validSession: Session | null = null;
-    for (const session of userSessions) {
-      if (
-        session.hashedRefreshToken &&
-        (await bcrypt.compare(refreshToken, session.hashedRefreshToken))
-      ) {
-        validSession = session;
-        break;
-      }
-    }
-    if (!validSession || validSession.expiresAt < new Date()) {
+    // 2. **Xác thực session**
+    if (
+      !session ||
+      session.userId !== userId || // Đảm bảo session này thuộc về đúng user
+      session.revokedAt ||
+      !session.hashedRefreshToken ||
+      !(await bcrypt.compare(refreshToken, session.hashedRefreshToken)) ||
+      session.expiresAt < new Date()
+    ) {
       throw new UnauthorizedException(
-        'Refresh token is invalid or has expired.',
+        AUTH_ERRORS.REFRESH_TOKEN_INVALID_OR_EXPIRED,
       );
     }
 
     const user = await this.userRepository.findWithPermissionsById(
-      validSession.userId,
+      session.userId,
     );
     if (!user) {
       throw new UnauthorizedException(AUTH_ERRORS.USER_FOR_SESSION_NOT_FOUND);
@@ -142,17 +150,17 @@ export class AuthService {
     const accessTokenId = createId();
     const accessTokenPayload: AccessTokenPayload = {
       sub: user.id,
-      sessionId: validSession.id,
+      sessionId: session.id,
       permissions: user.permissions,
       jti: accessTokenId,
     };
     const accessToken = this.jwtService.sign(accessTokenPayload, {
       secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN', '15m'),
+      expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN'),
     });
 
     await this.prisma.session.update({
-      where: { id: validSession.id },
+      where: { id: session.id },
       data: { lastAccessTokenId: accessTokenId },
     });
 

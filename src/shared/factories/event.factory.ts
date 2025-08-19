@@ -20,6 +20,10 @@ import { DepartmentDeletedEvent } from 'src/2_domain/department/events/departmen
 import { DepartmentRestoredEvent } from 'src/2_domain/department/events/department-restored.event';
 import { UserOfficeChangedEvent } from 'src/2_domain/user/events/user-office-changed.event';
 import { UserDepartmentChangedEvent } from 'src/2_domain/user/events/user-department-changed.event';
+import { StatusLabelCreatedEvent } from 'src/2_domain/status-label/events/status-label-created.event';
+import { StatusLabelUpdatedEvent } from 'src/2_domain/status-label/events/status-label-updated.event';
+import { StatusLabelDeletedEvent } from 'src/2_domain/status-label/events/status-label-deleted.event';
+import { StatusLabelRestoredEvent } from 'src/2_domain/status-label/events/status-label-restored.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -47,6 +51,11 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [DepartmentUpdatedEvent.name]: DepartmentUpdatedEvent,
   [DepartmentDeletedEvent.name]: DepartmentDeletedEvent,
   [DepartmentRestoredEvent.name]: DepartmentRestoredEvent,
+
+  [StatusLabelCreatedEvent.name]: StatusLabelCreatedEvent,
+  [StatusLabelUpdatedEvent.name]: StatusLabelUpdatedEvent,
+  [StatusLabelDeletedEvent.name]: StatusLabelDeletedEvent,
+  [StatusLabelRestoredEvent.name]: StatusLabelRestoredEvent,
 };
 
 export class EventFactory {

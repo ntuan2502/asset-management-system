@@ -5,7 +5,7 @@ import {
   UserWithPermissions,
 } from 'src/2_domain/user/repositories/user.repository.interface';
 import { UserAggregate } from 'src/2_domain/user/aggregates/user.aggregate';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../../prisma.service';
 import { UserMapper } from 'src/1_application/user/mappers/user.mapper';
 
 @Injectable()

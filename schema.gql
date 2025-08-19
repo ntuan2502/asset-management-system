@@ -104,6 +104,18 @@ type PermissionConnection {
   meta: PaginationMeta!
 }
 
+type StatusLabel {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type StatusLabelConnection {
+  nodes: [StatusLabel!]!
+  meta: PaginationMeta!
+}
+
 type Query {
   hello: String!
   users(page: Int = 1, limit: Int = 10): UserConnection!
@@ -117,6 +129,8 @@ type Query {
   office(id: ID!): Office
   sessions(page: Int = 1, limit: Int = 10): SessionConnection!
   permissions(page: Int = 1, limit: Int = 10): PermissionConnection!
+  statusLabels(page: Int = 1, limit: Int = 10): StatusLabelConnection!
+  statusLabel(id: ID!): StatusLabel
 }
 
 type Mutation {
@@ -141,6 +155,9 @@ type Mutation {
   refreshToken(refresh_token: String!): LoginResponse!
   logout: Boolean!
   logoutAll: Boolean!
+  createStatusLabel(input: CreateStatusLabelInput!): StatusLabel!
+  updateStatusLabel(id: ID!, input: UpdateStatusLabelInput!): StatusLabel!
+  deleteStatusLabel(id: ID!): Boolean!
 }
 
 input CreateUserInput {
@@ -224,4 +241,12 @@ input UpdateOfficeInput {
 input LoginUserInput {
   email: String!
   password: String!
+}
+
+input CreateStatusLabelInput {
+  name: String!
+}
+
+input UpdateStatusLabelInput {
+  name: String
 }

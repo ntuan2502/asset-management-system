@@ -14,7 +14,7 @@ import { GetUserByIdHandler } from 'src/1_application/user/queries/handlers/get-
 import { USER_REPOSITORY } from './repositories/user.repository.interface';
 import { UserAggregateRepository } from './repositories/user-aggregate.repository';
 
-import { PrismaUserRepository } from 'src/3_infrastructure/persistence/prisma/repositories/prisma-user.repository';
+import { PrismaUserRepository } from 'src/3_infrastructure/persistence/prisma/repositories/user/prisma-user.repository';
 import { SnapshotterService } from 'src/3_infrastructure/snapshot-store/snapshotter.service';
 
 import { SharedInfrastructureModule } from 'src/3_infrastructure/shared/shared-infrastructure.module';

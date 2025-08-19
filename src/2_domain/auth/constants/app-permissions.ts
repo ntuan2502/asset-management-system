@@ -33,4 +33,10 @@ export const ALL_APP_PERMISSIONS: AppPermission[] = [
   { action: ACTIONS.READ, subject: SUBJECTS.DEPARTMENT },
   { action: ACTIONS.UPDATE, subject: SUBJECTS.DEPARTMENT },
   { action: ACTIONS.DELETE, subject: SUBJECTS.DEPARTMENT },
+
+  // Quyền trên StatusLabel
+  { action: ACTIONS.CREATE, subject: SUBJECTS.STATUS_LABEL },
+  { action: ACTIONS.READ, subject: SUBJECTS.STATUS_LABEL },
+  { action: ACTIONS.UPDATE, subject: SUBJECTS.STATUS_LABEL },
+  { action: ACTIONS.DELETE, subject: SUBJECTS.STATUS_LABEL },
 ];

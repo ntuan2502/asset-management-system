@@ -1,4 +1,5 @@
-// prisma/schema.prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -9,28 +10,36 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Tạo một enum cho Gender để đảm bảo tính nhất quán
+// Enum cho các giá trị cố định, đảm bảo tính nhất quán
 enum Gender {
   MALE
   FEMALE
   OTHER
 }
 
+// ================================================
+// 1. AUTH & RBAC (Xác thực & Phân quyền)
+// ================================================
+
 model User {
   id        String    @id @default(cuid())
-  email     String    @unique
-  password  String // THÊM MỚI: Lưu trữ mật khẩu đã được hash
-  firstName String
-  lastName  String
-  dob       DateTime? // THÊM MỚI: Date of Birth, optional
-  gender    Gender? // THÊM MỚI: Dùng Enum, optional
+  email     String    @unique // vd: "john.doe@example.com"
+  password  String // vd: "$2b$10$..." (chuỗi đã được hash bằng bcrypt)
+  firstName String // vd: "John"
+  lastName  String // vd: "Doe"
+  dob       DateTime? // vd: "1990-01-15T00:00:00.000Z"
+  gender    Gender? // vd: MALE, FEMALE, OTHER (Giá trị từ Enum)
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  deletedAt DateTime? // THÊM MỚI: Dùng cho soft delete, optional
+  deletedAt DateTime? // Dùng cho soft delete
 
-  roles    Role[]    @relation("UserRoles")
-  sessions Session[]
+  // --- Mối quan hệ ---
+  roles             Role[]            @relation("UserRoles")
+  sessions          Session[]
+  assignedInstances Instance[] // Các tài sản mà user này đang được gán
+  actionHistory     InstanceHistory[] @relation("ActionByUser") // Các hành động mà user này đã thực hiện
+  relatedHistory    InstanceHistory[] @relation("RelatedToUser") // Lịch sử liên quan đến user (vd: được gán tài sản)
 
   officeId String?
   office   Office? @relation(fields: [officeId], references: [id])
@@ -39,51 +48,39 @@ model User {
   department   Department? @relation(fields: [departmentId], references: [id])
 }
 
-// Model để lưu trữ các sự kiện một cách bất biến (append-only)
-model Event {
-  id            String   @id @default(cuid())
-  aggregateId   String // ID của đối tượng mà sự kiện này thuộc về (ví dụ: userId)
-  aggregateType String // Loại đối tượng (ví dụ: "User", "Asset")
-  eventType     String // Tên của sự kiện (ví dụ: "UserCreatedEvent")
-  payload       Json // Dữ liệu chi tiết của sự kiện dưới dạng JSON
-  version       Int // Phiên bản của sự kiện cho một aggregate cụ thể
-  createdAt     DateTime @default(now())
+model Session {
+  id                 String    @id @default(cuid())
+  hashedRefreshToken String? // vd: "$2b$10$..." (hash của refresh token JWT)
+  userAgent          String? // vd: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."
+  ipAddress          String? // vd: "192.168.1.10"
+  lastAccessTokenId  String? // vd: "cuid_cua_access_token_cuoi_cung" (dùng cho anti-replay)
+  expiresAt          DateTime // Thời điểm refresh token hết hạn
+  createdAt          DateTime  @default(now())
+  revokedAt          DateTime? // Thời điểm logout hoặc bị thu hồi
 
-  // Đảm bảo mỗi phiên bản của một aggregate là duy nhất, ngăn chặn race condition
-  @@unique([aggregateId, version])
-  // Tăng tốc độ truy vấn các sự kiện cho một aggregate
-  @@index([aggregateId])
-}
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Snapshot {
-  id            String @id @default(cuid())
-  aggregateId   String // ID của đối tượng (vd: userId)
-  aggregateType String // Loại đối tượng (vd: "User")
-  version       Int // Phiên bản của aggregate tại thời điểm snapshot
-  payload       Json // Toàn bộ trạng thái của aggregate dưới dạng JSON
-
-  @@unique([aggregateId, version]) // Đảm bảo snapshot cho một version là duy nhất
-  @@index([aggregateId])
+  @@index([userId])
 }
 
 model Role {
   id          String  @id @default(cuid())
-  name        String  @unique
-  description String?
+  name        String  @unique // vd: "ADMIN", "EDITOR", "IT_SUPPORT"
+  description String? // vd: "Can manage users and roles"
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  users User[] @relation("UserRoles")
-
+  users       User[]       @relation("UserRoles")
   permissions Permission[] @relation("RolePermissions")
 }
 
 model Permission {
   id      String @id @default(cuid())
-  action  String // vd: "create", "read", "update", "delete"
-  subject String // vd: "Asset", "User"
+  action  String // vd: "create", "read", "update", "delete", "manage"
+  subject String // vd: "User", "Asset", "Office", "All"
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,31 +90,17 @@ model Permission {
   @@unique([action, subject]) // Đảm bảo mỗi quyền là duy nhất
 }
 
-model Session {
-  id                 String   @id @default(cuid())
-  hashedRefreshToken String? // Lưu refresh token đã được hash, tùy chọn
-  userAgent          String? // Thông tin trình duyệt
-  ipAddress          String? // Địa chỉ IP
-  expiresAt          DateTime // Thời điểm refresh token hết hạn
-  createdAt          DateTime @default(now())
-
-  revokedAt         DateTime?
-  lastAccessTokenId String?
-
-  // Mối quan hệ: Mỗi Session thuộc về một User
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
+// ================================================
+// 2. ORGANIZATIONAL (Tổ chức)
+// ================================================
 
 model Office {
   id                String  @id @default(cuid())
-  name              String // Tên
-  internationalName String // Tên quốc tế
-  shortName         String // Tên viết tắt
-  taxCode           String // Mã số thuế
-  address           String
+  name              String // vd: "Công ty Cổ phần Amata Việt Nam"
+  internationalName String // vd: "Amata Vietnam JSC"
+  shortName         String // vd: "AMATAVN"
+  taxCode           String // vd: "0123456789"
+  address           String // vd: "123 Đường ABC, Quận XYZ, TP. HCM"
   description       String?
 
   createdAt DateTime  @default(now())
@@ -134,7 +117,7 @@ model Office {
 
 model Department {
   id          String  @id @default(cuid())
-  name        String
+  name        String // vd: "Information Technology", "Human Resources"
   description String?
 
   createdAt DateTime  @default(now())
@@ -145,5 +128,177 @@ model Department {
   office   Office @relation(fields: [officeId], references: [id])
   users    User[]
 
-  @@unique([name, officeId])
+  @@unique([name, officeId]) // Tên phòng ban là duy nhất trong một office
+}
+
+// ================================================
+// 3. ASSET MANAGEMENT (Quản lý Tài sản)
+// ================================================
+
+// --- Phần Catalog (Mô tả sản phẩm, không phải vật thể thật) ---
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique // vd: "Laptop", "Monitor", "Component", "Accessory"
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  products Product[]
+}
+
+model Manufacturer {
+  id   String @id @default(cuid())
+  name String @unique // vd: "Dell", "HP", "Samsung", "Intel"
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  products Product[]
+}
+
+model Product {
+  id          String  @id @default(cuid())
+  name        String  @unique // vd: "Latitude 5450", "ThinkPad T14 Gen 3", "SSD 980 Pro"
+  modelNumber String? // vd: "5450", "T14"
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  categoryId     String
+  category       Category     @relation(fields: [categoryId], references: [id])
+  manufacturerId String
+  manufacturer   Manufacturer @relation(fields: [manufacturerId], references: [id])
+
+  instances  Instance[]
+  attributes ProductAttribute[]
+}
+
+// --- Phần Thuộc tính (Dành cho tìm kiếm chi tiết) ---
+
+model Attribute {
+  id        String  @id @default(cuid())
+  name      String  @unique // vd: "Screen Size", "CPU Model", "Total RAM (GB)", "Operating System"
+  unit      String? // vd: "inch", "GB", "m3/day"
+  valueType String // vd: "STRING", "NUMBER", "BOOLEAN" (Để validate dữ liệu nhập)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  productValues  ProductAttribute[]
+  instanceValues InstanceAttribute[]
+}
+
+model ProductAttribute {
+  id    String @id @default(cuid())
+  value String // vd: "14" (cho Screen Size), "Intel Core Ultra 7 155U" (cho CPU Model)
+
+  productId   String
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attributeId String
+  attribute   Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, attributeId])
+}
+
+model InstanceAttribute {
+  id    String @id @default(cuid())
+  value String // vd: "32" (cho "Total RAM (GB)"), "1024" (cho "Total Storage (GB)")
+
+  instanceId  String
+  instance    Instance  @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  attributeId String
+  attribute   Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  @@unique([instanceId, attributeId])
+}
+
+// --- Phần Thực thể Vật lý & Lịch sử ---
+
+model StatusLabel {
+  id   String @id @default(cuid())
+  name String @unique // vd: "In Stock", "In Use", "Under Maintenance", "Retired"
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  instances Instance[]
+}
+
+model Instance {
+  id              String    @id @default(cuid())
+  assetTag        String?   @unique // vd: "ACLT-050", "PC-IT-001" (Mã tài sản chính, gốc)
+  serialNumber    String?   @unique // vd: "SN-XYZ-12345" (của từng món đồ vật lý)
+  purchaseDate    DateTime?
+  warrantyEndDate DateTime?
+  notes           String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  productId    String
+  product      Product     @relation(fields: [productId], references: [id])
+  statusId     String
+  status       StatusLabel @relation(fields: [statusId], references: [id])
+  assignedToId String?
+  assignedTo   User?       @relation(fields: [assignedToId], references: [id])
+
+  // Quan hệ tự tham chiếu cho linh kiện
+  parentId   String?
+  parent     Instance?  @relation("ComponentHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  components Instance[] @relation("ComponentHierarchy")
+
+  // Quan hệ với các thành phần khác
+  history    InstanceHistory[]
+  attributes InstanceAttribute[]
+}
+
+model InstanceHistory {
+  id         String   @id @default(cuid())
+  actionType String // vd: "Checkout", "Checkin", "Audit", "Repair"
+  notes      String? // vd: "Bàn giao cho nhân viên mới", "Nâng cấp RAM"
+  createdAt  DateTime @default(now())
+
+  instanceId String
+  instance   Instance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  actionById String // User thực hiện hành động (thường là admin)
+  actionBy   User   @relation("ActionByUser", fields: [actionById], references: [id])
+
+  assignedToId String? // User liên quan (vd: người nhận tài sản)
+  assignedTo   User?   @relation("RelatedToUser", fields: [assignedToId], references: [id])
+}
+
+// ================================================
+// 4. EVENT SOURCING & SNAPSHOTS
+// ================================================
+
+model Event {
+  id            String   @id @default(cuid())
+  aggregateId   String
+  aggregateType String // vd: "User", "Role", "Office", "Department"
+  eventType     String // vd: "UserCreatedEvent", "RoleUpdatedEvent"
+  payload       Json
+  version       Int
+  createdAt     DateTime @default(now())
+
+  @@unique([aggregateId, version])
+  @@index([aggregateId])
+}
+
+model Snapshot {
+  id            String @id @default(cuid())
+  aggregateId   String
+  aggregateType String
+  version       Int
+  payload       Json
+
+  @@unique([aggregateId, version])
+  @@index([aggregateId])
 }

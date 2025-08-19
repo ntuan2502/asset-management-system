@@ -71,6 +71,16 @@ export const DEPARTMENT_ERRORS = {
   IS_ACTIVE: 'Cannot restore an active department.',
 };
 
+export const STATUS_LABEL_ERRORS = {
+  NOT_FOUND: (id: string) => `StatusLabel with ID "${id}" not found.`,
+  ALREADY_EXISTS: (name: string) =>
+    `StatusLabel with name "${name}" already exists.`,
+  ALREADY_DELETED:
+    'Cannot delete a status label that has already been deleted.',
+  CANNOT_UPDATE_DELETED: 'Cannot update a deleted status label.',
+  IS_ACTIVE: 'Cannot restore an active status label.',
+};
+
 // ==================================
 // SEEDER ERRORS
 // ==================================

@@ -15,6 +15,7 @@ import { PrismaModule } from './3_infrastructure/persistence/prisma/prisma.modul
 import { AuthMiddleware } from './2_domain/auth/middleware/auth.middleware';
 import { OfficeModule } from './2_domain/office/office.module';
 import { DepartmentModule } from './2_domain/department/department.module';
+import { StatusLabelModule } from './2_domain/status-label/status-label.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { DepartmentModule } from './2_domain/department/department.module';
     SeederModule,
     OfficeModule,
     DepartmentModule,
+    StatusLabelModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

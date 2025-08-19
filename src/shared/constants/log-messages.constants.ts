@@ -119,6 +119,32 @@ export const PROJECTOR_LOGS = {
     ERROR: (id: string) => logTemplate('Error', `restoring role ${id}`),
   },
 
+  STATUS_LABEL_CREATED: {
+    RECEIVED: logTemplate('Received', 'StatusLabelCreatedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `created status label ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `creating status label ${id}`),
+  },
+  STATUS_LABEL_UPDATED: {
+    RECEIVED: logTemplate('Received', 'StatusLabelUpdatedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `updated status label ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `updating status label ${id}`),
+  },
+  STATUS_LABEL_DELETED: {
+    RECEIVED: logTemplate('Received', 'StatusLabelDeletedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `soft-deleted status label ${id}`),
+    ERROR: (id: string) =>
+      logTemplate('Error', `soft-deleting status label ${id}`),
+  },
+  STATUS_LABEL_RESTORED: {
+    RECEIVED: logTemplate('Received', 'StatusLabelRestoredEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `restored status label ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `restoring status label ${id}`),
+  },
+
   PERMISSIONS_ASSIGNED_TO_ROLE: {
     RECEIVED: logTemplate('Received', 'PermissionAssignedToRoleEvent'),
     SUCCESS: (id: string) =>
