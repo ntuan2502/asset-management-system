@@ -1,5 +1,5 @@
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
-import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { createId } from '@paralleldrive/cuid2';
 import {
   StatusLabelCreatedEvent,
@@ -15,7 +15,7 @@ import { UpdateStatusLabelInput } from 'src/1_application/status-label/dtos/upda
 import { STATUS_LABEL_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class StatusLabelAggregate extends BaseAggregateRoot {
-  public readonly aggregateType = AGGREGATE_TYPES.STATUS_LABEL;
+  public readonly aggregateType = ENTITY_SUBJECTS.STATUS_LABEL;
 
   public name: string;
   public createdAt: Date;

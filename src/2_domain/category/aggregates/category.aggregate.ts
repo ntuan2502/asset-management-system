@@ -1,5 +1,5 @@
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
-import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { createId } from '@paralleldrive/cuid2';
 import {
   CategoryCreatedEvent,
@@ -15,7 +15,7 @@ import { UpdateCategoryInput } from 'src/1_application/category/dtos/update-cate
 import { CATEGORY_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class CategoryAggregate extends BaseAggregateRoot {
-  public readonly aggregateType = AGGREGATE_TYPES.CATEGORY;
+  public readonly aggregateType = ENTITY_SUBJECTS.CATEGORY;
 
   public name: string;
   public createdAt: Date;

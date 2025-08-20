@@ -16,7 +16,7 @@ import { DepartmentAggregate } from 'src/2_domain/department/aggregates/departme
 import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { OfficeType } from '../office/office.type';
 import { OfficeAggregate } from 'src/2_domain/office/aggregates/office.aggregate';
@@ -40,7 +40,10 @@ export class DepartmentResolver {
   ) {}
 
   @Mutation(() => DepartmentType)
-  @CheckPermissions({ action: ACTIONS.CREATE, subject: SUBJECTS.DEPARTMENT })
+  @CheckPermissions({
+    action: ACTIONS.CREATE,
+    subject: ENTITY_SUBJECTS.DEPARTMENT,
+  })
   async createDepartment(
     @Args('input') input: CreateDepartmentInput,
   ): Promise<DepartmentAggregate> {
@@ -48,7 +51,10 @@ export class DepartmentResolver {
   }
 
   @Query(() => DepartmentConnection, { name: 'departments' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.DEPARTMENT })
+  @CheckPermissions({
+    action: ACTIONS.READ,
+    subject: ENTITY_SUBJECTS.DEPARTMENT,
+  })
   async getAllDepartments(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedDepartmentsResult> {
@@ -56,7 +62,10 @@ export class DepartmentResolver {
   }
 
   @Query(() => DepartmentType, { name: 'department', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.DEPARTMENT })
+  @CheckPermissions({
+    action: ACTIONS.READ,
+    subject: ENTITY_SUBJECTS.DEPARTMENT,
+  })
   async getDepartmentById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<DepartmentAggregate | null> {
@@ -64,7 +73,10 @@ export class DepartmentResolver {
   }
 
   @Mutation(() => DepartmentType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.DEPARTMENT })
+  @CheckPermissions({
+    action: ACTIONS.UPDATE,
+    subject: ENTITY_SUBJECTS.DEPARTMENT,
+  })
   async updateDepartment(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateDepartmentInput,
@@ -73,7 +85,10 @@ export class DepartmentResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.DEPARTMENT })
+  @CheckPermissions({
+    action: ACTIONS.DELETE,
+    subject: ENTITY_SUBJECTS.DEPARTMENT,
+  })
   async deleteDepartment(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -82,7 +97,10 @@ export class DepartmentResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.DEPARTMENT })
+  @CheckPermissions({
+    action: ACTIONS.UPDATE,
+    subject: ENTITY_SUBJECTS.DEPARTMENT,
+  })
   async restoreDepartment(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

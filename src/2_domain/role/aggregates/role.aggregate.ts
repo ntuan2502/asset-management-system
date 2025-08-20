@@ -10,13 +10,13 @@ import {
 } from '../events/role-updated.event';
 import { RoleDeletedEvent } from '../events/role-deleted.event';
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
-import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { UpdateRoleInput } from 'src/1_application/role/dtos/update-role.input';
 import { RoleRestoredEvent } from '../events/role-restored.event';
 import { ROLE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class RoleAggregate extends BaseAggregateRoot {
-  public readonly aggregateType = AGGREGATE_TYPES.ROLE;
+  public readonly aggregateType = ENTITY_SUBJECTS.ROLE;
 
   public name: string;
   public description: string | null = null;

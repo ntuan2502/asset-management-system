@@ -9,7 +9,7 @@ import { CategoryAggregate } from 'src/2_domain/category/aggregates/category.agg
 import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { CategoryConnection } from './category-connection.type';
 import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
@@ -29,7 +29,10 @@ export class CategoryResolver {
   ) {}
 
   @Mutation(() => CategoryType)
-  @CheckPermissions({ action: ACTIONS.CREATE, subject: SUBJECTS.CATEGORY })
+  @CheckPermissions({
+    action: ACTIONS.CREATE,
+    subject: ENTITY_SUBJECTS.CATEGORY,
+  })
   async createCategory(
     @Args('input') input: CreateCategoryInput,
   ): Promise<CategoryAggregate> {
@@ -37,7 +40,7 @@ export class CategoryResolver {
   }
 
   @Query(() => CategoryConnection, { name: 'Categories' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.CATEGORY })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.CATEGORY })
   async getAllCategories(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedCategoriesResult> {
@@ -45,7 +48,7 @@ export class CategoryResolver {
   }
 
   @Query(() => CategoryType, { name: 'Category', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.CATEGORY })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.CATEGORY })
   async getCategoryById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<CategoryAggregate | null> {
@@ -53,7 +56,10 @@ export class CategoryResolver {
   }
 
   @Mutation(() => CategoryType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.CATEGORY })
+  @CheckPermissions({
+    action: ACTIONS.UPDATE,
+    subject: ENTITY_SUBJECTS.CATEGORY,
+  })
   async updateCategory(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateCategoryInput,
@@ -62,7 +68,10 @@ export class CategoryResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.CATEGORY })
+  @CheckPermissions({
+    action: ACTIONS.DELETE,
+    subject: ENTITY_SUBJECTS.CATEGORY,
+  })
   async deleteCategory(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

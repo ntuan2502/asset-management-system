@@ -10,12 +10,12 @@ import {
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
 import { OfficeDeletedEvent } from '../events/office-deleted.event';
 import { OfficeRestoredEvent } from '../events/office-restored.event';
-import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { UpdateOfficeInput } from 'src/1_application/office/dtos/update-office.input';
 import { OFFICE_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class OfficeAggregate extends BaseAggregateRoot {
-  public readonly aggregateType = AGGREGATE_TYPES.OFFICE;
+  public readonly aggregateType = ENTITY_SUBJECTS.OFFICE;
 
   public name: string;
   public internationalName: string;

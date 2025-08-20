@@ -17,7 +17,7 @@ import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 
 @Resolver(() => OfficeType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -28,7 +28,7 @@ export class OfficeResolver {
   ) {}
 
   @Mutation(() => OfficeType)
-  @CheckPermissions({ action: ACTIONS.CREATE, subject: SUBJECTS.OFFICE })
+  @CheckPermissions({ action: ACTIONS.CREATE, subject: ENTITY_SUBJECTS.OFFICE })
   async createOffice(
     @Args('input') input: CreateOfficeInput,
   ): Promise<OfficeAggregate> {
@@ -36,7 +36,7 @@ export class OfficeResolver {
   }
 
   @Query(() => OfficeConnection, { name: 'offices' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.OFFICE })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.OFFICE })
   async getAllOffices(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedOfficesResult> {
@@ -44,7 +44,7 @@ export class OfficeResolver {
   }
 
   @Query(() => OfficeType, { name: 'office', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.OFFICE })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.OFFICE })
   async getOfficeById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<OfficeAggregate | null> {
@@ -52,7 +52,7 @@ export class OfficeResolver {
   }
 
   @Mutation(() => OfficeType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.OFFICE })
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.OFFICE })
   async updateOffice(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateOfficeInput,
@@ -61,7 +61,7 @@ export class OfficeResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.OFFICE })
+  @CheckPermissions({ action: ACTIONS.DELETE, subject: ENTITY_SUBJECTS.OFFICE })
   async deleteOffice(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

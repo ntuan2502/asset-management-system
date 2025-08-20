@@ -13,7 +13,7 @@ import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { UpdateRoleInput } from 'src/1_application/role/dtos/update-role.input';
 import { UpdateRoleCommand } from 'src/1_application/role/commands/impl/update-role.command';
 import { DeleteRoleCommand } from 'src/1_application/role/commands/impl/delete-role.command';
@@ -31,7 +31,7 @@ export class RoleResolver {
   ) {}
 
   @Mutation(() => RoleType)
-  @CheckPermissions({ action: ACTIONS.CREATE, subject: SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.CREATE, subject: ENTITY_SUBJECTS.ROLE })
   async createRole(
     @Args('input') input: CreateRoleInput,
   ): Promise<RoleAggregate> {
@@ -39,7 +39,7 @@ export class RoleResolver {
   }
 
   @Query(() => RoleConnection, { name: 'roles' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.ROLE })
   async getAllRoles(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedRolesResult> {
@@ -47,7 +47,7 @@ export class RoleResolver {
   }
 
   @Query(() => RoleType, { name: 'role', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.ROLE })
   async getRoleById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<RoleAggregate | null> {
@@ -55,7 +55,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => RoleType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.ROLE })
   async updateRole(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateRoleInput,
@@ -64,7 +64,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.DELETE, subject: ENTITY_SUBJECTS.ROLE })
   async deleteRole(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -73,7 +73,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.ROLE })
   async restoreRole(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -82,7 +82,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => RoleType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.ROLE })
   async assignPermissionsToRole(
     @Args('roleId', { type: () => ID }) roleId: string,
     @Args('input') input: AssignPermissionsToRoleInput,

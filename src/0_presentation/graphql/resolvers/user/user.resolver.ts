@@ -25,7 +25,7 @@ import { AssignRoleToUserCommand } from 'src/1_application/user/commands/impl/as
 import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { AuthenticatedUser } from 'src/shared/types/context.types';
 import { UserConnection } from './user-connection.type';
 import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
@@ -54,7 +54,7 @@ export class UserResolver {
   }
 
   @Query(() => UserConnection, { name: 'users' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.USER })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.USER })
   async getAllUsers(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedUsersResult> {
@@ -62,7 +62,7 @@ export class UserResolver {
   }
 
   @Query(() => UserType, { name: 'user', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.USER })
+  @CheckPermissions({ action: ACTIONS.READ, subject: ENTITY_SUBJECTS.USER })
   async getUserById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<UserType | null> {
@@ -70,7 +70,7 @@ export class UserResolver {
   }
 
   @Mutation(() => UserType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.USER })
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.USER })
   async updateUser(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateUserInput,
@@ -78,7 +78,7 @@ export class UserResolver {
     return this.commandBus.execute(new UpdateUserCommand(id, input));
   }
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.USER })
+  @CheckPermissions({ action: ACTIONS.DELETE, subject: ENTITY_SUBJECTS.USER })
   async deleteUser(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
@@ -87,7 +87,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.USER })
+  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.USER })
   async restoreUser(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

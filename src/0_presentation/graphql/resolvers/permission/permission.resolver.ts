@@ -10,7 +10,7 @@ import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions
 import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
 import { PaginatedPermissionsResult } from 'src/1_application/permission/queries/handlers/get-all-permissions.handler';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 
 @Resolver(() => PermissionType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -18,7 +18,10 @@ export class PermissionResolver {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Query(() => PermissionConnection, { name: 'permissions' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.PERMISSION })
+  @CheckPermissions({
+    action: ACTIONS.READ,
+    subject: ENTITY_SUBJECTS.PERMISSION,
+  })
   async getAllPermissions(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedPermissionsResult> {

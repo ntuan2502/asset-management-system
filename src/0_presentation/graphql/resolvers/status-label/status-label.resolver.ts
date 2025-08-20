@@ -9,7 +9,7 @@ import { StatusLabelAggregate } from 'src/2_domain/status-label/aggregates/statu
 import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { StatusLabelConnection } from './status-label-connection.type';
 import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
@@ -29,7 +29,10 @@ export class StatusLabelResolver {
   ) {}
 
   @Mutation(() => StatusLabelType)
-  @CheckPermissions({ action: ACTIONS.CREATE, subject: SUBJECTS.STATUS_LABEL })
+  @CheckPermissions({
+    action: ACTIONS.CREATE,
+    subject: ENTITY_SUBJECTS.STATUS_LABEL,
+  })
   async createStatusLabel(
     @Args('input') input: CreateStatusLabelInput,
   ): Promise<StatusLabelAggregate> {
@@ -37,7 +40,10 @@ export class StatusLabelResolver {
   }
 
   @Query(() => StatusLabelConnection, { name: 'statusLabels' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.STATUS_LABEL })
+  @CheckPermissions({
+    action: ACTIONS.READ,
+    subject: ENTITY_SUBJECTS.STATUS_LABEL,
+  })
   async getAllStatusLabels(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedStatusLabelsResult> {
@@ -45,7 +51,10 @@ export class StatusLabelResolver {
   }
 
   @Query(() => StatusLabelType, { name: 'statusLabel', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.STATUS_LABEL })
+  @CheckPermissions({
+    action: ACTIONS.READ,
+    subject: ENTITY_SUBJECTS.STATUS_LABEL,
+  })
   async getStatusLabelById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<StatusLabelAggregate | null> {
@@ -53,7 +62,10 @@ export class StatusLabelResolver {
   }
 
   @Mutation(() => StatusLabelType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.STATUS_LABEL })
+  @CheckPermissions({
+    action: ACTIONS.UPDATE,
+    subject: ENTITY_SUBJECTS.STATUS_LABEL,
+  })
   async updateStatusLabel(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateStatusLabelInput,
@@ -62,7 +74,10 @@ export class StatusLabelResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.STATUS_LABEL })
+  @CheckPermissions({
+    action: ACTIONS.DELETE,
+    subject: ENTITY_SUBJECTS.STATUS_LABEL,
+  })
   async deleteStatusLabel(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

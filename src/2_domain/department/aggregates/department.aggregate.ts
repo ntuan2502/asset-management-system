@@ -1,5 +1,5 @@
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
-import { AGGREGATE_TYPES } from 'src/shared/constants/aggregate-types.constants';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { createId } from '@paralleldrive/cuid2';
 import {
   DepartmentCreatedEvent,
@@ -15,7 +15,7 @@ import { UpdateDepartmentInput } from 'src/1_application/department/dtos/update-
 import { DEPARTMENT_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class DepartmentAggregate extends BaseAggregateRoot {
-  public readonly aggregateType = AGGREGATE_TYPES.DEPARTMENT;
+  public readonly aggregateType = ENTITY_SUBJECTS.DEPARTMENT;
 
   public name: string;
   public officeId: string;

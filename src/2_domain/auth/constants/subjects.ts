@@ -1,4 +1,4 @@
-export const SUBJECTS = {
+export const ENTITY_SUBJECTS = {
   USER: 'User',
   PERMISSION: 'Permission',
   ROLE: 'Role',

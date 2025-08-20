@@ -9,7 +9,7 @@ import { ManufacturerAggregate } from 'src/2_domain/manufacturer/aggregates/manu
 import { GqlAuthGuard } from 'src/2_domain/auth/guards/gql-auth.guard';
 import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
-import { SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { ManufacturerConnection } from './manufacturer-connection.type';
 import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
@@ -29,7 +29,10 @@ export class ManufacturerResolver {
   ) {}
 
   @Mutation(() => ManufacturerType)
-  @CheckPermissions({ action: ACTIONS.CREATE, subject: SUBJECTS.MANUFACTURER })
+  @CheckPermissions({
+    action: ACTIONS.CREATE,
+    subject: ENTITY_SUBJECTS.MANUFACTURER,
+  })
   async createManufacturer(
     @Args('input') input: CreateManufacturerInput,
   ): Promise<ManufacturerAggregate> {
@@ -37,7 +40,10 @@ export class ManufacturerResolver {
   }
 
   @Query(() => ManufacturerConnection, { name: 'Manufacturers' })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.MANUFACTURER })
+  @CheckPermissions({
+    action: ACTIONS.READ,
+    subject: ENTITY_SUBJECTS.MANUFACTURER,
+  })
   async getAllManufacturers(
     @Args() args: PaginationArgs,
   ): Promise<PaginatedManufacturersResult> {
@@ -45,7 +51,10 @@ export class ManufacturerResolver {
   }
 
   @Query(() => ManufacturerType, { name: 'Manufacturer', nullable: true })
-  @CheckPermissions({ action: ACTIONS.READ, subject: SUBJECTS.MANUFACTURER })
+  @CheckPermissions({
+    action: ACTIONS.READ,
+    subject: ENTITY_SUBJECTS.MANUFACTURER,
+  })
   async getManufacturerById(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<ManufacturerAggregate | null> {
@@ -53,7 +62,10 @@ export class ManufacturerResolver {
   }
 
   @Mutation(() => ManufacturerType)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: SUBJECTS.MANUFACTURER })
+  @CheckPermissions({
+    action: ACTIONS.UPDATE,
+    subject: ENTITY_SUBJECTS.MANUFACTURER,
+  })
   async updateManufacturer(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateManufacturerInput,
@@ -62,7 +74,10 @@ export class ManufacturerResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.DELETE, subject: SUBJECTS.MANUFACTURER })
+  @CheckPermissions({
+    action: ACTIONS.DELETE,
+    subject: ENTITY_SUBJECTS.MANUFACTURER,
+  })
   async deleteManufacturer(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
