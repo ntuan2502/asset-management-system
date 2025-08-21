@@ -87,7 +87,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.USER })
+  @CheckPermissions({ action: ACTIONS.RESTORE, subject: ENTITY_SUBJECTS.USER })
   async restoreUser(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

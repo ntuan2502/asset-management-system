@@ -19,6 +19,7 @@ import { PaginatedCategoriesResult } from 'src/1_application/category/queries/ha
 import { UpdateCategoryInput } from 'src/1_application/category/dtos/update-category.input';
 import { UpdateCategoryCommand } from 'src/1_application/category/commands/impl/update-category.command';
 import { DeleteCategoryCommand } from 'src/1_application/category/commands/impl/delete-category.command';
+import { RestoreCategoryCommand } from 'src/1_application/category/commands/impl/restore-category.command';
 
 @Resolver(() => CategoryType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -76,6 +77,18 @@ export class CategoryResolver {
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
     await this.commandBus.execute(new DeleteCategoryCommand(id));
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @CheckPermissions({
+    action: ACTIONS.RESTORE,
+    subject: ENTITY_SUBJECTS.CATEGORY,
+  })
+  async restoreCategory(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    await this.commandBus.execute(new RestoreCategoryCommand(id));
     return true;
   }
 }

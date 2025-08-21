@@ -100,6 +100,15 @@ export const MANUFACTURER_ERRORS = {
   IS_ACTIVE: 'Cannot restore an active manufacturer.',
 };
 
+export const ATTRIBUTE_ERRORS = {
+  NOT_FOUND: (id: string) => `Attribute with ID "${id}" not found.`,
+  ALREADY_EXISTS: (name: string) =>
+    `Attribute with name "${name}" already exists.`,
+  ALREADY_DELETED: 'Cannot delete an attribute that has already been deleted.',
+  CANNOT_UPDATE_DELETED: 'Cannot update a deleted attribute.',
+  IS_ACTIVE: 'Cannot restore an active attribute.',
+};
+
 // ==================================
 // SEEDER ERRORS
 // ==================================

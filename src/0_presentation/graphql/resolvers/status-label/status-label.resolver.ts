@@ -19,6 +19,7 @@ import { PaginatedStatusLabelsResult } from 'src/1_application/status-label/quer
 import { UpdateStatusLabelInput } from 'src/1_application/status-label/dtos/update-status-label.input';
 import { UpdateStatusLabelCommand } from 'src/1_application/status-label/commands/impl/update-status-label.command';
 import { DeleteStatusLabelCommand } from 'src/1_application/status-label/commands/impl/delete-status-label.command';
+import { RestoreStatusLabelCommand } from 'src/1_application/status-label/commands/impl/restore-status-label.command';
 
 @Resolver(() => StatusLabelType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -82,6 +83,18 @@ export class StatusLabelResolver {
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
     await this.commandBus.execute(new DeleteStatusLabelCommand(id));
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @CheckPermissions({
+    action: ACTIONS.RESTORE,
+    subject: ENTITY_SUBJECTS.STATUS_LABEL,
+  })
+  async restoreStatusLabel(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    await this.commandBus.execute(new RestoreStatusLabelCommand(id));
     return true;
   }
 }

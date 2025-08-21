@@ -70,15 +70,6 @@ export class PrismaUserRepository implements IUserRepository {
     };
   }
 
-  async softDelete(id: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
-  }
-
   async findWithPermissionsByEmail(
     email: string,
   ): Promise<UserWithPermissions | null> {

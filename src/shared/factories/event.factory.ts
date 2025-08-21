@@ -32,6 +32,10 @@ import { ManufacturerCreatedEvent } from 'src/2_domain/manufacturer/events/manuf
 import { ManufacturerUpdatedEvent } from 'src/2_domain/manufacturer/events/manufacturer-updated.event';
 import { ManufacturerDeletedEvent } from 'src/2_domain/manufacturer/events/manufacturer-deleted.event';
 import { ManufacturerRestoredEvent } from 'src/2_domain/manufacturer/events/manufacturer-restored.event';
+import { AttributeCreatedEvent } from 'src/2_domain/attribute/events/attribute-created.event';
+import { AttributeUpdatedEvent } from 'src/2_domain/attribute/events/attribute-updated.event';
+import { AttributeDeletedEvent } from 'src/2_domain/attribute/events/attribute-deleted.event';
+import { AttributeRestoredEvent } from 'src/2_domain/attribute/events/attribute-restored.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -74,6 +78,11 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [ManufacturerUpdatedEvent.name]: ManufacturerUpdatedEvent,
   [ManufacturerDeletedEvent.name]: ManufacturerDeletedEvent,
   [ManufacturerRestoredEvent.name]: ManufacturerRestoredEvent,
+
+  [AttributeCreatedEvent.name]: AttributeCreatedEvent,
+  [AttributeUpdatedEvent.name]: AttributeUpdatedEvent,
+  [AttributeDeletedEvent.name]: AttributeDeletedEvent,
+  [AttributeRestoredEvent.name]: AttributeRestoredEvent,
 };
 
 export class EventFactory {

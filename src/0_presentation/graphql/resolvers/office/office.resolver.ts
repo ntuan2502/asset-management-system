@@ -18,6 +18,7 @@ import { PermissionsGuard } from 'src/2_domain/auth/guards/permissions.guard';
 import { CheckPermissions } from 'src/2_domain/auth/decorators/check-permissions.decorator';
 import { ACTIONS } from 'src/2_domain/auth/constants/actions';
 import { ENTITY_SUBJECTS } from 'src/2_domain/auth/constants/subjects';
+import { RestoreOfficeCommand } from 'src/1_application/office/commands/impl/restore-office.command';
 
 @Resolver(() => OfficeType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -66,6 +67,18 @@ export class OfficeResolver {
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
     await this.commandBus.execute(new DeleteOfficeCommand(id));
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @CheckPermissions({
+    action: ACTIONS.RESTORE,
+    subject: ENTITY_SUBJECTS.OFFICE,
+  })
+  async restoreOffice(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    await this.commandBus.execute(new RestoreOfficeCommand(id));
     return true;
   }
 }

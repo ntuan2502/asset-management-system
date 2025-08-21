@@ -3,5 +3,6 @@ export const ACTIONS = {
   READ: 'read',
   UPDATE: 'update',
   DELETE: 'delete',
+  RESTORE: 'restore',
   MANAGE: 'manage',
 };

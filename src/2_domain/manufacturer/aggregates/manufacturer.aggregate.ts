@@ -12,7 +12,7 @@ import {
 import { ManufacturerDeletedEvent } from '../events/manufacturer-deleted.event';
 import { ManufacturerRestoredEvent } from '../events/manufacturer-restored.event';
 import { UpdateManufacturerInput } from 'src/1_application/manufacturer/dtos/update-manufacturer.input';
-import { CATEGORY_ERRORS } from 'src/shared/constants/error-messages.constants';
+import { MANUFACTURER_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 export class ManufacturerAggregate extends BaseAggregateRoot {
   public readonly aggregateType = ENTITY_SUBJECTS.CATEGORY;
@@ -32,7 +32,7 @@ export class ManufacturerAggregate extends BaseAggregateRoot {
 
   public updateManufacturer(payload: UpdateManufacturerInput) {
     if (this.deletedAt) {
-      throw new Error(CATEGORY_ERRORS.CANNOT_UPDATE_DELETED);
+      throw new Error(MANUFACTURER_ERRORS.CANNOT_UPDATE_DELETED);
     }
 
     const changes: Partial<ManufacturerUpdatedPayload> = {};
@@ -57,14 +57,14 @@ export class ManufacturerAggregate extends BaseAggregateRoot {
   }
 
   public deleteManufacturer() {
-    if (this.deletedAt) throw new Error(CATEGORY_ERRORS.ALREADY_DELETED);
+    if (this.deletedAt) throw new Error(MANUFACTURER_ERRORS.ALREADY_DELETED);
     this.apply(
       new ManufacturerDeletedEvent({ id: this.id, deletedAt: new Date() }),
     );
   }
 
   public restoreManufacturer() {
-    if (!this.deletedAt) throw new Error(CATEGORY_ERRORS.IS_ACTIVE);
+    if (!this.deletedAt) throw new Error(MANUFACTURER_ERRORS.IS_ACTIVE);
     this.apply(
       new ManufacturerRestoredEvent({ id: this.id, restoredAt: new Date() }),
     );

@@ -8,4 +8,5 @@ export const ENTITY_SUBJECTS = {
   STATUS_LABEL: 'StatusLabel',
   CATEGORY: 'Category',
   MANUFACTURER: 'Manufacturer',
+  ATTRIBUTE: 'Attribute',
 };

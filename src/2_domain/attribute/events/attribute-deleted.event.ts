@@ -1,15 +1,15 @@
 import { IEvent } from '@nestjs/cqrs';
 
-interface UserDeletedPayload {
+export interface AttributeDeletedPayload {
   id: string;
   deletedAt: Date;
 }
 
-export class UserDeletedEvent implements IEvent {
+export class AttributeDeletedEvent implements IEvent {
   public readonly id: string;
   public readonly deletedAt: Date;
 
-  constructor(payload: UserDeletedPayload) {
+  constructor(payload: AttributeDeletedPayload) {
     Object.assign(this, payload);
     if (this.deletedAt) {
       this.deletedAt = new Date(this.deletedAt);

@@ -18,6 +18,7 @@ import { DepartmentModule } from './2_domain/department/department.module';
 import { StatusLabelModule } from './2_domain/status-label/status-label.module';
 import { CategoryModule } from './2_domain/category/category.module';
 import { ManufacturerModule } from './2_domain/manufacturer/manufacturer.module';
+import { AttributeModule } from './2_domain/attribute/attribute.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ManufacturerModule } from './2_domain/manufacturer/manufacturer.module'
     StatusLabelModule,
     CategoryModule,
     ManufacturerModule,
+    AttributeModule,
   ],
   controllers: [AppController],
   providers: [AppService, AppResolver],

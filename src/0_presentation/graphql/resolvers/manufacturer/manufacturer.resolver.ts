@@ -19,6 +19,7 @@ import { PaginatedManufacturersResult } from 'src/1_application/manufacturer/que
 import { UpdateManufacturerInput } from 'src/1_application/manufacturer/dtos/update-manufacturer.input';
 import { UpdateManufacturerCommand } from 'src/1_application/manufacturer/commands/impl/update-manufacturer.command';
 import { DeleteManufacturerCommand } from 'src/1_application/manufacturer/commands/impl/delete-manufacturer.command';
+import { RestoreManufacturerCommand } from 'src/1_application/manufacturer/commands/impl/restore-manufacturer.command';
 
 @Resolver(() => ManufacturerType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -82,6 +83,18 @@ export class ManufacturerResolver {
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {
     await this.commandBus.execute(new DeleteManufacturerCommand(id));
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  @CheckPermissions({
+    action: ACTIONS.RESTORE,
+    subject: ENTITY_SUBJECTS.MANUFACTURER,
+  })
+  async restoreManufacturer(
+    @Args('id', { type: () => ID }) id: string,
+  ): Promise<boolean> {
+    await this.commandBus.execute(new RestoreManufacturerCommand(id));
     return true;
   }
 }

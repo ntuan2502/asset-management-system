@@ -98,7 +98,7 @@ export class DepartmentResolver {
 
   @Mutation(() => Boolean)
   @CheckPermissions({
-    action: ACTIONS.UPDATE,
+    action: ACTIONS.RESTORE,
     subject: ENTITY_SUBJECTS.DEPARTMENT,
   })
   async restoreDepartment(

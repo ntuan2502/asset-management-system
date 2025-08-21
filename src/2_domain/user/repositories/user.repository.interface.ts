@@ -20,7 +20,6 @@ export interface IUserRepository {
   findById(id: string): Promise<UserAggregate | null>;
   findByEmail(email: string): Promise<UserAggregate | null>;
   findAll(args: { page: number; limit: number }): Promise<PaginatedUsers>;
-  softDelete(id: string): Promise<void>;
   findWithPermissionsByEmail(
     email: string,
   ): Promise<UserWithPermissions | null>;

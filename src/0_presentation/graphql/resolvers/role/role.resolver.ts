@@ -73,7 +73,7 @@ export class RoleResolver {
   }
 
   @Mutation(() => Boolean)
-  @CheckPermissions({ action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.ROLE })
+  @CheckPermissions({ action: ACTIONS.RESTORE, subject: ENTITY_SUBJECTS.ROLE })
   async restoreRole(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<boolean> {

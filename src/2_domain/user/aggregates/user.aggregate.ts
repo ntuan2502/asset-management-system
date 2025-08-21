@@ -8,7 +8,6 @@ import {
   UserUpdatedPayload,
 } from '../events/user-updated.event';
 import { UpdateUserInput } from 'src/1_application/user/dtos/update-user.input';
-import { UserSnapshotDto } from './user-snapshot.dto';
 import { UserRestoredEvent } from '../events/user-restored.event';
 import { RoleAssignedToUserEvent } from '../events/role-assigned-to-user.event';
 import { BaseAggregateRoot } from 'src/shared/domain/base.aggregate';
@@ -34,72 +33,6 @@ export class UserAggregate extends BaseAggregateRoot {
   public officeId: string | null = null;
   public departmentId: string | null = null;
 
-  public loadFromSnapshot(snapshot: UserSnapshotDto) {
-    Object.assign(this, snapshot);
-    this.version = snapshot.version;
-  }
-
-  protected onUserCreatedEvent(event: UserCreatedEvent) {
-    this.id = event.id;
-    this.email = event.email;
-    this.password = event.hashedPassword;
-    this.firstName = event.firstName;
-    this.lastName = event.lastName;
-    this.dob = event.dob ?? null;
-    this.gender = event.gender ?? null;
-    this.officeId = event.officeId ?? null;
-    this.departmentId = event.departmentId ?? null;
-    this.createdAt = event.createdAt;
-    this.updatedAt = event.createdAt;
-  }
-
-  protected onUserUpdatedEvent(event: UserUpdatedEvent) {
-    if (event.firstName !== undefined) {
-      this.firstName = event.firstName;
-    }
-    if (event.lastName !== undefined) {
-      this.lastName = event.lastName;
-    }
-    if (event.dob !== undefined) {
-      this.dob = event.dob;
-    }
-    if (event.gender !== undefined) {
-      this.gender = event.gender;
-    }
-    this.updatedAt = event.updatedAt;
-  }
-
-  protected onUserDeletedEvent(_event: UserDeletedEvent) {
-    this.deletedAt = new Date();
-  }
-
-  protected onUserRestoredEvent(event: UserRestoredEvent) {
-    this.deletedAt = null;
-    this.updatedAt = event.restoredAt;
-  }
-
-  protected onRoleAssignedToUserEvent(event: RoleAssignedToUserEvent) {
-    if (!this.roleIds.includes(event.roleId)) {
-      this.roleIds.push(event.roleId);
-    }
-    this.updatedAt = event.assignedAt;
-    if (!this.getUncommittedEvents().some((e) => e === event)) {
-      this.version++;
-    }
-  }
-
-  protected onUserOfficeChangedEvent(event: UserOfficeChangedEvent) {
-    this.officeId = event.newOfficeId;
-    this.updatedAt = event.changedAt;
-    this.version++;
-  }
-
-  protected onUserDepartmentChangedEvent(event: UserDepartmentChangedEvent) {
-    this.departmentId = event.newDepartmentId;
-    this.updatedAt = event.changedAt;
-    this.version++;
-  }
-
   public createUser(data: Omit<UserCreatedPayload, 'id' | 'createdAt'>) {
     const id = createId();
     const createdAt = new Date();
@@ -107,9 +40,7 @@ export class UserAggregate extends BaseAggregateRoot {
   }
 
   public updateUser(payload: UpdateUserInput) {
-    if (this.deletedAt) {
-      throw new Error(USER_ERRORS.CANNOT_UPDATE_DELETED);
-    }
+    if (this.deletedAt) throw new Error(USER_ERRORS.CANNOT_UPDATE_DELETED);
 
     const changes: Partial<UserUpdatedPayload> = {};
     let hasChanges = false;
@@ -143,37 +74,32 @@ export class UserAggregate extends BaseAggregateRoot {
       this.changeDepartment(payload.departmentId);
     }
 
-    if (!hasChanges) {
-      return;
-    }
+    if (!hasChanges) return;
 
-    const eventPayload: UserUpdatedPayload = {
-      ...changes,
-      id: this.id,
-      updatedAt: new Date(),
-    };
-
-    this.apply(new UserUpdatedEvent(eventPayload));
+    this.apply(
+      new UserUpdatedEvent({
+        ...changes,
+        id: this.id,
+        updatedAt: new Date(),
+      }),
+    );
   }
 
   public deleteUser() {
-    if (this.deletedAt) {
-      throw new Error(USER_ERRORS.ALREADY_DELETED);
-    }
-    this.apply(new UserDeletedEvent({ id: this.id }));
+    if (this.deletedAt) throw new Error(USER_ERRORS.ALREADY_DELETED);
+
+    this.apply(new UserDeletedEvent({ id: this.id, deletedAt: new Date() }));
   }
 
   public restoreUser() {
-    if (!this.deletedAt) {
-      throw new Error(USER_ERRORS.IS_ACTIVE);
-    }
+    if (!this.deletedAt) throw new Error(USER_ERRORS.IS_ACTIVE);
+
     this.apply(new UserRestoredEvent({ id: this.id, restoredAt: new Date() }));
   }
 
   public assignRole(roleId: string) {
-    if (this.roleIds.includes(roleId)) {
-      return;
-    }
+    if (this.roleIds.includes(roleId)) return;
+
     this.apply(
       new RoleAssignedToUserEvent({
         userId: this.id,
@@ -185,10 +111,9 @@ export class UserAggregate extends BaseAggregateRoot {
 
   public changeOffice(newOfficeId: string | null) {
     if (this.officeId === newOfficeId) return;
-    // Nếu đổi office, department cũ không còn hợp lệ -> reset
-    if (this.departmentId) {
-      this.changeDepartment(null);
-    }
+
+    if (this.departmentId) this.changeDepartment(null);
+
     this.apply(
       new UserOfficeChangedEvent({
         id: this.id,
@@ -200,6 +125,7 @@ export class UserAggregate extends BaseAggregateRoot {
 
   public changeDepartment(newDepartmentId: string | null) {
     if (this.departmentId === newDepartmentId) return;
+
     this.apply(
       new UserDepartmentChangedEvent({
         id: this.id,
@@ -207,5 +133,62 @@ export class UserAggregate extends BaseAggregateRoot {
         changedAt: new Date(),
       }),
     );
+  }
+
+  protected onUserCreatedEvent(event: UserCreatedEvent) {
+    this.id = event.id;
+    this.email = event.email;
+    this.password = event.hashedPassword;
+    this.firstName = event.firstName;
+    this.lastName = event.lastName;
+    this.dob = event.dob ?? null;
+    this.gender = event.gender ?? null;
+    this.officeId = event.officeId ?? null;
+    this.departmentId = event.departmentId ?? null;
+    this.createdAt = event.createdAt;
+    this.updatedAt = event.createdAt;
+    this.version = 1;
+  }
+
+  protected onUserUpdatedEvent(event: UserUpdatedEvent) {
+    if (event.firstName !== undefined) this.firstName = event.firstName;
+    if (event.lastName !== undefined) this.lastName = event.lastName;
+    if (event.dob !== undefined) this.dob = event.dob;
+    if (event.gender !== undefined) this.gender = event.gender;
+
+    this.updatedAt = event.updatedAt;
+    this.version++;
+  }
+
+  protected onUserDeletedEvent(event: UserDeletedEvent) {
+    this.deletedAt = event.deletedAt;
+    this.deletedAt = new Date();
+    this.version++;
+  }
+
+  protected onUserRestoredEvent(event: UserRestoredEvent) {
+    this.deletedAt = null;
+    this.updatedAt = event.restoredAt;
+    this.version++;
+  }
+
+  protected onRoleAssignedToUserEvent(event: RoleAssignedToUserEvent) {
+    if (!this.roleIds.includes(event.roleId)) this.roleIds.push(event.roleId);
+
+    this.updatedAt = event.assignedAt;
+
+    if (!this.getUncommittedEvents().some((e) => e === event)) this.version++;
+  }
+
+  protected onUserOfficeChangedEvent(event: UserOfficeChangedEvent) {
+    this.officeId = event.newOfficeId;
+    this.updatedAt = event.changedAt;
+    this.version++;
+  }
+
+  protected onUserDepartmentChangedEvent(event: UserDepartmentChangedEvent) {
+    this.departmentId = event.newDepartmentId;
+    this.updatedAt = event.changedAt;
+    this.version++;
   }
 }

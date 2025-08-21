@@ -190,6 +190,27 @@ export const PROJECTOR_LOGS = {
     ERROR: (id: string) => logTemplate('Error', `restoring manufacturer ${id}`),
   },
 
+  ATTRIBUTE_CREATED: {
+    RECEIVED: logTemplate('Received', 'AttributeCreatedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `created attribute ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `creating attribute ${id}`),
+  },
+  ATTRIBUTE_UPDATED: {
+    RECEIVED: logTemplate('Received', 'AttributeUpdatedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `updated attribute ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `updating attribute ${id}`),
+  },
+  ATTRIBUTE_DELETED: {
+    RECEIVED: logTemplate('Received', 'AttributeDeletedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `deleted attribute ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `deleting attribute ${id}`),
+  },
+  ATTRIBUTE_RESTORED: {
+    RECEIVED: logTemplate('Received', 'AttributeRestoredEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `restored attribute ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `restoring attribute ${id}`),
+  },
+
   PERMISSIONS_ASSIGNED_TO_ROLE: {
     RECEIVED: logTemplate('Received', 'PermissionAssignedToRoleEvent'),
     SUCCESS: (id: string) =>

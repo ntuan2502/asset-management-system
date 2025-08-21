@@ -140,6 +140,25 @@ type ManufacturerConnection {
   meta: PaginationMeta!
 }
 
+type Attribute {
+  id: ID!
+  name: String!
+  unit: String
+  valueType: ValueTypeEnum!
+}
+
+"""The data type of the attribute value."""
+enum ValueTypeEnum {
+  STRING
+  NUMBER
+  BOOLEAN
+}
+
+type AttributeConnection {
+  nodes: [Attribute!]!
+  meta: PaginationMeta!
+}
+
 type Query {
   hello: String!
   users(page: Int = 1, limit: Int = 10): UserConnection!
@@ -159,6 +178,8 @@ type Query {
   Category(id: ID!): Category
   Manufacturers(page: Int = 1, limit: Int = 10): ManufacturerConnection!
   Manufacturer(id: ID!): Manufacturer
+  attributes(page: Int = 1, limit: Int = 10): AttributeConnection!
+  attribute(id: ID!): Attribute
 }
 
 type Mutation {
@@ -179,6 +200,7 @@ type Mutation {
   createOffice(input: CreateOfficeInput!): Office!
   updateOffice(id: ID!, input: UpdateOfficeInput!): Office!
   deleteOffice(id: ID!): Boolean!
+  restoreOffice(id: ID!): Boolean!
   login(input: LoginUserInput!): LoginResponse!
   refreshToken(refresh_token: String!): LoginResponse!
   logout: Boolean!
@@ -186,12 +208,19 @@ type Mutation {
   createStatusLabel(input: CreateStatusLabelInput!): StatusLabel!
   updateStatusLabel(id: ID!, input: UpdateStatusLabelInput!): StatusLabel!
   deleteStatusLabel(id: ID!): Boolean!
+  restoreStatusLabel(id: ID!): Boolean!
   createCategory(input: CreateCategoryInput!): Category!
   updateCategory(id: ID!, input: UpdateCategoryInput!): Category!
   deleteCategory(id: ID!): Boolean!
+  restoreCategory(id: ID!): Boolean!
   createManufacturer(input: CreateManufacturerInput!): Manufacturer!
   updateManufacturer(id: ID!, input: UpdateManufacturerInput!): Manufacturer!
   deleteManufacturer(id: ID!): Boolean!
+  restoreManufacturer(id: ID!): Boolean!
+  createAttribute(input: CreateAttributeInput!): Attribute!
+  updateAttribute(id: ID!, input: UpdateAttributeInput!): Attribute!
+  deleteAttribute(id: ID!): Attribute!
+  restoreAttribute(id: ID!): Boolean!
 }
 
 input CreateUserInput {
@@ -299,4 +328,16 @@ input CreateManufacturerInput {
 
 input UpdateManufacturerInput {
   name: String
+}
+
+input CreateAttributeInput {
+  name: String!
+  unit: String
+  valueType: ValueTypeEnum!
+}
+
+input UpdateAttributeInput {
+  name: String
+  unit: String
+  valueType: ValueTypeEnum
 }
