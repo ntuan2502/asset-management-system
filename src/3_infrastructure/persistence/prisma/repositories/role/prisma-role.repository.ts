@@ -35,6 +35,7 @@ export class PrismaRoleRepository implements IRoleRepository {
         id: { in: ids },
         deletedAt: null,
       },
+      include: { permissions: true },
     });
     return roles.map((role) => RoleMapper.toDomain(role));
   }
