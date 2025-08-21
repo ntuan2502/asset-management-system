@@ -26,10 +26,17 @@ type Department {
   office: Office!
 }
 
+type Permission {
+  id: ID!
+  action: String!
+  subject: String!
+}
+
 type Role {
   id: ID!
   name: String!
   description: String
+  permissions: [Permission!]!
 }
 
 type User {
@@ -91,12 +98,6 @@ type Session {
 type SessionConnection {
   nodes: [Session!]!
   meta: PaginationMeta!
-}
-
-type Permission {
-  id: ID!
-  action: String!
-  subject: String!
 }
 
 type PermissionConnection {

@@ -26,8 +26,8 @@ import { OfficeModule } from '../office/office.module';
 
 const CommandHandlers = [
   CreateUserHandler,
-  DeleteUserHandler,
   UpdateUserHandler,
+  DeleteUserHandler,
   RestoreUserHandler,
   AssignRoleToUserHandler,
 ];

@@ -12,6 +12,10 @@ import {
   PERMISSION_ERRORS,
   ROLE_ERRORS,
 } from 'src/shared/constants/error-messages.constants';
+import {
+  IRoleRepository,
+  ROLE_REPOSITORY,
+} from 'src/2_domain/role/repositories/role.repository.interface';
 
 @CommandHandler(AssignPermissionsToRoleCommand)
 export class AssignPermissionsToRoleHandler
@@ -20,6 +24,7 @@ export class AssignPermissionsToRoleHandler
   constructor(
     private readonly aggregateRepository: RoleAggregateRepository,
     @Inject(EVENT_STORE_SERVICE) private readonly eventStore: IEventStore,
+    @Inject(ROLE_REPOSITORY) private readonly roleRepository: IRoleRepository,
     private readonly prisma: PrismaService,
   ) {}
 
@@ -56,6 +61,15 @@ export class AssignPermissionsToRoleHandler
       role.commit();
     }
 
-    return role;
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    const updatedRole =
+      await this.roleRepository.findByIdWithPermissions(roleId);
+    if (!updatedRole) {
+      throw new NotFoundException(
+        `Role with ID "${roleId}" not found after update.`,
+      );
+    }
+
+    return updatedRole;
   }
 }

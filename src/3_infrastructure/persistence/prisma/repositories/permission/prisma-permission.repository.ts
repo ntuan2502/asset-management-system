@@ -5,6 +5,7 @@ import {
 } from 'src/2_domain/permission/repositories/permission.repository.interface';
 import { PrismaService } from 'src/3_infrastructure/persistence/prisma/prisma.service';
 import { PermissionMapper } from 'src/1_application/permission/mappers/permission.mapper';
+import { PermissionAggregate } from 'src/2_domain/permission/aggregates/permission.aggregate';
 
 @Injectable()
 export class PrismaPermissionRepository implements IPermissionRepository {
@@ -30,5 +31,12 @@ export class PrismaPermissionRepository implements IPermissionRepository {
       nodes: permissions.map((p) => PermissionMapper.toDomain(p)),
       meta: { totalCount, page, limit },
     };
+  }
+
+  async findByIds(ids: string[]): Promise<PermissionAggregate[]> {
+    const permissions = await this.prisma.permission.findMany({
+      where: { id: { in: ids } },
+    });
+    return permissions.map((p) => PermissionMapper.toDomain(p));
   }
 }

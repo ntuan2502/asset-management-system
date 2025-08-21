@@ -1,4 +1,12 @@
-import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  ID,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { RoleType } from './role.type';
 import { CreateRoleInput } from 'src/1_application/role/dtos/create-role.input';
@@ -21,6 +29,9 @@ import { RestoreRoleCommand } from 'src/1_application/role/commands/impl/restore
 import { RoleConnection } from './role-connection.type';
 import { PaginationArgs } from 'src/shared/dtos/pagination-args.dto';
 import { PaginatedRolesResult } from 'src/1_application/role/queries/handlers/get-all-roles.handler';
+import { PermissionType } from '../permission/permission.type';
+import { GetPermissionsByIdsQuery } from 'src/1_application/permission/queries/impl/get-permissions-by-ids.query';
+import { PermissionAggregate } from 'src/2_domain/permission/aggregates/permission.aggregate';
 
 @Resolver(() => RoleType)
 @UseGuards(GqlAuthGuard, PermissionsGuard)
@@ -89,6 +100,18 @@ export class RoleResolver {
   ): Promise<RoleAggregate> {
     return this.commandBus.execute(
       new AssignPermissionsToRoleCommand(roleId, input),
+    );
+  }
+
+  @ResolveField('permissions', () => [PermissionType])
+  async getPermissions(
+    @Parent() role: RoleAggregate,
+  ): Promise<PermissionAggregate[]> {
+    if (!role.permissionIds || role.permissionIds.length === 0) {
+      return [];
+    }
+    return this.queryBus.execute(
+      new GetPermissionsByIdsQuery(role.permissionIds),
     );
   }
 }

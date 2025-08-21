@@ -29,7 +29,7 @@ export class UserType {
   @Field(() => GraphQLISODateTime)
   updatedAt: Date;
 
-  @Field(() => [RoleType], { nullable: 'itemsAndList' }) // Cho phép cả mảng và các item trong mảng là null/rỗng
+  @Field(() => [RoleType], { nullable: 'itemsAndList' })
   roles: RoleType[];
 
   @Field(() => OfficeType, { nullable: true })

@@ -8,4 +8,5 @@ export interface PaginatedPermissions {
 export const PERMISSION_REPOSITORY = 'PERMISSION_REPOSITORY';
 export interface IPermissionRepository {
   findAll(args: { page: number; limit: number }): Promise<PaginatedPermissions>;
+  findByIds(ids: string[]): Promise<PermissionAggregate[]>;
 }
