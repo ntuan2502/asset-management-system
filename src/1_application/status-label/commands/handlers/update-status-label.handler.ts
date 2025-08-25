@@ -11,7 +11,7 @@ import {
 } from 'src/2_domain/status-label/repositories/status-label.repository.interface';
 import { UpdateStatusLabelCommand } from 'src/1_application/status-label/commands/impl/update-status-label.command';
 import { StatusLabelAggregateRepository } from 'src/2_domain/status-label/repositories/status-label-aggregate.repository';
-import { DEPARTMENT_ERRORS } from 'src/shared/constants/error-messages.constants';
+import { STATUS_LABEL_ERRORS } from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(UpdateStatusLabelCommand)
 export class UpdateStatusLabelHandler
@@ -30,7 +30,7 @@ export class UpdateStatusLabelHandler
     const { id, payload } = command;
     const statusLabel = await this.aggregateRepository.findById(id);
     if (!statusLabel.id) {
-      throw new NotFoundException(DEPARTMENT_ERRORS.NOT_FOUND(id));
+      throw new NotFoundException(STATUS_LABEL_ERRORS.NOT_FOUND(id));
     }
 
     const expectedVersion = statusLabel.version;

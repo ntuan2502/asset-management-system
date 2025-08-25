@@ -73,15 +73,16 @@ export class AttributeResolver {
     return this.commandBus.execute(new UpdateAttributeCommand(id, input));
   }
 
-  @Mutation(() => AttributeType)
+  @Mutation(() => Boolean)
   @CheckPermissions({
     action: ACTIONS.DELETE,
     subject: ENTITY_SUBJECTS.ATTRIBUTE,
   })
   async deleteAttribute(
     @Args('id', { type: () => ID }) id: string,
-  ): Promise<AttributeAggregate> {
-    return this.commandBus.execute(new DeleteAttributeCommand(id));
+  ): Promise<boolean> {
+    await this.commandBus.execute(new DeleteAttributeCommand(id));
+    return true;
   }
 
   @Mutation(() => Boolean)

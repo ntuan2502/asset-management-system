@@ -66,7 +66,7 @@ export class CategoryProjector implements IEventHandler<CategoryEvent> {
         dataToUpdate.name = event.name;
       }
 
-      await this.prisma.department.update({
+      await this.prisma.category.update({
         where: { id: event.id },
         data: dataToUpdate,
       });
@@ -80,7 +80,7 @@ export class CategoryProjector implements IEventHandler<CategoryEvent> {
     const logs = PROJECTOR_LOGS.CATEGORY_DELETED;
     try {
       console.log(logs.RECEIVED, event);
-      await this.prisma.department.update({
+      await this.prisma.category.update({
         where: { id: event.id },
         data: {
           deletedAt: event.deletedAt,
@@ -99,7 +99,7 @@ export class CategoryProjector implements IEventHandler<CategoryEvent> {
     const logs = PROJECTOR_LOGS.CATEGORY_RESTORED;
     try {
       console.log(logs.RECEIVED, event);
-      await this.prisma.department.update({
+      await this.prisma.category.update({
         where: { id: event.id },
         data: {
           deletedAt: null,

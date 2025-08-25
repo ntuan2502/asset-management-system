@@ -146,6 +146,8 @@ type Attribute {
   name: String!
   unit: String
   valueType: ValueTypeEnum!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 """The data type of the attribute value."""
@@ -220,7 +222,7 @@ type Mutation {
   restoreManufacturer(id: ID!): Boolean!
   createAttribute(input: CreateAttributeInput!): Attribute!
   updateAttribute(id: ID!, input: UpdateAttributeInput!): Attribute!
-  deleteAttribute(id: ID!): Attribute!
+  deleteAttribute(id: ID!): Boolean!
   restoreAttribute(id: ID!): Boolean!
 }
 
