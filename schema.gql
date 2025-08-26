@@ -309,6 +309,9 @@ input CreateDepartmentInput {
 input UpdateDepartmentInput {
   name: String
   description: String
+
+  """ID of the new office for the department"""
+  officeId: ID
 }
 
 input CreateOfficeInput {

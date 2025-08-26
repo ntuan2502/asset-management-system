@@ -13,6 +13,7 @@ import { DepartmentDeletedEvent } from '../events/department-deleted.event';
 import { DepartmentRestoredEvent } from '../events/department-restored.event';
 import { UpdateDepartmentInput } from 'src/1_application/department/dtos/update-department.input';
 import { DEPARTMENT_ERRORS } from 'src/shared/constants/error-messages.constants';
+import { DepartmentOfficeChangedEvent } from '../events/department-office-changed.event';
 
 export class DepartmentAggregate extends BaseAggregateRoot {
   public readonly aggregateType = ENTITY_SUBJECTS.DEPARTMENT;
@@ -52,6 +53,10 @@ export class DepartmentAggregate extends BaseAggregateRoot {
       hasChanges = true;
     }
 
+    if (payload.officeId !== undefined && payload.officeId !== this.officeId) {
+      this.changeOffice(payload.officeId);
+    }
+
     if (!hasChanges) {
       return;
     }
@@ -76,6 +81,18 @@ export class DepartmentAggregate extends BaseAggregateRoot {
     if (!this.deletedAt) throw new Error(DEPARTMENT_ERRORS.IS_ACTIVE);
     this.apply(
       new DepartmentRestoredEvent({ id: this.id, restoredAt: new Date() }),
+    );
+  }
+
+  public changeOffice(newOfficeId: string) {
+    if (this.officeId === newOfficeId) return;
+
+    this.apply(
+      new DepartmentOfficeChangedEvent({
+        id: this.id,
+        newOfficeId,
+        changedAt: new Date(),
+      }),
     );
   }
 
@@ -109,6 +126,14 @@ export class DepartmentAggregate extends BaseAggregateRoot {
   protected onDepartmentRestoredEvent(event: DepartmentRestoredEvent) {
     this.deletedAt = null;
     this.updatedAt = event.restoredAt;
+    this.version++;
+  }
+
+  protected onDepartmentOfficeChangedEvent(
+    event: DepartmentOfficeChangedEvent,
+  ) {
+    this.officeId = event.newOfficeId;
+    this.updatedAt = event.changedAt;
     this.version++;
   }
 }

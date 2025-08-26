@@ -97,6 +97,13 @@ export const PROJECTOR_LOGS = {
       logTemplate('Success', `restored department ${id}`),
     ERROR: (id: string) => logTemplate('Error', `restoring department ${id}`),
   },
+  DEPARTMENT_OFFICE_CHANGED: {
+    RECEIVED: logTemplate('Received', 'DepartmentOfficeChangedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `changed office for department ${id}`),
+    ERROR: (id: string) =>
+      logTemplate('Error', `changing office for department ${id}`),
+  },
 
   ROLE_CREATED: {
     RECEIVED: logTemplate('Received', 'RoleCreatedEvent'),

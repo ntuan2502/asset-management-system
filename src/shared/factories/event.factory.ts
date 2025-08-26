@@ -42,6 +42,7 @@ import { ProductDeletedEvent } from 'src/2_domain/product/events/product-deleted
 import { ProductRestoredEvent } from 'src/2_domain/product/events/product-restored.event';
 import { ProductCategoryChangedEvent } from 'src/2_domain/product/events/product-category-changed.event';
 import { ProductManufacturerChangedEvent } from 'src/2_domain/product/events/product-manufacturer-changed.event';
+import { DepartmentOfficeChangedEvent } from 'src/2_domain/department/events/department-office-changed.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -69,6 +70,7 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [DepartmentUpdatedEvent.name]: DepartmentUpdatedEvent,
   [DepartmentDeletedEvent.name]: DepartmentDeletedEvent,
   [DepartmentRestoredEvent.name]: DepartmentRestoredEvent,
+  [DepartmentOfficeChangedEvent.name]: DepartmentOfficeChangedEvent,
 
   [StatusLabelCreatedEvent.name]: StatusLabelCreatedEvent,
   [StatusLabelUpdatedEvent.name]: StatusLabelUpdatedEvent,

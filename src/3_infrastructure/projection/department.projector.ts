@@ -7,18 +7,21 @@ import { Prisma } from '@prisma/client';
 import { DepartmentDeletedEvent } from 'src/2_domain/department/events/department-deleted.event';
 import { DepartmentRestoredEvent } from 'src/2_domain/department/events/department-restored.event';
 import { PROJECTOR_LOGS } from 'src/shared/constants/log-messages.constants';
+import { DepartmentOfficeChangedEvent } from 'src/2_domain/department/events/department-office-changed.event';
 
 type DepartmentEvent =
   | DepartmentCreatedEvent
   | DepartmentUpdatedEvent
   | DepartmentDeletedEvent
-  | DepartmentRestoredEvent;
+  | DepartmentRestoredEvent
+  | DepartmentOfficeChangedEvent;
 @Injectable()
 @EventsHandler(
   DepartmentCreatedEvent,
   DepartmentUpdatedEvent,
   DepartmentDeletedEvent,
   DepartmentRestoredEvent,
+  DepartmentOfficeChangedEvent,
 )
 export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
   constructor(private readonly prisma: PrismaService) {}
@@ -32,6 +35,8 @@ export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
       await this.onDepartmentDeleted(event);
     } else if (event instanceof DepartmentRestoredEvent) {
       await this.onDepartmentRestored(event);
+    } else if (event instanceof DepartmentOfficeChangedEvent) {
+      await this.onDepartmentOfficeChanged(event);
     }
   }
   private async onDepartmentCreated(
@@ -112,6 +117,25 @@ export class DepartmentProjector implements IEventHandler<DepartmentEvent> {
         data: {
           deletedAt: null,
           updatedAt: event.restoredAt,
+        },
+      });
+      console.log(logs.SUCCESS(event.id));
+    } catch (error) {
+      console.error(logs.ERROR(event.id), error);
+    }
+  }
+
+  private async onDepartmentOfficeChanged(
+    event: DepartmentOfficeChangedEvent,
+  ): Promise<void> {
+    const logs = PROJECTOR_LOGS.DEPARTMENT_OFFICE_CHANGED;
+    try {
+      console.log(logs.RECEIVED, event);
+      await this.prisma.department.update({
+        where: { id: event.id },
+        data: {
+          office: { connect: { id: event.newOfficeId } },
+          updatedAt: event.changedAt,
         },
       });
       console.log(logs.SUCCESS(event.id));

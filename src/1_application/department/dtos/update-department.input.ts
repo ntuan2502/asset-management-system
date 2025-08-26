@@ -1,5 +1,6 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsCuid } from 'src/shared/validators/is-cuid.validator';
 
 @InputType()
 export class UpdateDepartmentInput {
@@ -14,4 +15,12 @@ export class UpdateDepartmentInput {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @Field(() => ID, {
+    nullable: true,
+    description: 'ID of the new office for the department',
+  })
+  @IsOptional()
+  @IsCuid()
+  officeId?: string;
 }
