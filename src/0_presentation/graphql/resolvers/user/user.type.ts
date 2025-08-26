@@ -23,12 +23,6 @@ export class UserType {
   @Field({ nullable: true })
   gender: string;
 
-  @Field(() => GraphQLISODateTime)
-  createdAt: Date;
-
-  @Field(() => GraphQLISODateTime)
-  updatedAt: Date;
-
   @Field(() => [RoleType], { nullable: 'itemsAndList' })
   roles: RoleType[];
 
@@ -37,4 +31,10 @@ export class UserType {
 
   @Field(() => DepartmentType, { nullable: true })
   department?: DepartmentType;
+
+  @Field(() => GraphQLISODateTime)
+  createdAt: Date;
+
+  @Field(() => GraphQLISODateTime)
+  updatedAt: Date;
 }

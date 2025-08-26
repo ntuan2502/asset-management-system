@@ -24,6 +24,8 @@ type Department {
   name: String!
   description: String
   office: Office!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Permission {
@@ -37,6 +39,8 @@ type Role {
   name: String!
   description: String
   permissions: [Permission!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type User {
@@ -46,11 +50,11 @@ type User {
   lastName: String!
   dob: DateTime
   gender: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
   roles: [Role!]!
   office: Office
   department: Department
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type PaginationMeta {
@@ -162,6 +166,21 @@ type AttributeConnection {
   meta: PaginationMeta!
 }
 
+type Product {
+  id: ID!
+  name: String!
+  modelNumber: String
+  category: Category!
+  manufacturer: Manufacturer!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type ProductConnection {
+  nodes: [Product!]!
+  meta: PaginationMeta!
+}
+
 type Query {
   hello: String!
   users(page: Int = 1, limit: Int = 10): UserConnection!
@@ -183,6 +202,8 @@ type Query {
   Manufacturer(id: ID!): Manufacturer
   attributes(page: Int = 1, limit: Int = 10): AttributeConnection!
   attribute(id: ID!): Attribute
+  products(page: Int = 1, limit: Int = 10): ProductConnection!
+  product(id: ID!): Product
 }
 
 type Mutation {
@@ -224,6 +245,10 @@ type Mutation {
   updateAttribute(id: ID!, input: UpdateAttributeInput!): Attribute!
   deleteAttribute(id: ID!): Boolean!
   restoreAttribute(id: ID!): Boolean!
+  createProduct(input: CreateProductInput!): Product!
+  updateProduct(id: ID!, input: UpdateProductInput!): Product!
+  deleteProduct(id: ID!): Boolean!
+  restoreProduct(id: ID!): Boolean!
 }
 
 input CreateUserInput {
@@ -343,4 +368,22 @@ input UpdateAttributeInput {
   name: String
   unit: String
   valueType: ValueTypeEnum
+}
+
+input CreateProductInput {
+  name: String!
+  modelNumber: String
+  categoryId: ID!
+  manufacturerId: ID!
+}
+
+input UpdateProductInput {
+  name: String
+  modelNumber: String
+
+  """ID of the new category for the product"""
+  categoryId: ID
+
+  """ID of the new manufacturer for the product"""
+  manufacturerId: ID
 }

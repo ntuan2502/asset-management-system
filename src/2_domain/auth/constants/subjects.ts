@@ -9,4 +9,5 @@ export const ENTITY_SUBJECTS = {
   CATEGORY: 'Category',
   MANUFACTURER: 'Manufacturer',
   ATTRIBUTE: 'Attribute',
+  PRODUCT: 'Product',
 };

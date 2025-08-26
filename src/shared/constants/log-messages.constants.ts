@@ -211,6 +211,41 @@ export const PROJECTOR_LOGS = {
     ERROR: (id: string) => logTemplate('Error', `restoring attribute ${id}`),
   },
 
+  PRODUCT_CREATED: {
+    RECEIVED: logTemplate('Received', 'ProductCreatedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `created product ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `creating product ${id}`),
+  },
+  PRODUCT_UPDATED: {
+    RECEIVED: logTemplate('Received', 'ProductUpdatedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `updated product ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `updating product ${id}`),
+  },
+  PRODUCT_DELETED: {
+    RECEIVED: logTemplate('Received', 'ProductDeletedEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `deleted product ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `deleting product ${id}`),
+  },
+  PRODUCT_RESTORED: {
+    RECEIVED: logTemplate('Received', 'ProductRestoredEvent'),
+    SUCCESS: (id: string) => logTemplate('Success', `restored product ${id}`),
+    ERROR: (id: string) => logTemplate('Error', `restoring product ${id}`),
+  },
+  PRODUCT_CATEGORY_CHANGED: {
+    RECEIVED: logTemplate('Received', 'ProductCategoryChangedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `changed category of product ${id}`),
+    ERROR: (id: string) =>
+      logTemplate('Error', `changing category of product ${id}`),
+  },
+  PRODUCT_MANUFACTURER_CHANGED: {
+    RECEIVED: logTemplate('Received', 'ProductManufacturerChangedEvent'),
+    SUCCESS: (id: string) =>
+      logTemplate('Success', `changed manufacturer of product ${id}`),
+    ERROR: (id: string) =>
+      logTemplate('Error', `changing manufacturer of product ${id}`),
+  },
+
   PERMISSIONS_ASSIGNED_TO_ROLE: {
     RECEIVED: logTemplate('Received', 'PermissionAssignedToRoleEvent'),
     SUCCESS: (id: string) =>

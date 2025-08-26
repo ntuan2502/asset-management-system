@@ -65,4 +65,11 @@ export const ALL_APP_PERMISSIONS: AppPermission[] = [
   { action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.ATTRIBUTE },
   { action: ACTIONS.DELETE, subject: ENTITY_SUBJECTS.ATTRIBUTE },
   { action: ACTIONS.RESTORE, subject: ENTITY_SUBJECTS.ATTRIBUTE },
+
+  // Quyền trên Product
+  { action: ACTIONS.CREATE, subject: ENTITY_SUBJECTS.PRODUCT },
+  { action: ACTIONS.READ, subject: ENTITY_SUBJECTS.PRODUCT },
+  { action: ACTIONS.UPDATE, subject: ENTITY_SUBJECTS.PRODUCT },
+  { action: ACTIONS.DELETE, subject: ENTITY_SUBJECTS.PRODUCT },
+  { action: ACTIONS.RESTORE, subject: ENTITY_SUBJECTS.PRODUCT },
 ];

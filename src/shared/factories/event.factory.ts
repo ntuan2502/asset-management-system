@@ -36,6 +36,12 @@ import { AttributeCreatedEvent } from 'src/2_domain/attribute/events/attribute-c
 import { AttributeUpdatedEvent } from 'src/2_domain/attribute/events/attribute-updated.event';
 import { AttributeDeletedEvent } from 'src/2_domain/attribute/events/attribute-deleted.event';
 import { AttributeRestoredEvent } from 'src/2_domain/attribute/events/attribute-restored.event';
+import { ProductCreatedEvent } from 'src/2_domain/product/events/product-created.event';
+import { ProductUpdatedEvent } from 'src/2_domain/product/events/product-updated.event';
+import { ProductDeletedEvent } from 'src/2_domain/product/events/product-deleted.event';
+import { ProductRestoredEvent } from 'src/2_domain/product/events/product-restored.event';
+import { ProductCategoryChangedEvent } from 'src/2_domain/product/events/product-category-changed.event';
+import { ProductManufacturerChangedEvent } from 'src/2_domain/product/events/product-manufacturer-changed.event';
 
 type EventConstructor = new (...args: any[]) => IEvent;
 
@@ -83,6 +89,13 @@ const eventConstructors: { [key: string]: EventConstructor } = {
   [AttributeUpdatedEvent.name]: AttributeUpdatedEvent,
   [AttributeDeletedEvent.name]: AttributeDeletedEvent,
   [AttributeRestoredEvent.name]: AttributeRestoredEvent,
+
+  [ProductCreatedEvent.name]: ProductCreatedEvent,
+  [ProductUpdatedEvent.name]: ProductUpdatedEvent,
+  [ProductDeletedEvent.name]: ProductDeletedEvent,
+  [ProductRestoredEvent.name]: ProductRestoredEvent,
+  [ProductCategoryChangedEvent.name]: ProductCategoryChangedEvent,
+  [ProductManufacturerChangedEvent.name]: ProductManufacturerChangedEvent,
 };
 
 export class EventFactory {

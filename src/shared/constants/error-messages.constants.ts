@@ -109,6 +109,15 @@ export const ATTRIBUTE_ERRORS = {
   IS_ACTIVE: 'Cannot restore an active attribute.',
 };
 
+export const PRODUCT_ERRORS = {
+  NOT_FOUND: (id: string) => `Product with ID "${id}" not found.`,
+  ALREADY_EXISTS: (name: string) =>
+    `Product with name "${name}" already exists.`,
+  ALREADY_DELETED: 'Cannot delete a product that has already been deleted.',
+  CANNOT_UPDATE_DELETED: 'Cannot update a deleted product.',
+  IS_ACTIVE: 'Cannot restore an active product.',
+};
+
 // ==================================
 // SEEDER ERRORS
 // ==================================

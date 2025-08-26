@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 import { PermissionType } from '../permission/permission.type';
 
 @ObjectType('Role')
@@ -14,4 +14,10 @@ export class RoleType {
 
   @Field(() => [PermissionType], { nullable: 'itemsAndList' })
   permissions: PermissionType[];
+
+  @Field(() => GraphQLISODateTime)
+  createdAt: Date;
+
+  @Field(() => GraphQLISODateTime)
+  updatedAt: Date;
 }

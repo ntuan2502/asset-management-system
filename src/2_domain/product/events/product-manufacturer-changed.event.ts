@@ -1,17 +1,17 @@
 import { IEvent } from '@nestjs/cqrs';
 
-export interface UserOfficeChangedPayload {
+export interface ProductManufacturerChangedPayload {
   id: string;
-  newOfficeId: string | null;
+  newManufacturerId: string;
   changedAt: Date;
 }
 
-export class UserOfficeChangedEvent implements IEvent {
+export class ProductManufacturerChangedEvent implements IEvent {
   public readonly id: string;
-  public readonly newOfficeId: string | null;
+  public readonly newManufacturerId: string;
   public readonly changedAt: Date;
 
-  constructor(payload: UserOfficeChangedPayload) {
+  constructor(payload: ProductManufacturerChangedPayload) {
     Object.assign(this, payload);
     if (this.changedAt) {
       this.changedAt = new Date(this.changedAt);

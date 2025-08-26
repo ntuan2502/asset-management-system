@@ -3,19 +3,23 @@ import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { IsCuid } from 'src/shared/validators/is-cuid.validator';
 
 @InputType()
-export class CreateDepartmentInput {
+export class CreateProductInput {
   @Field()
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
   name: string;
 
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  modelNumber?: string;
+
   @Field(() => ID)
   @IsCuid()
-  officeId: string;
+  categoryId: string;
 
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  description?: string;
+  @Field(() => ID)
+  @IsCuid()
+  manufacturerId: string;
 }
