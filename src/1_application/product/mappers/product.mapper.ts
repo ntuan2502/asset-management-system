@@ -6,8 +6,6 @@ import {
 } from '@prisma/client';
 import { ProductAggregate } from 'src/2_domain/product/aggregates/product.aggregate';
 
-// Định nghĩa một kiểu dữ liệu cho đối tượng Prisma Product khi nó được query
-// cùng với các mối quan hệ lồng nhau.
 type PrismaProductWithRelations = PrismaProduct & {
   category?: PrismaCategory;
   manufacturer?: PrismaManufacturer;

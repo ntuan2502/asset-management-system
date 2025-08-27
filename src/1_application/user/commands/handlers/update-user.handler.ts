@@ -34,17 +34,17 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
 
   async execute(command: UpdateUserCommand): Promise<UserAggregate> {
     const { id, payload } = command;
-    const user = await this.aggregateRepository.findById(id);
-    if (!user.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(USER_ERRORS.NOT_FOUND(id));
     }
 
     const finalOfficeId =
-      payload.officeId !== undefined ? payload.officeId : user.officeId;
+      payload.officeId !== undefined ? payload.officeId : data.officeId;
     const finalDepartmentId =
       payload.departmentId !== undefined
         ? payload.departmentId
-        : user.departmentId;
+        : data.departmentId;
 
     if (payload.officeId) {
       const office = await this.officeRepo.findById(payload.officeId);
@@ -62,26 +62,24 @@ export class UpdateUserHandler implements ICommandHandler<UpdateUserCommand> {
       }
 
       if (finalOfficeId && department.officeId !== finalOfficeId) {
-        throw new Error(
-          'Inconsistency: The specified department does not belong to the final office.',
-        );
+        throw new Error(OFFICE_ERRORS.INCONSISTENT_DEPARTMENT);
       }
     }
 
-    const expectedVersion = user.version;
-    user.updateUser(payload);
+    const expectedVersion = data.version;
+    data.updateUser(payload);
 
-    const events = user.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        user.id,
-        user.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      user.commit();
+      data.commit();
     }
 
-    return user;
+    return data;
   }
 }

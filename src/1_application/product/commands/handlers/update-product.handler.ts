@@ -19,7 +19,11 @@ import {
   IManufacturerRepository,
   MANUFACTURER_REPOSITORY,
 } from 'src/2_domain/manufacturer/repositories/manufacturer.repository.interface';
-import { PRODUCT_ERRORS } from 'src/shared/constants/error-messages.constants';
+import {
+  CATEGORY_ERRORS,
+  MANUFACTURER_ERRORS,
+  PRODUCT_ERRORS,
+} from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(UpdateProductCommand)
 export class UpdateProductHandler
@@ -38,15 +42,12 @@ export class UpdateProductHandler
 
   async execute(command: UpdateProductCommand): Promise<ProductAggregate> {
     const { id, payload } = command;
-    const product = await this.aggregateRepository.findById(id);
-    if (!product.id) {
-      throw new NotFoundException(`Product with ID "${id}" not found.`);
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
+      throw new NotFoundException(PRODUCT_ERRORS.NOT_FOUND(id));
     }
 
-    // --- Bắt đầu Validation ---
-
-    // 1. Validation: Nếu tên sản phẩm thay đổi, kiểm tra xem tên mới có bị trùng không
-    if (payload.name && payload.name !== product.name) {
+    if (payload.name && payload.name !== data.name) {
       const existingProduct = await this.productRepository.findByName(
         payload.name,
       );
@@ -55,51 +56,45 @@ export class UpdateProductHandler
       }
     }
 
-    // 2. Validation: Nếu categoryId thay đổi, kiểm tra xem nó có tồn tại không
-    if (payload.categoryId && payload.categoryId !== product.categoryId) {
+    if (payload.categoryId && payload.categoryId !== data.categoryId) {
       const category = await this.categoryRepository.findById(
         payload.categoryId,
       );
       if (!category) {
         throw new NotFoundException(
-          `Category with ID "${payload.categoryId}" not found.`,
+          CATEGORY_ERRORS.NOT_FOUND(payload.categoryId),
         );
       }
     }
 
-    // 3. Validation: Nếu manufacturerId thay đổi, kiểm tra xem nó có tồn tại không
     if (
       payload.manufacturerId &&
-      payload.manufacturerId !== product.manufacturerId
+      payload.manufacturerId !== data.manufacturerId
     ) {
       const manufacturer = await this.manufacturerRepository.findById(
         payload.manufacturerId,
       );
       if (!manufacturer) {
         throw new NotFoundException(
-          `Manufacturer with ID "${payload.manufacturerId}" not found.`,
+          MANUFACTURER_ERRORS.NOT_FOUND(payload.manufacturerId),
         );
       }
     }
 
-    // --- Kết thúc Validation ---
+    const expectedVersion = data.version;
+    data.updateProduct(payload);
 
-    // Thực thi logic nghiệp vụ
-    const expectedVersion = product.version;
-    product.updateProduct(payload);
-
-    // Lưu và publish sự kiện
-    const events = product.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        product.id,
-        product.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      product.commit();
+      data.commit();
     }
 
-    return product;
+    return data;
   }
 }

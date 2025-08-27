@@ -5,7 +5,7 @@ import {
   IOfficeRepository,
   OFFICE_REPOSITORY,
 } from 'src/2_domain/office/repositories/office.repository.interface';
-import { OfficeAggregate } from 'src/2_domain/office/aggregates/office.aggregate'; // << Import
+import { OfficeAggregate } from 'src/2_domain/office/aggregates/office.aggregate';
 
 @QueryHandler(GetOfficeByIdQuery)
 export class GetOfficeByIdHandler

@@ -28,24 +28,24 @@ export class UpdateManufacturerHandler
     command: UpdateManufacturerCommand,
   ): Promise<ManufacturerAggregate> {
     const { id, payload } = command;
-    const manufacturer = await this.aggregateRepository.findById(id);
-    if (!manufacturer.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(MANUFACTURER_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = manufacturer.version;
-    manufacturer.updateManufacturer(payload);
+    const expectedVersion = data.version;
+    data.updateManufacturer(payload);
 
-    const events = manufacturer.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        manufacturer.id,
-        manufacturer.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      manufacturer.commit();
+      data.commit();
     }
-    return manufacturer;
+    return data;
   }
 }

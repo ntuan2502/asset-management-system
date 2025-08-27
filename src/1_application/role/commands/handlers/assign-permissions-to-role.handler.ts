@@ -42,32 +42,30 @@ export class AssignPermissionsToRoleHandler
       throw new Error(PERMISSION_ERRORS.INVALID_IDS);
     }
 
-    const role = await this.aggregateRepository.findById(roleId);
-    if (!role.id) {
+    const data = await this.aggregateRepository.findById(roleId);
+    if (!data.id) {
       throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(roleId));
     }
 
-    const expectedVersion = role.version;
-    role.assignPermissions(payload.permissionIds);
+    const expectedVersion = data.version;
+    data.assignPermissions(payload.permissionIds);
 
-    const events = role.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        role.id,
-        role.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      role.commit();
+      data.commit();
     }
 
     await new Promise((resolve) => setTimeout(resolve, 200));
     const updatedRole =
       await this.roleRepository.findByIdWithPermissions(roleId);
     if (!updatedRole) {
-      throw new NotFoundException(
-        `Role with ID "${roleId}" not found after update.`,
-      );
+      throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(roleId));
     }
 
     return updatedRole;

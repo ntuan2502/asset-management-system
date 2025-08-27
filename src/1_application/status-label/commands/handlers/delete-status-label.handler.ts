@@ -19,23 +19,23 @@ export class DeleteStatusLabelHandler
 
   async execute(command: DeleteStatusLabelCommand): Promise<void> {
     const { id } = command;
-    const statusLabel = await this.aggregateRepository.findById(id);
-    if (!statusLabel.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(STATUS_LABEL_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = statusLabel.version;
-    statusLabel.deleteStatusLabel();
+    const expectedVersion = data.version;
+    data.deleteStatusLabel();
 
-    const events = statusLabel.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        statusLabel.id,
-        statusLabel.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      statusLabel.commit();
+      data.commit();
     }
   }
 }

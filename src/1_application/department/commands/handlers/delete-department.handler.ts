@@ -19,23 +19,23 @@ export class DeleteDepartmentHandler
 
   async execute(command: DeleteDepartmentCommand): Promise<void> {
     const { id } = command;
-    const department = await this.aggregateRepository.findById(id);
-    if (!department.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(DEPARTMENT_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = department.version;
-    department.deleteDepartment();
+    const expectedVersion = data.version;
+    data.deleteDepartment();
 
-    const events = department.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        department.id,
-        department.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      department.commit();
+      data.commit();
     }
   }
 }

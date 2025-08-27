@@ -5,7 +5,7 @@ import {
   IDepartmentRepository,
   DEPARTMENT_REPOSITORY,
 } from 'src/2_domain/department/repositories/department.repository.interface';
-import { DepartmentAggregate } from 'src/2_domain/department/aggregates/department.aggregate'; // << Import
+import { DepartmentAggregate } from 'src/2_domain/department/aggregates/department.aggregate';
 
 @QueryHandler(GetDepartmentByIdQuery)
 export class GetDepartmentByIdHandler

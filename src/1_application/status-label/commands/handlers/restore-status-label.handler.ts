@@ -19,23 +19,23 @@ export class RestoreStatusLabelHandler
 
   async execute(command: RestoreStatusLabelCommand): Promise<void> {
     const { id } = command;
-    const statusLabel = await this.aggregateRepository.findById(id);
-    if (!statusLabel.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(STATUS_LABEL_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = statusLabel.version;
-    statusLabel.restoreStatusLabel();
+    const expectedVersion = data.version;
+    data.restoreStatusLabel();
 
-    const events = statusLabel.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        statusLabel.id,
-        statusLabel.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      statusLabel.commit();
+      data.commit();
     }
   }
 }

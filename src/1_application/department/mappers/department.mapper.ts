@@ -4,7 +4,6 @@ import {
 } from '@prisma/client';
 import { DepartmentAggregate } from 'src/2_domain/department/aggregates/department.aggregate';
 
-// Kiểu dữ liệu Prisma trả về khi include
 type PrismaDepartmentWithOffice = PrismaDepartment & { office?: PrismaOffice };
 
 export class DepartmentMapper {

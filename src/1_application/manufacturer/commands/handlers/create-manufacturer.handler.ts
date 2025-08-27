@@ -35,20 +35,13 @@ export class CreateManufacturerHandler
       throw new Error(MANUFACTURER_ERRORS.ALREADY_EXISTS(input.name));
     }
 
-    const manufacturer = this.publisher.mergeObjectContext(
-      new ManufacturerAggregate(),
-    );
-    manufacturer.createManufacturer({ name: input.name });
+    const data = this.publisher.mergeObjectContext(new ManufacturerAggregate());
+    data.createManufacturer({ name: input.name });
 
-    const events = manufacturer.getUncommittedEvents();
-    await this.eventStore.saveEvents(
-      manufacturer.id,
-      manufacturer.aggregateType,
-      events,
-      0,
-    );
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
 
-    manufacturer.commit();
-    return manufacturer;
+    data.commit();
+    return data;
   }
 }

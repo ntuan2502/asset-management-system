@@ -34,25 +34,25 @@ export class AssignRoleToUserHandler
       throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(roleId));
     }
 
-    const user = await this.userAggregateRepository.findById(userId);
-    if (!user.id) {
+    const data = await this.userAggregateRepository.findById(userId);
+    if (!data.id) {
       throw new NotFoundException(USER_ERRORS.NOT_FOUND(userId));
     }
 
-    const expectedVersion = user.version;
-    user.assignRole(roleId);
+    const expectedVersion = data.version;
+    data.assignRole(roleId);
 
-    const events = user.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        user.id,
-        user.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      user.commit();
+      data.commit();
     }
 
-    return user;
+    return data;
   }
 }

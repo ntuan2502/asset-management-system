@@ -35,20 +35,13 @@ export class CreateStatusLabelHandler
       throw new Error(STATUS_LABEL_ERRORS.ALREADY_EXISTS(input.name));
     }
 
-    const statusLabel = this.publisher.mergeObjectContext(
-      new StatusLabelAggregate(),
-    );
-    statusLabel.createStatusLabel({ name: input.name });
+    const data = this.publisher.mergeObjectContext(new StatusLabelAggregate());
+    data.createStatusLabel({ name: input.name });
 
-    const events = statusLabel.getUncommittedEvents();
-    await this.eventStore.saveEvents(
-      statusLabel.id,
-      statusLabel.aggregateType,
-      events,
-      0,
-    );
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
 
-    statusLabel.commit();
-    return statusLabel;
+    data.commit();
+    return data;
   }
 }

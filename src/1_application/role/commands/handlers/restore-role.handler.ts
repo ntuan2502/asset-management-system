@@ -17,23 +17,23 @@ export class RestoreRoleHandler implements ICommandHandler<RestoreRoleCommand> {
 
   async execute(command: RestoreRoleCommand): Promise<void> {
     const { id } = command;
-    const role = await this.aggregateRepository.findById(id);
-    if (!role.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(ROLE_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = role.version;
-    role.restoreRole();
+    const expectedVersion = data.version;
+    data.restoreRole();
 
-    const events = role.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        role.id,
-        role.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      role.commit();
+      data.commit();
     }
   }
 }

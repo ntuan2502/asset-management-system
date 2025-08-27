@@ -26,24 +26,24 @@ export class UpdateCategoryHandler
 
   async execute(command: UpdateCategoryCommand): Promise<CategoryAggregate> {
     const { id, payload } = command;
-    const category = await this.aggregateRepository.findById(id);
-    if (!category.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(DEPARTMENT_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = category.version;
-    category.updateCategory(payload);
+    const expectedVersion = data.version;
+    data.updateCategory(payload);
 
-    const events = category.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        category.id,
-        category.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      category.commit();
+      data.commit();
     }
-    return category;
+    return data;
   }
 }

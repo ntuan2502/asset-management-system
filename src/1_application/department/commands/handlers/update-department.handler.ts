@@ -28,37 +28,39 @@ export class UpdateDepartmentHandler
     command: UpdateDepartmentCommand,
   ): Promise<DepartmentAggregate> {
     const { id, payload } = command;
-    const department = await this.aggregateRepository.findById(id);
-    if (!department.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(DEPARTMENT_ERRORS.NOT_FOUND(id));
     }
 
-    // Kiểm tra trùng lặp tên nếu tên được thay đổi
-    if (payload.name && payload.name !== department.name) {
+    if (payload.name && payload.name !== data.name) {
       const isDuplicate = await this.departmentRepository.doesNameExistInOffice(
         payload.name,
-        department.officeId,
+        data.officeId,
       );
       if (isDuplicate) {
         throw new Error(
-          `Department with name "${payload.name}" already exists in this office.`,
+          DEPARTMENT_ERRORS.ALREADY_EXISTS_IN_OFFICE(
+            payload.name,
+            data.officeId,
+          ),
         );
       }
     }
 
-    const expectedVersion = department.version;
-    department.updateDepartment(payload);
+    const expectedVersion = data.version;
+    data.updateDepartment(payload);
 
-    const events = department.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        department.id,
-        department.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      department.commit();
+      data.commit();
     }
-    return department;
+    return data;
   }
 }

@@ -19,23 +19,23 @@ export class DeleteManufacturerHandler
 
   async execute(command: DeleteManufacturerCommand): Promise<void> {
     const { id } = command;
-    const manufacturer = await this.aggregateRepository.findById(id);
-    if (!manufacturer.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(MANUFACTURER_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = manufacturer.version;
-    manufacturer.deleteManufacturer();
+    const expectedVersion = data.version;
+    data.deleteManufacturer();
 
-    const events = manufacturer.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        manufacturer.id,
-        manufacturer.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      manufacturer.commit();
+      data.commit();
     }
   }
 }

@@ -18,23 +18,23 @@ export class RestoreUserHandler implements ICommandHandler<RestoreUserCommand> {
   async execute(command: RestoreUserCommand): Promise<void> {
     const { id } = command;
 
-    const user = await this.aggregateRepository.findById(id);
-    if (!user.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(USER_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = user.version;
-    user.restoreUser();
+    const expectedVersion = data.version;
+    data.restoreUser();
 
-    const events = user.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        user.id,
-        user.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      user.commit();
+      data.commit();
     }
   }
 }

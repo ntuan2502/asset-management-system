@@ -18,7 +18,11 @@ import {
   IManufacturerRepository,
   MANUFACTURER_REPOSITORY,
 } from 'src/2_domain/manufacturer/repositories/manufacturer.repository.interface';
-import { PRODUCT_ERRORS } from 'src/shared/constants/error-messages.constants';
+import {
+  CATEGORY_ERRORS,
+  MANUFACTURER_ERRORS,
+  PRODUCT_ERRORS,
+} from 'src/shared/constants/error-messages.constants';
 
 @CommandHandler(CreateProductCommand)
 export class CreateProductHandler
@@ -38,48 +42,32 @@ export class CreateProductHandler
   async execute(command: CreateProductCommand): Promise<ProductAggregate> {
     const { input } = command;
 
-    // --- Bắt đầu Validation ---
-
-    // 1. Validation: Tên sản phẩm không được trùng lặp
     const existingProduct = await this.productRepository.findByName(input.name);
     if (existingProduct) {
       throw new Error(PRODUCT_ERRORS.ALREADY_EXISTS(input.name));
     }
 
-    // 2. Validation: Category phải tồn tại
     const category = await this.categoryRepository.findById(input.categoryId);
     if (!category) {
-      throw new NotFoundException(
-        `Category with ID "${input.categoryId}" not found.`,
-      );
+      throw new NotFoundException(CATEGORY_ERRORS.NOT_FOUND(input.categoryId));
     }
 
-    // 3. Validation: Manufacturer phải tồn tại
     const manufacturer = await this.manufacturerRepository.findById(
       input.manufacturerId,
     );
     if (!manufacturer) {
       throw new NotFoundException(
-        `Manufacturer with ID "${input.manufacturerId}" not found.`,
+        MANUFACTURER_ERRORS.NOT_FOUND(input.manufacturerId),
       );
     }
 
-    // --- Kết thúc Validation ---
+    const data = this.publisher.mergeObjectContext(new ProductAggregate());
+    data.createProduct(input);
 
-    // Tạo aggregate và phát ra sự kiện
-    const product = this.publisher.mergeObjectContext(new ProductAggregate());
-    product.createProduct(input);
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
 
-    // Lưu và publish sự kiện
-    const events = product.getUncommittedEvents();
-    await this.eventStore.saveEvents(
-      product.id,
-      product.aggregateType,
-      events,
-      0,
-    );
-
-    product.commit();
-    return product;
+    data.commit();
+    return data;
   }
 }

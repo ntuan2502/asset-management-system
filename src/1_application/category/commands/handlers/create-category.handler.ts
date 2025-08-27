@@ -33,18 +33,13 @@ export class CreateCategoryHandler
       throw new Error(CATEGORY_ERRORS.ALREADY_EXISTS(input.name));
     }
 
-    const category = this.publisher.mergeObjectContext(new CategoryAggregate());
-    category.createCategory({ name: input.name });
+    const data = this.publisher.mergeObjectContext(new CategoryAggregate());
+    data.createCategory({ name: input.name });
 
-    const events = category.getUncommittedEvents();
-    await this.eventStore.saveEvents(
-      category.id,
-      category.aggregateType,
-      events,
-      0,
-    );
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
 
-    category.commit();
-    return category;
+    data.commit();
+    return data;
   }
 }

@@ -28,24 +28,24 @@ export class UpdateStatusLabelHandler
     command: UpdateStatusLabelCommand,
   ): Promise<StatusLabelAggregate> {
     const { id, payload } = command;
-    const statusLabel = await this.aggregateRepository.findById(id);
-    if (!statusLabel.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(STATUS_LABEL_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = statusLabel.version;
-    statusLabel.updateStatusLabel(payload);
+    const expectedVersion = data.version;
+    data.updateStatusLabel(payload);
 
-    const events = statusLabel.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        statusLabel.id,
-        statusLabel.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      statusLabel.commit();
+      data.commit();
     }
-    return statusLabel;
+    return data;
   }
 }

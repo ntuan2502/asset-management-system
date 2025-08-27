@@ -19,23 +19,21 @@ export class DeleteAttributeHandler
 
   async execute(command: DeleteAttributeCommand): Promise<void> {
     const { id } = command;
-    const attribute = await this.aggregateRepository.findById(id);
-    if (!attribute.id) {
-      throw new NotFoundException(ATTRIBUTE_ERRORS.NOT_FOUND(id));
-    }
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) throw new NotFoundException(ATTRIBUTE_ERRORS.NOT_FOUND(id));
 
-    const expectedVersion = attribute.version;
-    attribute.deleteAttribute();
+    const expectedVersion = data.version;
+    data.deleteAttribute();
 
-    const events = attribute.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        attribute.id,
-        attribute.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      attribute.commit();
+      data.commit();
     }
   }
 }

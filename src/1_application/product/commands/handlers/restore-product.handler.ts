@@ -19,24 +19,23 @@ export class RestoreProductHandler
 
   async execute(command: RestoreProductCommand): Promise<void> {
     const { id } = command;
-    // Tải aggregate, bao gồm cả các bản ghi đã bị soft-delete
-    const product = await this.aggregateRepository.findById(id);
-    if (!product.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(PRODUCT_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = product.version;
-    product.restoreProduct();
+    const expectedVersion = data.version;
+    data.restoreProduct();
 
-    const events = product.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        product.id,
-        product.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      product.commit();
+      data.commit();
     }
   }
 }

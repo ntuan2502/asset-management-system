@@ -5,7 +5,7 @@ import {
   IRoleRepository,
   ROLE_REPOSITORY,
 } from 'src/2_domain/role/repositories/role.repository.interface';
-import { RoleAggregate } from 'src/2_domain/role/aggregates/role.aggregate'; // << Import
+import { RoleAggregate } from 'src/2_domain/role/aggregates/role.aggregate';
 
 @QueryHandler(GetRolesByIdsQuery)
 export class GetRolesByIdsHandler

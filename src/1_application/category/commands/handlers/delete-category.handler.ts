@@ -19,23 +19,23 @@ export class DeleteCategoryHandler
 
   async execute(command: DeleteCategoryCommand): Promise<void> {
     const { id } = command;
-    const category = await this.aggregateRepository.findById(id);
-    if (!category.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(CATEGORY_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = category.version;
-    category.deleteCategory();
+    const expectedVersion = data.version;
+    data.deleteCategory();
 
-    const events = category.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        category.id,
-        category.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      category.commit();
+      data.commit();
     }
   }
 }

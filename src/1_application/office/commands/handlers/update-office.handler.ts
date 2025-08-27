@@ -20,24 +20,24 @@ export class UpdateOfficeHandler
 
   async execute(command: UpdateOfficeCommand): Promise<OfficeAggregate> {
     const { id, payload } = command;
-    const office = await this.aggregateRepository.findById(id);
-    if (!office.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(OFFICE_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = office.version;
-    office.updateOffice(payload);
+    const expectedVersion = data.version;
+    data.updateOffice(payload);
 
-    const events = office.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        office.id,
-        office.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      office.commit();
+      data.commit();
     }
-    return office;
+    return data;
   }
 }

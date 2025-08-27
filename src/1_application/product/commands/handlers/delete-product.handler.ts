@@ -19,23 +19,23 @@ export class DeleteProductHandler
 
   async execute(command: DeleteProductCommand): Promise<void> {
     const { id } = command;
-    const product = await this.aggregateRepository.findById(id);
-    if (!product.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(PRODUCT_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = product.version;
-    product.deleteProduct();
+    const expectedVersion = data.version;
+    data.deleteProduct();
 
-    const events = product.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        product.id,
-        product.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      product.commit();
+      data.commit();
     }
   }
 }

@@ -28,15 +28,15 @@ export class CreateRoleHandler implements ICommandHandler<CreateRoleCommand> {
       throw new Error(ROLE_ERRORS.ALREADY_EXISTS(input.name));
     }
 
-    const role = this.publisher.mergeObjectContext(new RoleAggregate());
+    const data = this.publisher.mergeObjectContext(new RoleAggregate());
 
-    role.createRole(input);
+    data.createRole(input);
 
-    const events = role.getUncommittedEvents();
-    await this.eventStore.saveEvents(role.id, role.aggregateType, events, 0);
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
 
-    role.commit();
+    data.commit();
 
-    return role;
+    return data;
   }
 }

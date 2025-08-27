@@ -19,23 +19,23 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   async execute(command: DeleteUserCommand): Promise<void> {
     const { id } = command;
 
-    const user = await this.aggregateRepository.findById(id);
-    if (!user.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(USER_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = user.version;
-    user.deleteUser();
+    const expectedVersion = data.version;
+    data.deleteUser();
 
-    const events = user.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        user.id,
-        user.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      user.commit();
+      data.commit();
     }
   }
 }

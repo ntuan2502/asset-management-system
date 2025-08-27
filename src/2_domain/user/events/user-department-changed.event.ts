@@ -1,7 +1,7 @@
 import { IEvent } from '@nestjs/cqrs';
 
 export interface UserDepartmentChangedPayload {
-  id: string; // userId
+  id: string;
   newDepartmentId: string | null;
   changedAt: Date;
 }

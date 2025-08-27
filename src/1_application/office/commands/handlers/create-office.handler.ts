@@ -35,18 +35,13 @@ export class CreateOfficeHandler
       throw new Error(OFFICE_ERRORS.DUPLICATE);
     }
 
-    const office = this.publisher.mergeObjectContext(new OfficeAggregate());
-    office.createOffice(input);
+    const data = this.publisher.mergeObjectContext(new OfficeAggregate());
+    data.createOffice(input);
 
-    const events = office.getUncommittedEvents();
-    await this.eventStore.saveEvents(
-      office.id,
-      office.aggregateType,
-      events,
-      0,
-    );
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
 
-    office.commit();
-    return office;
+    data.commit();
+    return data;
   }
 }

@@ -71,9 +71,9 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(input.password, saltRounds);
-    const user = this.publisher.mergeObjectContext(new UserAggregate());
+    const data = this.publisher.mergeObjectContext(new UserAggregate());
 
-    user.createUser({
+    data.createUser({
       email: input.email,
       hashedPassword: hashedPassword,
       firstName: input.firstName,
@@ -84,11 +84,11 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       departmentId: input.departmentId,
     });
 
-    const events = user.getUncommittedEvents();
-    await this.eventStore.saveEvents(user.id, user.aggregateType, events, 0);
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
 
-    user.commit();
+    data.commit();
 
-    return user;
+    return data;
   }
 }

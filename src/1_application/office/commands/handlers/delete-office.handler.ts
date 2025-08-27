@@ -19,23 +19,23 @@ export class DeleteOfficeHandler
 
   async execute(command: DeleteOfficeCommand): Promise<void> {
     const { id } = command;
-    const office = await this.aggregateRepository.findById(id);
-    if (!office.id) {
+    const data = await this.aggregateRepository.findById(id);
+    if (!data.id) {
       throw new NotFoundException(OFFICE_ERRORS.NOT_FOUND(id));
     }
 
-    const expectedVersion = office.version;
-    office.deleteOffice();
+    const expectedVersion = data.version;
+    data.deleteOffice();
 
-    const events = office.getUncommittedEvents();
+    const events = data.getUncommittedEvents();
     if (events.length > 0) {
       await this.eventStore.saveEvents(
-        office.id,
-        office.aggregateType,
+        data.id,
+        data.aggregateType,
         events,
         expectedVersion,
       );
-      office.commit();
+      data.commit();
     }
   }
 }

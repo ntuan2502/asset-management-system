@@ -67,26 +67,22 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string,
   ) {
-    // 1. **Tạo bản ghi Session TẠM THỜI**
     const refreshTokenExpiresAt = new Date();
     refreshTokenExpiresAt.setDate(refreshTokenExpiresAt.getDate() + 7);
 
-    // Tạo session trước để lấy ID
     const session = await this.prisma.session.create({
       data: {
         userId: user.id,
         ipAddress,
         userAgent,
         expiresAt: refreshTokenExpiresAt,
-        // hashedRefreshToken và lastAccessTokenId sẽ được cập nhật sau
       },
     });
 
-    // 2. **Tạo Refresh Token DUY NHẤT**
     const refreshTokenPayload: RefreshTokenPayload = {
       sub: user.id,
       sessionId: session.id,
-    }; // << THÊM sessionId
+    };
     const refreshToken = this.jwtService.sign(refreshTokenPayload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get<string>(
@@ -95,7 +91,6 @@ export class AuthService {
     });
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-    // 3. **Tạo Access Token**
     const accessTokenId = createId();
     const accessTokenPayload: AccessTokenPayload = {
       sub: user.id,
@@ -108,7 +103,6 @@ export class AuthService {
       expiresIn: this.configService.get<string>('JWT_SECRET_EXPIRES_IN'),
     });
 
-    // 4. **Cập nhật lại Session với các token đã tạo**
     await this.prisma.session.update({
       where: { id: session.id },
       data: {
@@ -121,15 +115,13 @@ export class AuthService {
   }
 
   async refreshToken(userId: string, refreshToken: string, sessionId: string) {
-    // 1. **Query trực tiếp vào session cụ thể**
     const session = await this.prisma.session.findUnique({
       where: { id: sessionId },
     });
 
-    // 2. **Xác thực session**
     if (
       !session ||
-      session.userId !== userId || // Đảm bảo session này thuộc về đúng user
+      session.userId !== userId ||
       session.revokedAt ||
       !session.hashedRefreshToken ||
       !(await bcrypt.compare(refreshToken, session.hashedRefreshToken)) ||

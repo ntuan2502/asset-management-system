@@ -23,7 +23,7 @@ export const AUTH_ERRORS = {
 
   // Session validation
   NO_ACTIVE_SESSIONS: 'No active sessions found.',
-  SESSION_INVALID: 'Session is invalid or has expired.', // Giữ lại cho các trường hợp chung
+  SESSION_INVALID: 'Session is invalid or has expired.',
   USER_FOR_SESSION_NOT_FOUND: 'User for this session not found.',
 };
 
@@ -60,6 +60,8 @@ export const OFFICE_ERRORS = {
   ALREADY_DELETED: 'Cannot delete an office that has already been deleted.',
   CANNOT_UPDATE_DELETED: 'Cannot update a deleted office.',
   IS_ACTIVE: 'Cannot restore an active office.',
+  INCONSISTENT_DEPARTMENT:
+    'Department does not belong to the specified office.',
 };
 
 export const DEPARTMENT_ERRORS = {
@@ -69,6 +71,8 @@ export const DEPARTMENT_ERRORS = {
   ALREADY_DELETED: 'Cannot delete a department that has already been deleted.',
   CANNOT_UPDATE_DELETED: 'Cannot update a deleted department.',
   IS_ACTIVE: 'Cannot restore an active department.',
+  ALREADY_EXISTS_IN_OFFICE: (name: string, officeId: string) =>
+    `Department with name "${name}" already exists in office "${officeId}".`,
 };
 
 export const STATUS_LABEL_ERRORS = {

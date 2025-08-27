@@ -25,33 +25,23 @@ export class CreateAttributeHandler
 
   async execute(command: CreateAttributeCommand): Promise<AttributeAggregate> {
     const { input } = command;
-
-    // Validation: Tên không được trùng
     const existingAttribute = await this.attributeRepository.findByName(
       input.name,
     );
-    if (existingAttribute) {
-      throw new Error(ATTRIBUTE_ERRORS.ALREADY_EXISTS(input.name));
-    }
 
-    const attribute = this.publisher.mergeObjectContext(
-      new AttributeAggregate(),
-    );
-    attribute.createAttribute({
+    if (existingAttribute)
+      throw new Error(ATTRIBUTE_ERRORS.ALREADY_EXISTS(input.name));
+
+    const data = this.publisher.mergeObjectContext(new AttributeAggregate());
+    data.createAttribute({
       name: input.name,
       unit: input.unit,
       valueType: input.valueType,
     });
 
-    const events = attribute.getUncommittedEvents();
-    await this.eventStore.saveEvents(
-      attribute.id,
-      attribute.aggregateType,
-      events,
-      0,
-    );
-
-    attribute.commit();
-    return attribute;
+    const events = data.getUncommittedEvents();
+    await this.eventStore.saveEvents(data.id, data.aggregateType, events, 0);
+    data.commit();
+    return data;
   }
 }
